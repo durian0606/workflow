@@ -377,13 +377,12 @@
         }
         
         .task-checkbox {
-            width: 24px;
-            height: 24px;
-            min-width: 24px;
-            border: 2px solid #d0d0d0;
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            border: 2px solid #ccc;
             border-radius: 50%;
             cursor: pointer;
-            margin-top: 2px;
             background: white;
             transition: all 0.2s;
         }
@@ -402,7 +401,7 @@
             content: '✓';
             position: absolute;
             color: white;
-            font-size: 14px;
+            font-size: 12px;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -414,9 +413,9 @@
         }
         
         .task-title {
-            font-size: 15px;
+            font-size: 14px;
             color: #333;
-            margin-bottom: 4px;
+            font-weight: 500;
             line-height: 1.4;
         }
         
@@ -428,32 +427,30 @@
         .task-meta {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
+            margin-top: 4px;
         }
         
         .task-date {
-            font-size: 13px;
-            color: #0d7377;
-            font-weight: 500;
+            font-size: 11px;
+            color: #666;
         }
 
         .test-date-label {
-            font-size: 12px;
+            font-size: 11px;
             background: #e8f4f5;
             color: #0d7377;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-weight: 500;
+            padding: 2px 8px;
+            border-radius: 10px;
         }
 
         .task-assignee {
-            font-size: 12px;
+            font-size: 11px;
             background: #f0f9f9;
             color: #0d7377;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-weight: 500;
+            padding: 2px 8px;
+            border-radius: 10px;
         }
         
         .task-right {
@@ -475,13 +472,13 @@
         }
         
         .assignee-select {
-            padding: 6px 8px;
+            padding: 4px 8px;
             border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 12px;
+            border-radius: 4px;
+            font-size: 11px;
             background: white;
             cursor: pointer;
-            min-width: 90px;
+            min-width: 70px;
         }
         
         .assignee-select:focus {
@@ -495,31 +492,31 @@
         }
         
         .action-btn {
-            background: #ffe0e0;
+            background: none;
             border: none;
-            color: #d13438;
+            color: #999;
             cursor: pointer;
-            padding: 6px 10px;
+            padding: 4px;
             font-size: 16px;
-            border-radius: 6px;
+            border-radius: 4px;
             transition: all 0.2s;
         }
         
         .action-btn:hover {
-            background: #ffcccc;
-            color: #a01c1f;
+            background: #ffe0e0;
+            color: #d13438;
         }
         
         .section-header {
-            color: #666;
-            font-size: 13px;
+            color: #999;
+            font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
-            margin: 20px 0 12px 0;
+            margin: 16px 0 8px 0;
             letter-spacing: 0.5px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .section-header.my-work {
@@ -527,8 +524,8 @@
         }
 
         .section-divider {
-            margin: 30px 0;
-            border-bottom: 2px solid #e0e0e0;
+            margin: 20px 0;
+            border-bottom: 1px solid #e8e8e8;
         }
 
         .empty-state {
@@ -856,7 +853,7 @@
         // 초기화
         window.onload = function() {
             loadAssignees();
-            initMap();
+            // 지도는 로그인 후에 초기화
         };
 
         // 카카오맵 초기화
@@ -1002,11 +999,18 @@
             loadWorks();
             loadSites();
             
-            // 지도 초기화를 약간 지연시켜서 DOM이 완전히 렌더링된 후 실행
+            // 로그인 후 지도 초기화 - 약간 지연시켜서 DOM 렌더링 완료 후 실행
             setTimeout(() => {
+                console.log('지도 초기화 시작...');
                 initMap();
-                showCurrentLocation();
-            }, 100);
+                
+                // 지도가 생성되었는지 확인 후 위치 표시
+                setTimeout(() => {
+                    if (map) {
+                        showCurrentLocation();
+                    }
+                }, 500);
+            }, 300);
         };
 
         // 로그아웃
@@ -1220,7 +1224,7 @@
             if (work.assignee) {
                 const assigneeTag = document.createElement('span');
                 assigneeTag.className = 'task-assignee';
-                assigneeTag.textContent = '👤 ' + work.assignee;
+                assigneeTag.textContent = work.assignee;
                 meta.appendChild(assigneeTag);
             }
             
@@ -1228,12 +1232,14 @@
             if (work.testDate) {
                 const testDateTag = document.createElement('span');
                 testDateTag.className = 'test-date-label';
-                testDateTag.textContent = '시험일: ' + work.testDate;
+                testDateTag.textContent = '시험 ' + work.testDate;
                 meta.appendChild(testDateTag);
             }
             
             content.appendChild(title);
-            content.appendChild(meta);
+            if (meta.children.length > 0) {
+                content.appendChild(meta);
+            }
             card.appendChild(checkbox);
             card.appendChild(content);
             
@@ -1244,17 +1250,13 @@
                 const assigneeSection = document.createElement('div');
                 assigneeSection.className = 'assignee-section';
                 
-                const label = document.createElement('span');
-                label.className = 'assignee-label';
-                label.textContent = '담당';
-                
                 const select = document.createElement('select');
                 select.className = 'assignee-select';
                 select.onclick = (e) => e.stopPropagation();
                 
                 const defaultOption = document.createElement('option');
                 defaultOption.value = '';
-                defaultOption.textContent = '선택';
+                defaultOption.textContent = '-';
                 select.appendChild(defaultOption);
                 
                 assignees.forEach(assignee => {
@@ -1269,7 +1271,6 @@
                 
                 select.onchange = () => saveAssignee(work.id, select.value);
                 
-                assigneeSection.appendChild(label);
                 assigneeSection.appendChild(select);
                 rightSection.appendChild(assigneeSection);
             }
