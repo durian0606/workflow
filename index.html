@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>작업 관리 & 위치 추적</title>
+    <title>작업 관리</title>
     <style>
         * {
             margin: 0;
@@ -17,23 +17,139 @@
             overflow: hidden;
             background: linear-gradient(135deg, #0d7377 0%, #14ccb8 100%);
         }
-        
-        .container {
+
+        /* 로그인 화면 */
+        .login-container {
             display: flex;
+            align-items: center;
+            justify-content: center;
             height: 100vh;
         }
-        
-        .main-panel {
-            width: 100%;
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .login-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #0d7377;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .user-list-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .user-card {
+            padding: 20px;
+            background: #f5f7fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .user-card:hover {
+            background: #0d7377;
+            color: white;
+            border-color: #0d7377;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13,115,119,0.3);
+        }
+
+        .user-card-avatar {
+            width: 50px;
+            height: 50px;
+            background: rgba(13,115,119,0.1);
+            border-radius: 50%;
             display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 20px;
+            margin: 0 auto 10px;
+            color: #0d7377;
+        }
+
+        .user-card:hover .user-card-avatar {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+
+        .user-card-name {
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .admin-section {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .admin-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .admin-input:focus {
+            outline: none;
+            border-color: #0d7377;
+        }
+
+        .admin-btn {
+            width: 100%;
+            padding: 12px;
+            background: #0d7377;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .admin-btn:hover {
+            background: #14ccb8;
+        }
+        
+        /* 메인 앱 */
+        .app-container {
+            display: none;
+            height: 100vh;
             flex-direction: column;
             background: #f5f7fa;
+        }
+
+        .app-container.active {
+            display: flex;
         }
         
         .app-header {
             background: linear-gradient(135deg, #0d7377 0%, #14ccb8 100%);
             color: white;
-            padding: 20px;
+            padding: 16px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -43,40 +159,48 @@
         .header-left {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
-        
-        .menu-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 5px;
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .header-info {
+            display: flex;
+            flex-direction: column;
         }
         
         .app-title {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 600;
         }
-        
-        .header-actions {
-            display: flex;
-            gap: 10px;
+
+        .user-name {
+            font-size: 13px;
+            opacity: 0.9;
         }
         
-        .header-btn {
+        .logout-btn {
             background: rgba(255,255,255,0.2);
             border: none;
             color: white;
-            padding: 8px 12px;
+            padding: 8px 16px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 14px;
             transition: background 0.2s;
         }
         
-        .header-btn:hover {
+        .logout-btn:hover {
             background: rgba(255,255,255,0.3);
         }
         
@@ -113,6 +237,55 @@
         }
         
         .nav-btn:hover {
+            background: #14ccb8;
+        }
+
+        /* 탭 네비게이션 */
+        .tab-nav {
+            background: white;
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 16px;
+            background: none;
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: #0d7377;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #0d7377;
+        }
+
+        .tab-badge {
+            display: inline-block;
+            background: #0d7377;
+            color: white;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 6px;
+            font-weight: 600;
+        }
+
+        .tab-btn.active .tab-badge {
             background: #14ccb8;
         }
         
@@ -162,11 +335,17 @@
         .add-btn:hover {
             background: #14ccb8;
         }
-        
-        .task-list-container {
+
+        /* 탭 컨텐츠 */
+        .tab-content {
+            display: none;
             flex: 1;
             overflow-y: auto;
             padding: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
         }
         
         .task-card {
@@ -183,6 +362,10 @@
         
         .task-card:hover {
             box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .task-card.my-task {
+            border-left: 4px solid #0d7377;
         }
         
         .task-checkbox {
@@ -238,15 +421,50 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-wrap: wrap;
         }
         
         .task-date {
             font-size: 13px;
             color: #0d7377;
             font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+        }
+
+        .task-assignee {
+            font-size: 12px;
+            background: #f0f9f9;
+            color: #0d7377;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+        
+        .add-due-btn {
+            background: none;
+            border: 1px solid #e0e0e0;
+            color: #666;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .add-due-btn:hover {
+            background: #f5f7fa;
+            border-color: #0d7377;
+            color: #0d7377;
+        }
+        
+        .date-clickable {
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        .date-clickable:hover {
+            background: rgba(13, 115, 119, 0.1);
         }
         
         .task-right {
@@ -311,7 +529,20 @@
             margin: 20px 0 12px 0;
             letter-spacing: 0.5px;
         }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
         
+        /* 모달 */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -335,8 +566,6 @@
             padding: 24px;
             width: 90%;
             max-width: 400px;
-            max-height: 80vh;
-            overflow-y: auto;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
         
@@ -362,80 +591,6 @@
             padding: 0;
             width: 30px;
             height: 30px;
-        }
-        
-        .assignee-list {
-            list-style: none;
-            margin-bottom: 20px;
-        }
-        
-        .assignee-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            background: #f5f7fa;
-            border-radius: 8px;
-            margin-bottom: 8px;
-        }
-        
-        .assignee-name {
-            font-size: 14px;
-            color: #333;
-        }
-        
-        .remove-assignee-btn {
-            background: #d13438;
-            color: white;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        
-        .add-assignee-form {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .date-picker-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.3);
-            z-index: 10001;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .date-picker-modal.active {
-            display: flex;
-        }
-        
-        .date-picker-content {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            width: 90%;
-            max-width: 350px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
-        
-        .date-picker-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        
-        .date-picker-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
         }
         
         .quick-dates {
@@ -494,86 +649,77 @@
             border-radius: 8px;
             font-size: 14px;
         }
-        
-        .date-clickable {
-            cursor: pointer;
-            color: #0d7377;
-            font-weight: 500;
-        }
-        
-        .date-clickable:hover {
-            text-decoration: underline;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="main-panel">
-            <div class="app-header">
-                <div class="header-left">
-                    <button class="menu-btn">☰</button>
-                    <h1 class="app-title">작업 관리</h1>
-                </div>
-                <div class="header-actions">
-                    <button class="header-btn" id="assigneeBtn">👥 담당자</button>
-                </div>
-            </div>
+    <!-- 로그인 화면 -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <h1 class="login-title">작업 관리</h1>
+            <p class="user-list-title">사용자를 선택하세요</p>
+            <div class="user-grid" id="userGrid"></div>
             
-            <div class="date-nav-bar">
-                <div class="date-display" id="dateDisplay"></div>
-                <div class="nav-buttons">
-                    <button class="nav-btn" id="prevDateBtn">◀</button>
-                    <button class="nav-btn" id="nextDateBtn">▶</button>
-                </div>
-            </div>
-            
-            <div class="task-input-container">
-                <div class="task-form">
-                    <div class="form-row">
-                        <input type="text" class="task-input" id="siteInput" placeholder="현장명">
-                        <input type="text" class="task-input" id="workInput" placeholder="작업 내용 입력">
-                    </div>
-                    <button class="add-btn" id="addWorkBtn">+ 작업 추가</button>
-                </div>
-            </div>
-            
-            <div class="task-list-container" id="taskList">
-                <div class="loading">데이터를 불러오는 중...</div>
+            <div class="admin-section">
+                <input type="text" class="admin-input" id="newUserInput" placeholder="새 사용자 추가">
+                <button class="admin-btn" onclick="addNewUser()">추가</button>
             </div>
         </div>
     </div>
+
+    <!-- 메인 앱 -->
+    <div class="app-container" id="appContainer">
+        <div class="app-header">
+            <div class="header-left">
+                <div class="user-avatar" id="userAvatar"></div>
+                <div class="header-info">
+                    <div class="app-title">작업 관리</div>
+                    <div class="user-name" id="headerUserName"></div>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">로그아웃</button>
+        </div>
+        
+        <div class="date-nav-bar">
+            <div class="date-display" id="dateDisplay"></div>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="changeDate(-1)">◀</button>
+                <button class="nav-btn" onclick="changeDate(1)">▶</button>
+            </div>
+        </div>
+
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('my')" id="myTab">
+                내 작업<span class="tab-badge" id="myTaskCount">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('team')" id="teamTab">
+                팀 작업<span class="tab-badge" id="teamTaskCount">0</span>
+            </button>
+        </div>
+        
+        <div class="task-input-container">
+            <div class="task-form">
+                <div class="form-row">
+                    <input type="text" class="task-input" id="siteInput" placeholder="현장명">
+                    <input type="text" class="task-input" id="workInput" placeholder="작업 내용 입력">
+                </div>
+                <button class="add-btn" onclick="addWork()">+ 작업 추가</button>
+            </div>
+        </div>
+        
+        <div class="tab-content active" id="myTaskList"></div>
+        <div class="tab-content" id="teamTaskList"></div>
+    </div>
     
-    <div class="modal-overlay" id="assigneeModal">
+    <!-- 날짜 선택 모달 -->
+    <div class="modal-overlay" id="datePickerModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">담당자 관리</h3>
-                <button class="close-btn" id="closeAssigneeBtn">×</button>
-            </div>
-            
-            <ul class="assignee-list" id="assigneeList"></ul>
-            
-            <div class="add-assignee-form">
-                <input type="text" class="task-input" id="newAssigneeName" placeholder="새 담당자 이름">
-                <button class="add-btn" id="addAssigneeBtn">추가</button>
-            </div>
-        </div>
-    </div>
-    
-    <div class="date-picker-modal" id="datePickerModal">
-        <div class="date-picker-content">
-            <div class="date-picker-header">
-                <h3 class="date-picker-title">기한 설정</h3>
-                <button class="close-btn" id="closeDatePickerBtn">×</button>
+                <h3 class="modal-title">기한 설정</h3>
+                <button class="close-btn" onclick="closeDatePicker()">×</button>
             </div>
             
             <div class="quick-dates">
-                <button class="quick-date-btn" data-type="today">
+                <button class="quick-date-btn" onclick="setQuickDate('today')">
                     <span class="quick-date-icon">☀️</span>
                     <div class="quick-date-text">
                         <div class="quick-date-label">오늘</div>
@@ -581,7 +727,7 @@
                     </div>
                 </button>
                 
-                <button class="quick-date-btn" data-type="tomorrow">
+                <button class="quick-date-btn" onclick="setQuickDate('tomorrow')">
                     <span class="quick-date-icon">🌙</span>
                     <div class="quick-date-text">
                         <div class="quick-date-label">내일</div>
@@ -589,7 +735,7 @@
                     </div>
                 </button>
                 
-                <button class="quick-date-btn" data-type="nextWeek">
+                <button class="quick-date-btn" onclick="setQuickDate('nextWeek')">
                     <span class="quick-date-icon">📅</span>
                     <div class="quick-date-text">
                         <div class="quick-date-label">다음 주</div>
@@ -599,15 +745,15 @@
             </div>
             
             <div class="calendar-section">
-                <input type="date" class="calendar-input" id="customDateInput">
+                <input type="date" class="calendar-input" id="customDateInput" onchange="setCustomDate()">
             </div>
         </div>
     </div>
 
     <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, push, set, update, remove, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        
         const firebaseConfig = {
             apiKey: "AIzaSyAMv0BmH24fyd0F8CUTkSYSXMlvbcnUXU4",
             authDomain: "work-todo-6ab7f.firebaseapp.com",
@@ -617,165 +763,424 @@
             messagingSenderId: "263893669261",
             appId: "1:263893669261:web:bdce10bec177ff1f67d9c4"
         };
-
+        
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
+        
+        window.db = database;
+        window.dbRef = ref;
+        window.dbSet = set;
+        window.dbPush = push;
+        window.dbOnValue = onValue;
+        window.dbUpdate = update;
+        window.dbRemove = remove;
+    </script>
 
+    <script>
         let currentDate = new Date();
         let selectedWorkId = null;
-        let assignees = {};
         let works = {};
+        let assignees = [];
+        let currentUser = null;
+        let currentTab = 'my';
+        
+        // 초기화
+        window.onload = function() {
+            loadAssignees();
+        };
 
-        function setupRealtimeListeners() {
-            const worksRef = ref(database, 'works');
-            onValue(worksRef, (snapshot) => {
-                works = snapshot.val() || {};
-                renderWorks();
-            });
-
-            const assigneesRef = ref(database, 'assignees');
-            onValue(assigneesRef, (snapshot) => {
-                assignees = snapshot.val() || {};
-                renderAssigneeList();
+        // 사용자 목록 로드
+        function loadAssignees() {
+            const assigneesRef = window.dbRef(window.db, 'assignees');
+            window.dbOnValue(assigneesRef, (snapshot) => {
+                assignees = [];
+                const data = snapshot.val();
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        assignees.push({ id: key, name: data[key].name });
+                    });
+                }
+                renderUserGrid();
             });
         }
 
-        function addWork() {
-            const site = document.getElementById('siteInput').value.trim();
-            const work = document.getElementById('workInput').value.trim();
+        // 사용자 그리드 렌더링
+        function renderUserGrid() {
+            const grid = document.getElementById('userGrid');
+            grid.innerHTML = '';
             
-            if (!site || !work) {
-                alert('현장명과 작업 내용을 입력해주세요.');
-                return;
-            }
-
-            const worksRef = ref(database, 'works');
-            const newWorkRef = push(worksRef);
-            
-            set(newWorkRef, {
-                date: currentDate.toISOString().split('T')[0],
-                site: site,
-                work: work,
-                assignee: '',
-                completed: false,
-                dueDate: null,
-                completedDate: null,
-                createdAt: new Date().toISOString()
-            });
-            
-            document.getElementById('siteInput').value = '';
-            document.getElementById('workInput').value = '';
-        }
-
-        function toggleComplete(id) {
-            const work = works[id];
-            if (!work) return;
-
-            const workRef = ref(database, `works/${id}`);
-            update(workRef, {
-                completed: !work.completed,
-                completedDate: !work.completed ? new Date().toISOString().split('T')[0] : null
+            assignees.forEach(user => {
+                const card = document.createElement('div');
+                card.className = 'user-card';
+                card.onclick = () => login(user.name);
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'user-card-avatar';
+                avatar.textContent = user.name.charAt(0);
+                
+                const name = document.createElement('div');
+                name.className = 'user-card-name';
+                name.textContent = user.name;
+                
+                card.appendChild(avatar);
+                card.appendChild(name);
+                grid.appendChild(card);
             });
         }
 
-        function saveAssignee(id) {
-            const select = document.getElementById(`assignee-${id}`);
-            if (!select) return;
-
-            const workRef = ref(database, `works/${id}`);
-            update(workRef, {
-                assignee: select.value
-            });
-        }
-
-        function deleteWork(id) {
-            if (!confirm('이 작업을 삭제하시겠습니까?')) return;
-
-            const workRef = ref(database, `works/${id}`);
-            remove(workRef);
-        }
-
-        function addAssignee() {
-            const input = document.getElementById('newAssigneeName');
+        // 새 사용자 추가
+        window.addNewUser = function() {
+            const input = document.getElementById('newUserInput');
             const name = input.value.trim();
             
             if (!name) {
-                alert('담당자 이름을 입력해주세요.');
+                alert('사용자 이름을 입력하세요.');
                 return;
             }
             
-            const isDuplicate = Object.values(assignees).some(a => a.name === name);
-            if (isDuplicate) {
-                alert('이미 등록된 담당자입니다.');
+            if (assignees.some(a => a.name === name)) {
+                alert('이미 존재하는 사용자입니다.');
                 return;
             }
-
-            const assigneesRef = ref(database, 'assignees');
-            const newAssigneeRef = push(assigneesRef);
             
-            set(newAssigneeRef, {
-                name: name,
-                createdAt: new Date().toISOString()
-            });
+            const assigneesRef = window.dbRef(window.db, 'assignees');
+            const newAssigneeRef = window.dbPush(assigneesRef);
+            window.dbSet(newAssigneeRef, { name: name });
             
             input.value = '';
-        }
+        };
 
-        function removeAssignee(id, name) {
-            const updates = {};
-            Object.keys(works).forEach(workId => {
-                if (works[workId].assignee === name) {
-                    updates[`works/${workId}/assignee`] = '';
-                }
-            });
+        // 로그인
+        window.login = function(userName) {
+            currentUser = userName;
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('appContainer').classList.add('active');
             
-            updates[`assignees/${id}`] = null;
+            document.getElementById('userAvatar').textContent = userName.charAt(0);
+            document.getElementById('headerUserName').textContent = userName;
             
-            update(ref(database), updates);
-        }
+            updateDateDisplay();
+            loadWorks();
+        };
 
-        function renderAssigneeList() {
-            const list = document.getElementById('assigneeList');
-            list.innerHTML = '';
+        // 로그아웃
+        window.logout = function() {
+            currentUser = null;
+            currentTab = 'my';
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('appContainer').classList.remove('active');
+        };
+
+        // 탭 전환
+        window.switchTab = function(tab) {
+            currentTab = tab;
             
-            Object.keys(assignees).forEach(id => {
-                const assignee = assignees[id];
-                
-                const li = document.createElement('li');
-                li.className = 'assignee-item';
-                
-                const nameSpan = document.createElement('span');
-                nameSpan.className = 'assignee-name';
-                nameSpan.textContent = assignee.name;
-                
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'remove-assignee-btn';
-                deleteBtn.textContent = '삭제';
-                deleteBtn.onclick = () => removeAssignee(id, assignee.name);
-                
-                li.appendChild(nameSpan);
-                li.appendChild(deleteBtn);
-                list.appendChild(li);
-            });
-        }
+            document.getElementById('myTab').classList.toggle('active', tab === 'my');
+            document.getElementById('teamTab').classList.toggle('active', tab === 'team');
+            
+            document.getElementById('myTaskList').classList.toggle('active', tab === 'my');
+            document.getElementById('teamTaskList').classList.toggle('active', tab === 'team');
+        };
 
-        function toggleAssigneeModal() {
-            const modal = document.getElementById('assigneeModal');
-            modal.classList.toggle('active');
-        }
-
-        function changeDate(days) {
+        // 날짜 변경
+        window.changeDate = function(days) {
             currentDate.setDate(currentDate.getDate() + days);
             updateDateDisplay();
             renderWorks();
-        }
-
+        };
+        
         function updateDateDisplay() {
             const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' };
             document.getElementById('dateDisplay').textContent = currentDate.toLocaleDateString('ko-KR', options);
         }
 
-        function openDatePicker(workId) {
+        // 작업 추가
+        window.addWork = function() {
+            const site = document.getElementById('siteInput').value.trim();
+            const work = document.getElementById('workInput').value.trim();
+            
+            if (!site || !work) {
+                alert('현장명과 작업 내용을 입력하세요.');
+                return;
+            }
+            
+            const worksRef = window.dbRef(window.db, 'works');
+            const newWorkRef = window.dbPush(worksRef);
+            window.dbSet(newWorkRef, {
+                date: currentDate.toISOString().split('T')[0],
+                site: site,
+                work: work,
+                assignee: currentUser, // 작업 추가한 사람으로 자동 할당
+                completed: false,
+                dueDate: null,
+                completedDate: null
+            });
+            
+            document.getElementById('siteInput').value = '';
+            document.getElementById('workInput').value = '';
+        };
+        
+        // 작업 로드
+        function loadWorks() {
+            const worksRef = window.dbRef(window.db, 'works');
+            window.dbOnValue(worksRef, (snapshot) => {
+                works = snapshot.val() || {};
+                renderWorks();
+            });
+        }
+        
+        // 작업 렌더링
+        function renderWorks() {
+            const searchDate = currentDate.toISOString().split('T')[0];
+            const searchDateObj = new Date(searchDate);
+            
+            const myWorks = [];
+            const teamWorks = [];
+            
+            Object.keys(works).forEach(workId => {
+                const work = works[workId];
+                const workDate = new Date(work.date);
+                
+                let visibleWork = null;
+                
+                if (work.work === '시험') {
+                    if (workDate.toISOString().split('T')[0] === searchDate) {
+                        visibleWork = { ...work, id: workId, displayWork: '시험', originalDate: work.date };
+                    } else if (calculateBusinessDays(workDate, searchDateObj) === 1) {
+                        visibleWork = { ...work, id: workId, displayWork: '캡핑', originalDate: work.date };
+                    } else if (calculateBusinessDays(workDate, searchDateObj) === 2) {
+                        visibleWork = { ...work, id: workId, displayWork: '탈형', originalDate: work.date };
+                    } else if (calculateAbsoluteDays(workDate, searchDateObj) === 7) {
+                        visibleWork = { ...work, id: workId, displayWork: '7일 강도 시험', originalDate: work.date };
+                    } else if (calculateAbsoluteDays(workDate, searchDateObj) === 28) {
+                        visibleWork = { ...work, id: workId, displayWork: '28일 강도 시험', originalDate: work.date };
+                    }
+                } else {
+                    if (work.date === searchDate) {
+                        visibleWork = { ...work, id: workId, displayWork: work.work, originalDate: work.date };
+                    }
+                }
+                
+                if (visibleWork) {
+                    if (work.assignee === currentUser) {
+                        myWorks.push(visibleWork);
+                    } else {
+                        teamWorks.push(visibleWork);
+                    }
+                }
+            });
+            
+            renderTaskList('myTaskList', myWorks);
+            renderTaskList('teamTaskList', teamWorks);
+            
+            document.getElementById('myTaskCount').textContent = myWorks.filter(w => !w.completed).length;
+            document.getElementById('teamTaskCount').textContent = teamWorks.filter(w => !w.completed).length;
+        }
+        
+        // 작업 리스트 렌더링
+        function renderTaskList(containerId, workList) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            const activeWorks = workList.filter(w => !w.completed);
+            const completedWorks = workList.filter(w => w.completed);
+            
+            if (activeWorks.length > 0) {
+                const sectionHeader = document.createElement('div');
+                sectionHeader.className = 'section-header';
+                sectionHeader.textContent = '진행 중';
+                container.appendChild(sectionHeader);
+                
+                activeWorks.forEach(work => {
+                    container.appendChild(createWorkCard(work, false));
+                });
+            }
+            
+            if (completedWorks.length > 0) {
+                const sectionHeader = document.createElement('div');
+                sectionHeader.className = 'section-header';
+                sectionHeader.textContent = `완료됨 ${completedWorks.length}`;
+                container.appendChild(sectionHeader);
+                
+                completedWorks.forEach(work => {
+                    container.appendChild(createWorkCard(work, true));
+                });
+            }
+            
+            if (workList.length === 0) {
+                const emptyState = document.createElement('div');
+                emptyState.className = 'empty-state';
+                emptyState.innerHTML = `
+                    <div class="empty-icon">📋</div>
+                    <div>${containerId === 'myTaskList' ? '할당된 작업이 없습니다' : '다른 팀원의 작업이 없습니다'}</div>
+                `;
+                container.appendChild(emptyState);
+            }
+        }
+        
+        // 작업 카드 생성
+        function createWorkCard(work, isCompleted) {
+            const card = document.createElement('div');
+            card.className = 'task-card' + (isCompleted ? ' completed' : '');
+            if (work.assignee === currentUser) {
+                card.classList.add('my-task');
+            }
+            
+            const checkbox = document.createElement('div');
+            checkbox.className = 'task-checkbox';
+            checkbox.onclick = () => toggleComplete(work.id);
+            
+            const content = document.createElement('div');
+            content.className = 'task-content';
+            
+            const title = document.createElement('div');
+            title.className = 'task-title';
+            title.textContent = `${work.site} - ${work.displayWork}`;
+            
+            const meta = document.createElement('div');
+            meta.className = 'task-meta';
+            
+            if (work.assignee) {
+                const assigneeTag = document.createElement('span');
+                assigneeTag.className = 'task-assignee';
+                assigneeTag.textContent = '👤 ' + work.assignee;
+                meta.appendChild(assigneeTag);
+            }
+            
+            if (isCompleted) {
+                const dateDiv = document.createElement('div');
+                dateDiv.className = 'task-date';
+                if (work.completedDate) {
+                    dateDiv.textContent = `✓ ${work.completedDate}`;
+                    dateDiv.style.color = '#28a745';
+                } else {
+                    dateDiv.textContent = `✓ 완료됨`;
+                    dateDiv.style.color = '#28a745';
+                }
+                meta.appendChild(dateDiv);
+            } else {
+                if (work.dueDate) {
+                    const dateDiv = document.createElement('div');
+                    dateDiv.className = 'task-date date-clickable';
+                    
+                    const dueDate = new Date(work.dueDate);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    dueDate.setHours(0, 0, 0, 0);
+                    
+                    if (dueDate < today) {
+                        dateDiv.innerHTML = `🔴 ${work.dueDate}`;
+                        dateDiv.style.color = '#d13438';
+                    } else {
+                        dateDiv.innerHTML = `⏰ ${work.dueDate}`;
+                    }
+                    
+                    dateDiv.onclick = (e) => {
+                        e.stopPropagation();
+                        openDatePicker(work.id);
+                    };
+                    meta.appendChild(dateDiv);
+                } else {
+                    const addDueBtn = document.createElement('button');
+                    addDueBtn.className = 'add-due-btn';
+                    addDueBtn.textContent = '⏰ 기한';
+                    addDueBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        openDatePicker(work.id);
+                    };
+                    meta.appendChild(addDueBtn);
+                }
+            }
+            
+            content.appendChild(title);
+            content.appendChild(meta);
+            card.appendChild(checkbox);
+            card.appendChild(content);
+            
+            const rightSection = document.createElement('div');
+            rightSection.className = 'task-right';
+            
+            if (!isCompleted) {
+                const assigneeSection = document.createElement('div');
+                assigneeSection.className = 'assignee-section';
+                
+                const label = document.createElement('span');
+                label.className = 'assignee-label';
+                label.textContent = '담당';
+                
+                const select = document.createElement('select');
+                select.className = 'assignee-select';
+                
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = '선택';
+                select.appendChild(defaultOption);
+                
+                assignees.forEach(assignee => {
+                    const option = document.createElement('option');
+                    option.value = assignee.name;
+                    option.textContent = assignee.name;
+                    if (work.assignee === assignee.name) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+                
+                select.onchange = () => saveAssignee(work.id, select.value);
+                
+                assigneeSection.appendChild(label);
+                assigneeSection.appendChild(select);
+                rightSection.appendChild(assigneeSection);
+            }
+            
+            const actions = document.createElement('div');
+            actions.className = 'task-actions';
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'action-btn';
+            deleteBtn.textContent = '🗑️';
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                deleteWork(work.id);
+            };
+            
+            actions.appendChild(deleteBtn);
+            rightSection.appendChild(actions);
+            card.appendChild(rightSection);
+            
+            return card;
+        }
+        
+        // 작업 완료 토글
+        function toggleComplete(workId) {
+            const work = works[workId];
+            if (!work) return;
+            
+            const workRef = window.dbRef(window.db, `works/${workId}`);
+            const newCompleted = !work.completed;
+            const completedDate = newCompleted ? new Date().toISOString().split('T')[0] : null;
+            
+            window.dbUpdate(workRef, {
+                completed: newCompleted,
+                completedDate: completedDate
+            });
+        }
+        
+        // 담당자 저장
+        function saveAssignee(workId, assignee) {
+            const workRef = window.dbRef(window.db, `works/${workId}`);
+            window.dbUpdate(workRef, { assignee: assignee });
+        }
+        
+        // 작업 삭제
+        function deleteWork(workId) {
+            if (!confirm('이 작업을 삭제하시겠습니까?')) return;
+            const workRef = window.dbRef(window.db, `works/${workId}`);
+            window.dbRemove(workRef);
+        }
+        
+        // 날짜 선택 모달
+        window.openDatePicker = function(workId) {
             selectedWorkId = workId;
             const modal = document.getElementById('datePickerModal');
             modal.classList.add('active');
@@ -789,15 +1194,14 @@
             document.getElementById('todayDate').textContent = formatDateKorean(today);
             document.getElementById('tomorrowDate').textContent = formatDateKorean(tomorrow);
             document.getElementById('nextWeekDate').textContent = formatDateKorean(nextWeek);
-        }
-
-        function closeDatePicker() {
-            const modal = document.getElementById('datePickerModal');
-            modal.classList.remove('active');
+        };
+        
+        window.closeDatePicker = function() {
+            document.getElementById('datePickerModal').classList.remove('active');
             selectedWorkId = null;
-        }
-
-        function setQuickDate(type) {
+        };
+        
+        window.setQuickDate = function(type) {
             if (!selectedWorkId) return;
             
             const today = new Date();
@@ -817,28 +1221,24 @@
                     break;
             }
             
-            const workRef = ref(database, `works/${selectedWorkId}`);
-            update(workRef, {
-                dueDate: selectedDate.toISOString().split('T')[0]
-            });
+            const workRef = window.dbRef(window.db, `works/${selectedWorkId}`);
+            window.dbUpdate(workRef, { dueDate: selectedDate.toISOString().split('T')[0] });
             closeDatePicker();
-        }
-
-        function setCustomDate() {
+        };
+        
+        window.setCustomDate = function() {
             if (!selectedWorkId) return;
             
             const dateInput = document.getElementById('customDateInput');
             const selectedDate = dateInput.value;
             
             if (selectedDate) {
-                const workRef = ref(database, `works/${selectedWorkId}`);
-                update(workRef, {
-                    dueDate: selectedDate
-                });
+                const workRef = window.dbRef(window.db, `works/${selectedWorkId}`);
+                window.dbUpdate(workRef, { dueDate: selectedDate });
                 closeDatePicker();
             }
-        }
-
+        };
+        
         function formatDateKorean(date) {
             const month = date.getMonth() + 1;
             const day = date.getDate();
@@ -846,217 +1246,7 @@
             const weekday = weekdays[date.getDay()];
             return `${month}월 ${day}일 ${weekday}`;
         }
-
-        function renderWorks() {
-            const container = document.getElementById('taskList');
-            const searchDate = currentDate.toISOString().split('T')[0];
-            const searchDateObj = new Date(searchDate);
-            
-            const visibleWorks = [];
-            
-            Object.keys(works).forEach(id => {
-                const work = { ...works[id], id };
-                const workDate = new Date(work.date);
-                
-                if (work.work === '시험') {
-                    const daysDiff = calculateBusinessDays(workDate, searchDateObj);
-                    
-                    if (daysDiff < 0) return;
-                    
-                    if (daysDiff === 0 || daysDiff === 1 || daysDiff === 2 || daysDiff === 7 || daysDiff === 28) {
-                        const displayWork = determineFollowUpWork(daysDiff);
-                        visibleWorks.push({
-                            ...work,
-                            displayWork: displayWork,
-                            originalDate: work.date
-                        });
-                    }
-                } else {
-                    if (work.date === searchDate) {
-                        visibleWorks.push({
-                            ...work,
-                            displayWork: work.work,
-                            originalDate: work.date
-                        });
-                    }
-                }
-            });
-            
-            const todayWorks = visibleWorks.filter(w => !w.completed);
-            const completedWorks = visibleWorks.filter(w => w.completed);
-            
-            container.innerHTML = '';
-            
-            if (todayWorks.length > 0) {
-                const sectionHeader = document.createElement('div');
-                sectionHeader.className = 'section-header';
-                sectionHeader.textContent = '진행 중';
-                container.appendChild(sectionHeader);
-                
-                todayWorks.forEach(work => {
-                    const card = createWorkCard(work, false);
-                    container.appendChild(card);
-                });
-            }
-            
-            if (completedWorks.length > 0) {
-                const sectionHeader = document.createElement('div');
-                sectionHeader.className = 'section-header';
-                sectionHeader.textContent = `완료됨 ${completedWorks.length}`;
-                container.appendChild(sectionHeader);
-                
-                completedWorks.forEach(work => {
-                    const card = createWorkCard(work, true);
-                    container.appendChild(card);
-                });
-            }
-            
-            if (visibleWorks.length === 0) {
-                const emptyMsg = document.createElement('div');
-                emptyMsg.style.textAlign = 'center';
-                emptyMsg.style.padding = '40px';
-                emptyMsg.style.color = '#999';
-                emptyMsg.textContent = '이 날짜에 예정된 작업이 없습니다.';
-                container.appendChild(emptyMsg);
-            }
-        }
-
-        function createWorkCard(work, isCompleted) {
-            const card = document.createElement('div');
-            card.className = 'task-card' + (isCompleted ? ' completed' : '');
-            
-            const checkbox = document.createElement('div');
-            checkbox.className = 'task-checkbox';
-            checkbox.addEventListener('click', () => toggleComplete(work.id));
-            
-            const content = document.createElement('div');
-            content.className = 'task-content';
-            
-            const title = document.createElement('div');
-            title.className = 'task-title';
-            title.textContent = `${work.site} - ${work.displayWork}`;
-            
-            const meta = document.createElement('div');
-            meta.className = 'task-meta';
-            
-            const dateDiv = document.createElement('div');
-            dateDiv.className = 'task-date';
-            
-            if (isCompleted) {
-                if (work.completedDate) {
-                    dateDiv.textContent = `✓ 완료: ${work.completedDate}`;
-                    dateDiv.style.color = '#28a745';
-                } else {
-                    dateDiv.textContent = `📅 ${work.originalDate}`;
-                }
-            } else {
-                if (work.dueDate) {
-                    const dueDate = new Date(work.dueDate);
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    dueDate.setHours(0, 0, 0, 0);
-                    
-                    if (dueDate < today) {
-                        dateDiv.innerHTML = `🔴 기한: ${work.dueDate}`;
-                        dateDiv.style.color = '#d13438';
-                    } else {
-                        dateDiv.innerHTML = `⏰ 기한: ${work.dueDate}`;
-                    }
-                    dateDiv.className = 'task-date date-clickable';
-                    dateDiv.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        openDatePicker(work.id);
-                    });
-                } else {
-                    dateDiv.innerHTML = `📅 ${work.originalDate} <span style="font-size: 11px; color: #999;">(기한 추가)</span>`;
-                    dateDiv.className = 'task-date date-clickable';
-                    dateDiv.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        openDatePicker(work.id);
-                    });
-                }
-            }
-            
-            meta.appendChild(dateDiv);
-            content.appendChild(title);
-            content.appendChild(meta);
-            
-            card.appendChild(checkbox);
-            card.appendChild(content);
-            
-            const rightSection = document.createElement('div');
-            rightSection.className = 'task-right';
-            
-            if (!isCompleted) {
-                const assigneeSection = document.createElement('div');
-                assigneeSection.className = 'assignee-section';
-                
-                const label = document.createElement('span');
-                label.className = 'assignee-label';
-                label.textContent = '담당';
-                
-                const select = document.createElement('select');
-                select.className = 'assignee-select';
-                select.id = `assignee-${work.id}`;
-                
-                const defaultOption = document.createElement('option');
-                defaultOption.value = '';
-                defaultOption.textContent = '선택';
-                select.appendChild(defaultOption);
-                
-                Object.values(assignees).forEach(assignee => {
-                    const option = document.createElement('option');
-                    option.value = assignee.name;
-                    option.textContent = assignee.name;
-                    if (work.assignee === assignee.name) {
-                        option.selected = true;
-                    }
-                    select.appendChild(option);
-                });
-                
-                select.addEventListener('change', () => saveAssignee(work.id));
-                
-                assigneeSection.appendChild(label);
-                assigneeSection.appendChild(select);
-                rightSection.appendChild(assigneeSection);
-            } else if (work.assignee) {
-                const assigneeSpan = document.createElement('span');
-                assigneeSpan.style.fontSize = '12px';
-                assigneeSpan.style.color = '#888';
-                assigneeSpan.textContent = `👤 ${work.assignee}`;
-                rightSection.appendChild(assigneeSpan);
-            }
-            
-            const actions = document.createElement('div');
-            actions.className = 'task-actions';
-            
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'action-btn';
-            deleteBtn.textContent = '🗑️';
-            deleteBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                deleteWork(work.id);
-            });
-            
-            actions.appendChild(deleteBtn);
-            rightSection.appendChild(actions);
-            
-            card.appendChild(rightSection);
-            
-            return card;
-        }
-
-        function determineFollowUpWork(daysDiff) {
-            switch(daysDiff) {
-                case 0: return '시험';
-                case 1: return '캡핑';
-                case 2: return '탈형';
-                case 7: return '7일 강도 시험';
-                case 28: return '28일 강도 시험';
-                default: return '시험';
-            }
-        }
-
+        
         function calculateBusinessDays(startDate, endDate) {
             if (startDate > endDate) return -1;
             
@@ -1070,59 +1260,31 @@
             }
             return count;
         }
-
-        // 초기화
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('앱 초기화 시작');
-            
-            updateDateDisplay();
-            setupRealtimeListeners();
-            
-            // 버튼 이벤트 리스너
-            document.getElementById('addWorkBtn').addEventListener('click', addWork);
-            document.getElementById('assigneeBtn').addEventListener('click', toggleAssigneeModal);
-            document.getElementById('closeAssigneeBtn').addEventListener('click', toggleAssigneeModal);
-            document.getElementById('addAssigneeBtn').addEventListener('click', addAssignee);
-            document.getElementById('prevDateBtn').addEventListener('click', () => changeDate(-1));
-            document.getElementById('nextDateBtn').addEventListener('click', () => changeDate(1));
-            document.getElementById('closeDatePickerBtn').addEventListener('click', closeDatePicker);
-            document.getElementById('customDateInput').addEventListener('change', setCustomDate);
-            
-            // 빠른 날짜 선택 버튼
-            document.querySelectorAll('.quick-date-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const type = btn.getAttribute('data-type');
-                    setQuickDate(type);
-                });
-            });
-            
-            // Enter 키 이벤트
-            document.getElementById('siteInput').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') addWork();
-            });
-            
-            document.getElementById('workInput').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') addWork();
-            });
-            
-            document.getElementById('newAssigneeName').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') addAssignee();
-            });
-            
-            // 모달 외부 클릭 시 닫기
-            document.getElementById('datePickerModal').addEventListener('click', (e) => {
-                if (e.target === document.getElementById('datePickerModal')) {
-                    closeDatePicker();
-                }
-            });
-            
-            document.getElementById('assigneeModal').addEventListener('click', (e) => {
-                if (e.target === document.getElementById('assigneeModal')) {
-                    toggleAssigneeModal();
-                }
-            });
-            
-            console.log('앱 초기화 완료');
+        
+        function calculateAbsoluteDays(startDate, endDate) {
+            const oneDay = 24 * 60 * 60 * 1000;
+            const diffDays = Math.round((endDate - startDate) / oneDay);
+            return diffDays;
+        }
+        
+        // 모달 외부 클릭 시 닫기
+        document.getElementById('datePickerModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('datePickerModal')) {
+                closeDatePicker();
+            }
+        });
+        
+        // Enter 키 이벤트
+        document.getElementById('siteInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addWork();
+        });
+        
+        document.getElementById('workInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addWork();
+        });
+        
+        document.getElementById('newUserInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addNewUser();
         });
     </script>
 </body>
