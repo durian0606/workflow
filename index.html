@@ -138,12 +138,12 @@
         .app-container {
             display: none;
             height: 100vh;
-            flex-direction: column;
             background: #f5f7fa;
         }
 
         .app-container.active {
             display: flex;
+            flex-direction: column;
         }
         
         .app-header {
@@ -188,8 +188,13 @@
             font-size: 13px;
             opacity: 0.9;
         }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
         
-        .logout-btn {
+        .header-btn {
             background: rgba(255,255,255,0.2);
             border: none;
             color: white;
@@ -200,8 +205,26 @@
             transition: background 0.2s;
         }
         
-        .logout-btn:hover {
+        .header-btn:hover {
             background: rgba(255,255,255,0.3);
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .left-panel {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .right-panel {
+            width: 50%;
+            position: relative;
         }
         
         .date-nav-bar {
@@ -239,13 +262,6 @@
         .nav-btn:hover {
             background: #14ccb8;
         }
-
-        /* 작업 컨테이너 */
-        .task-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-        }
         
         .task-input-container {
             background: white;
@@ -277,6 +293,22 @@
             outline: none;
             border-color: #0d7377;
         }
+
+        .site-select-btn {
+            padding: 12px 20px;
+            background: #f5f7fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            transition: all 0.2s;
+        }
+
+        .site-select-btn:hover {
+            background: #e8eef3;
+            border-color: #0d7377;
+        }
         
         .add-btn {
             background: #0d7377;
@@ -294,16 +326,10 @@
             background: #14ccb8;
         }
 
-        /* 탭 컨텐츠 */
-        .tab-content {
-            display: none;
+        .task-container {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
-        }
-
-        .tab-content.active {
-            display: block;
         }
         
         .task-card {
@@ -315,11 +341,13 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            transition: box-shadow 0.2s;
+            transition: all 0.2s;
+            cursor: pointer;
         }
         
         .task-card:hover {
             box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            transform: translateX(4px);
         }
 
         .task-card.my-task {
@@ -388,6 +416,15 @@
             font-weight: 500;
         }
 
+        .test-date-label {
+            font-size: 12px;
+            background: #e8f4f5;
+            color: #0d7377;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
         .task-assignee {
             font-size: 12px;
             background: #f0f9f9;
@@ -395,34 +432,6 @@
             padding: 4px 10px;
             border-radius: 12px;
             font-weight: 500;
-        }
-        
-        .add-due-btn {
-            background: none;
-            border: 1px solid #e0e0e0;
-            color: #666;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .add-due-btn:hover {
-            background: #f5f7fa;
-            border-color: #0d7377;
-            color: #0d7377;
-        }
-        
-        .date-clickable {
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 4px;
-            transition: background 0.2s;
-        }
-        
-        .date-clickable:hover {
-            background: rgba(13, 115, 119, 0.1);
         }
         
         .task-right {
@@ -511,6 +520,41 @@
             margin-bottom: 16px;
             opacity: 0.5;
         }
+
+        /* 지도 */
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .map-btn {
+            background: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+        }
+
+        .map-btn:hover {
+            background: #0d7377;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
         
         /* 모달 */
         .modal-overlay {
@@ -535,7 +579,9 @@
             border-radius: 12px;
             padding: 24px;
             width: 90%;
-            max-width: 400px;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
         
@@ -562,62 +608,90 @@
             width: 30px;
             height: 30px;
         }
-        
-        .quick-dates {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-        
-        .quick-date-btn {
+
+        /* 작업 타임라인 모달 */
+        .timeline-item {
+            padding: 16px;
             background: #f5f7fa;
-            border: none;
-            padding: 12px 16px;
             border-radius: 8px;
-            text-align: left;
-            cursor: pointer;
-            transition: background 0.2s;
+            margin-bottom: 12px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 10px;
         }
-        
-        .quick-date-btn:hover {
+
+        .timeline-item.active {
+            background: #e8f4f5;
+            border-left: 4px solid #0d7377;
+        }
+
+        .timeline-work {
+            font-size: 15px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .timeline-date {
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* 현장 선택 모달 */
+        .site-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .site-item {
+            padding: 14px;
+            background: #f5f7fa;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .site-item:hover {
             background: #e8eef3;
+            transform: translateX(4px);
         }
-        
-        .quick-date-icon {
-            font-size: 16px;
-        }
-        
-        .quick-date-text {
-            flex: 1;
-        }
-        
-        .quick-date-label {
+
+        .site-item-name {
             font-size: 14px;
             color: #333;
             font-weight: 500;
         }
-        
-        .quick-date-date {
+
+        .site-item-delete {
+            background: #ffe0e0;
+            border: none;
+            color: #d13438;
+            padding: 4px 10px;
+            border-radius: 4px;
             font-size: 12px;
-            color: #666;
-            margin-top: 2px;
+            cursor: pointer;
         }
-        
-        .calendar-section {
-            border-top: 1px solid #e0e0e0;
-            padding-top: 16px;
+
+        .add-site-form {
+            display: flex;
+            gap: 8px;
         }
-        
-        .calendar-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .left-panel, .right-panel {
+                width: 100%;
+            }
+
+            .right-panel {
+                height: 400px;
+            }
         }
     </style>
 </head>
@@ -646,79 +720,89 @@
                     <div class="user-name" id="headerUserName"></div>
                 </div>
             </div>
-            <button class="logout-btn" onclick="logout()">로그아웃</button>
-        </div>
-        
-        <div class="date-nav-bar">
-            <div class="date-display" id="dateDisplay"></div>
-            <div class="nav-buttons">
-                <button class="nav-btn" onclick="changeDate(-1)">◀</button>
-                <button class="nav-btn" onclick="changeDate(1)">▶</button>
+            <div class="header-actions">
+                <button class="header-btn" onclick="toggleSiteModal()">📍 현장</button>
+                <button class="header-btn" onclick="logout()">로그아웃</button>
             </div>
         </div>
 
-        <div class="tab-nav">
-            <button class="tab-btn active" onclick="switchTab('my')" id="myTab">
-                내 작업<span class="tab-badge" id="myTaskCount">0</span>
-            </button>
-            <button class="tab-btn" onclick="switchTab('team')" id="teamTab">
-                팀 작업<span class="tab-badge" id="teamTaskCount">0</span>
-            </button>
-        </div>
-        
-        <div class="task-input-container">
-            <div class="task-form">
-                <div class="form-row">
-                    <input type="text" class="task-input" id="siteInput" placeholder="현장명">
-                    <input type="text" class="task-input" id="workInput" placeholder="작업 내용 입력">
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="date-nav-bar">
+                    <div class="date-display" id="dateDisplay"></div>
+                    <div class="nav-buttons">
+                        <button class="nav-btn" onclick="changeDate(-1)">◀</button>
+                        <button class="nav-btn" onclick="changeDate(1)">▶</button>
+                    </div>
                 </div>
-                <button class="add-btn" onclick="addWork()">+ 작업 추가</button>
+                
+                <div class="task-input-container">
+                    <div class="task-form">
+                        <div class="form-row">
+                            <input type="text" class="task-input" id="siteInput" placeholder="현장명">
+                            <button class="site-select-btn" onclick="toggleSiteSelectModal()">📋 선택</button>
+                        </div>
+                        <input type="text" class="task-input" id="workInput" placeholder="작업 내용 입력">
+                        <button class="add-btn" onclick="addWork()">+ 작업 추가</button>
+                    </div>
+                </div>
+                
+                <div class="task-container" id="taskContainer"></div>
+            </div>
+
+            <div class="right-panel">
+                <div id="map"></div>
+                <div class="map-controls">
+                    <button class="map-btn" onclick="showCurrentLocation()">📍 내 위치</button>
+                    <button class="map-btn" onclick="toggleSiteModal()">➕ 현장 추가</button>
+                </div>
             </div>
         </div>
-        
-        <div class="task-container" id="taskContainer"></div>
     </div>
     
-    <!-- 날짜 선택 모달 -->
-    <div class="modal-overlay" id="datePickerModal">
+    <!-- 작업 타임라인 모달 -->
+    <div class="modal-overlay" id="timelineModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">기한 설정</h3>
-                <button class="close-btn" onclick="closeDatePicker()">×</button>
+                <h3 class="modal-title" id="timelineTitle"></h3>
+                <button class="close-btn" onclick="closeTimelineModal()">×</button>
+            </div>
+            <div id="timelineContent"></div>
+        </div>
+    </div>
+
+    <!-- 현장 관리 모달 -->
+    <div class="modal-overlay" id="siteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">현장 관리</h3>
+                <button class="close-btn" onclick="toggleSiteModal()">×</button>
             </div>
             
-            <div class="quick-dates">
-                <button class="quick-date-btn" onclick="setQuickDate('today')">
-                    <span class="quick-date-icon">☀️</span>
-                    <div class="quick-date-text">
-                        <div class="quick-date-label">오늘</div>
-                        <div class="quick-date-date" id="todayDate"></div>
-                    </div>
-                </button>
-                
-                <button class="quick-date-btn" onclick="setQuickDate('tomorrow')">
-                    <span class="quick-date-icon">🌙</span>
-                    <div class="quick-date-text">
-                        <div class="quick-date-label">내일</div>
-                        <div class="quick-date-date" id="tomorrowDate"></div>
-                    </div>
-                </button>
-                
-                <button class="quick-date-btn" onclick="setQuickDate('nextWeek')">
-                    <span class="quick-date-icon">📅</span>
-                    <div class="quick-date-text">
-                        <div class="quick-date-label">다음 주</div>
-                        <div class="quick-date-date" id="nextWeekDate"></div>
-                    </div>
-                </button>
-            </div>
+            <ul class="site-list" id="siteList"></ul>
             
-            <div class="calendar-section">
-                <input type="date" class="calendar-input" id="customDateInput" onchange="setCustomDate()">
+            <div class="add-site-form">
+                <input type="text" class="task-input" id="newSiteName" placeholder="새 현장 이름">
+                <button class="add-btn" onclick="addSite()">추가</button>
             </div>
         </div>
     </div>
 
+    <!-- 현장 선택 모달 -->
+    <div class="modal-overlay" id="siteSelectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">현장 선택</h3>
+                <button class="close-btn" onclick="toggleSiteSelectModal()">×</button>
+            </div>
+            <ul class="site-list" id="siteSelectList"></ul>
+        </div>
+    </div>
+
+    <!-- Kakao Map API -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_APP_KEY&libraries=services"></script>
+
+    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
@@ -747,14 +831,49 @@
 
     <script>
         let currentDate = new Date();
-        let selectedWorkId = null;
         let works = {};
         let assignees = [];
+        let sites = {};
         let currentUser = null;
+        let map = null;
+        let currentMarker = null;
         
         // 초기화
         window.onload = function() {
             loadAssignees();
+            initMap();
+        };
+
+        // 카카오맵 초기화
+        function initMap() {
+            const container = document.getElementById('map');
+            const options = {
+                center: new kakao.maps.LatLng(37.5665, 126.9780),
+                level: 3
+            };
+            map = new kakao.maps.Map(container, options);
+        }
+
+        // 현재 위치 표시
+        window.showCurrentLocation = function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const locPosition = new kakao.maps.LatLng(lat, lng);
+                    
+                    if (currentMarker) {
+                        currentMarker.setMap(null);
+                    }
+                    
+                    currentMarker = new kakao.maps.Marker({
+                        position: locPosition,
+                        map: map
+                    });
+                    
+                    map.setCenter(locPosition);
+                });
+            }
         };
 
         // 사용자 목록 로드
@@ -829,6 +948,8 @@
             
             updateDateDisplay();
             loadWorks();
+            loadSites();
+            showCurrentLocation();
         };
 
         // 로그아웃
@@ -866,10 +987,9 @@
                 date: currentDate.toISOString().split('T')[0],
                 site: site,
                 work: work,
-                assignee: currentUser, // 작업 추가한 사람으로 자동 할당
+                assignee: currentUser,
                 completed: false,
-                dueDate: null,
-                completedDate: null
+                createdAt: new Date().toISOString()
             });
             
             document.getElementById('siteInput').value = '';
@@ -882,6 +1002,15 @@
             window.dbOnValue(worksRef, (snapshot) => {
                 works = snapshot.val() || {};
                 renderWorks();
+            });
+        }
+
+        // 현장 로드
+        function loadSites() {
+            const sitesRef = window.dbRef(window.db, 'sites');
+            window.dbOnValue(sitesRef, (snapshot) => {
+                sites = snapshot.val() || {};
+                renderSiteList();
             });
         }
         
@@ -900,20 +1029,22 @@
                 let visibleWork = null;
                 
                 if (work.work === '시험') {
+                    const testDate = work.date;
+                    
                     if (workDate.toISOString().split('T')[0] === searchDate) {
-                        visibleWork = { ...work, id: workId, displayWork: '시험', originalDate: work.date };
+                        visibleWork = { ...work, id: workId, displayWork: '시험', testDate: testDate };
                     } else if (calculateBusinessDays(workDate, searchDateObj) === 1) {
-                        visibleWork = { ...work, id: workId, displayWork: '캡핑', originalDate: work.date };
+                        visibleWork = { ...work, id: workId, displayWork: '캡핑', testDate: testDate };
                     } else if (calculateBusinessDays(workDate, searchDateObj) === 2) {
-                        visibleWork = { ...work, id: workId, displayWork: '탈형', originalDate: work.date };
+                        visibleWork = { ...work, id: workId, displayWork: '탈형', testDate: testDate };
                     } else if (calculateAbsoluteDays(workDate, searchDateObj) === 7) {
-                        visibleWork = { ...work, id: workId, displayWork: '7일 강도 시험', originalDate: work.date };
+                        visibleWork = { ...work, id: workId, displayWork: '7일 강도 시험', testDate: testDate };
                     } else if (calculateAbsoluteDays(workDate, searchDateObj) === 28) {
-                        visibleWork = { ...work, id: workId, displayWork: '28일 강도 시험', originalDate: work.date };
+                        visibleWork = { ...work, id: workId, displayWork: '28일 강도 시험', testDate: testDate };
                     }
                 } else {
                     if (work.date === searchDate) {
-                        visibleWork = { ...work, id: workId, displayWork: work.work, originalDate: work.date };
+                        visibleWork = { ...work, id: workId, displayWork: work.work };
                     }
                 }
                 
@@ -961,7 +1092,7 @@
                 });
             }
             
-            // 완료된 작업 (내 작업 + 팀 작업)
+            // 완료된 작업
             const allCompletedWorks = [...myWorks, ...teamWorks].filter(w => w.completed);
             if (allCompletedWorks.length > 0) {
                 if (myActiveWorks.length > 0 || teamActiveWorks.length > 0) {
@@ -1000,9 +1131,24 @@
                 card.classList.add('my-task');
             }
             
+            // 시험 관련 작업이면 타임라인 표시
+            if (work.testDate) {
+                card.onclick = (e) => {
+                    if (e.target.classList.contains('task-checkbox') || 
+                        e.target.classList.contains('assignee-select') ||
+                        e.target.classList.contains('action-btn')) {
+                        return;
+                    }
+                    showTimeline(work);
+                };
+            }
+            
             const checkbox = document.createElement('div');
             checkbox.className = 'task-checkbox';
-            checkbox.onclick = () => toggleComplete(work.id);
+            checkbox.onclick = (e) => {
+                e.stopPropagation();
+                toggleComplete(work.id);
+            };
             
             const content = document.createElement('div');
             content.className = 'task-content';
@@ -1021,49 +1167,12 @@
                 meta.appendChild(assigneeTag);
             }
             
-            if (isCompleted) {
-                const dateDiv = document.createElement('div');
-                dateDiv.className = 'task-date';
-                if (work.completedDate) {
-                    dateDiv.textContent = `✓ ${work.completedDate}`;
-                    dateDiv.style.color = '#28a745';
-                } else {
-                    dateDiv.textContent = `✓ 완료됨`;
-                    dateDiv.style.color = '#28a745';
-                }
-                meta.appendChild(dateDiv);
-            } else {
-                if (work.dueDate) {
-                    const dateDiv = document.createElement('div');
-                    dateDiv.className = 'task-date date-clickable';
-                    
-                    const dueDate = new Date(work.dueDate);
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    dueDate.setHours(0, 0, 0, 0);
-                    
-                    if (dueDate < today) {
-                        dateDiv.innerHTML = `🔴 ${work.dueDate}`;
-                        dateDiv.style.color = '#d13438';
-                    } else {
-                        dateDiv.innerHTML = `⏰ ${work.dueDate}`;
-                    }
-                    
-                    dateDiv.onclick = (e) => {
-                        e.stopPropagation();
-                        openDatePicker(work.id);
-                    };
-                    meta.appendChild(dateDiv);
-                } else {
-                    const addDueBtn = document.createElement('button');
-                    addDueBtn.className = 'add-due-btn';
-                    addDueBtn.textContent = '⏰ 기한';
-                    addDueBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        openDatePicker(work.id);
-                    };
-                    meta.appendChild(addDueBtn);
-                }
+            // 시험일 표시
+            if (work.testDate) {
+                const testDateTag = document.createElement('span');
+                testDateTag.className = 'test-date-label';
+                testDateTag.textContent = '시험일: ' + work.testDate;
+                meta.appendChild(testDateTag);
             }
             
             content.appendChild(title);
@@ -1084,6 +1193,7 @@
                 
                 const select = document.createElement('select');
                 select.className = 'assignee-select';
+                select.onclick = (e) => e.stopPropagation();
                 
                 const defaultOption = document.createElement('option');
                 defaultOption.value = '';
@@ -1124,6 +1234,72 @@
             
             return card;
         }
+
+        // 타임라인 표시
+        function showTimeline(work) {
+            const modal = document.getElementById('timelineModal');
+            const title = document.getElementById('timelineTitle');
+            const content = document.getElementById('timelineContent');
+            
+            title.textContent = work.site + ' - 작업 일정';
+            content.innerHTML = '';
+            
+            const testDate = new Date(work.testDate);
+            const timeline = [
+                { work: '시험', days: 0 },
+                { work: '캡핑', days: 1 },
+                { work: '탈형', days: 2 },
+                { work: '7일 강도 시험', days: 7 },
+                { work: '28일 강도 시험', days: 28 }
+            ];
+            
+            const today = new Date().toISOString().split('T')[0];
+            
+            timeline.forEach(item => {
+                const itemDate = new Date(testDate);
+                let addedDays = 0;
+                
+                if (item.days <= 2) {
+                    // 영업일 기준
+                    let count = 0;
+                    while (count < item.days) {
+                        itemDate.setDate(itemDate.getDate() + 1);
+                        if (itemDate.getDay() !== 0 && itemDate.getDay() !== 6) {
+                            count++;
+                        }
+                    }
+                } else {
+                    // 절대일 기준
+                    itemDate.setDate(itemDate.getDate() + item.days);
+                }
+                
+                const dateStr = itemDate.toISOString().split('T')[0];
+                
+                const timelineItem = document.createElement('div');
+                timelineItem.className = 'timeline-item';
+                if (dateStr === today) {
+                    timelineItem.classList.add('active');
+                }
+                
+                const workName = document.createElement('div');
+                workName.className = 'timeline-work';
+                workName.textContent = work.site + ' - ' + item.work;
+                
+                const workDate = document.createElement('div');
+                workDate.className = 'timeline-date';
+                workDate.textContent = dateStr;
+                
+                timelineItem.appendChild(workName);
+                timelineItem.appendChild(workDate);
+                content.appendChild(timelineItem);
+            });
+            
+            modal.classList.add('active');
+        }
+
+        window.closeTimelineModal = function() {
+            document.getElementById('timelineModal').classList.remove('active');
+        };
         
         // 작업 완료 토글
         function toggleComplete(workId) {
@@ -1131,12 +1307,8 @@
             if (!work) return;
             
             const workRef = window.dbRef(window.db, `works/${workId}`);
-            const newCompleted = !work.completed;
-            const completedDate = newCompleted ? new Date().toISOString().split('T')[0] : null;
-            
             window.dbUpdate(workRef, {
-                completed: newCompleted,
-                completedDate: completedDate
+                completed: !work.completed
             });
         }
         
@@ -1152,73 +1324,94 @@
             const workRef = window.dbRef(window.db, `works/${workId}`);
             window.dbRemove(workRef);
         }
-        
-        // 날짜 선택 모달
-        window.openDatePicker = function(workId) {
-            selectedWorkId = workId;
-            const modal = document.getElementById('datePickerModal');
-            modal.classList.add('active');
-            
-            const today = new Date();
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const nextWeek = new Date(today);
-            nextWeek.setDate(nextWeek.getDate() + 7);
-            
-            document.getElementById('todayDate').textContent = formatDateKorean(today);
-            document.getElementById('tomorrowDate').textContent = formatDateKorean(tomorrow);
-            document.getElementById('nextWeekDate').textContent = formatDateKorean(nextWeek);
-        };
-        
-        window.closeDatePicker = function() {
-            document.getElementById('datePickerModal').classList.remove('active');
-            selectedWorkId = null;
-        };
-        
-        window.setQuickDate = function(type) {
-            if (!selectedWorkId) return;
-            
-            const today = new Date();
-            let selectedDate;
-            
-            switch(type) {
-                case 'today':
-                    selectedDate = today;
-                    break;
-                case 'tomorrow':
-                    selectedDate = new Date(today);
-                    selectedDate.setDate(selectedDate.getDate() + 1);
-                    break;
-                case 'nextWeek':
-                    selectedDate = new Date(today);
-                    selectedDate.setDate(selectedDate.getDate() + 7);
-                    break;
-            }
-            
-            const workRef = window.dbRef(window.db, `works/${selectedWorkId}`);
-            window.dbUpdate(workRef, { dueDate: selectedDate.toISOString().split('T')[0] });
-            closeDatePicker();
-        };
-        
-        window.setCustomDate = function() {
-            if (!selectedWorkId) return;
-            
-            const dateInput = document.getElementById('customDateInput');
-            const selectedDate = dateInput.value;
-            
-            if (selectedDate) {
-                const workRef = window.dbRef(window.db, `works/${selectedWorkId}`);
-                window.dbUpdate(workRef, { dueDate: selectedDate });
-                closeDatePicker();
+
+        // 현장 관리
+        window.toggleSiteModal = function() {
+            const modal = document.getElementById('siteModal');
+            modal.classList.toggle('active');
+            if (modal.classList.contains('active')) {
+                renderSiteList();
             }
         };
-        
-        function formatDateKorean(date) {
-            const month = date.getMonth() + 1;
-            const day = date.getDate();
-            const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-            const weekday = weekdays[date.getDay()];
-            return `${month}월 ${day}일 ${weekday}`;
+
+        window.toggleSiteSelectModal = function() {
+            const modal = document.getElementById('siteSelectModal');
+            modal.classList.toggle('active');
+            if (modal.classList.contains('active')) {
+                renderSiteSelectList();
+            }
+        };
+
+        function renderSiteList() {
+            const list = document.getElementById('siteList');
+            list.innerHTML = '';
+            
+            Object.keys(sites).forEach(id => {
+                const site = sites[id];
+                
+                const li = document.createElement('li');
+                li.className = 'site-item';
+                
+                const name = document.createElement('span');
+                name.className = 'site-item-name';
+                name.textContent = site.name;
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'site-item-delete';
+                deleteBtn.textContent = '삭제';
+                deleteBtn.onclick = () => deleteSite(id);
+                
+                li.appendChild(name);
+                li.appendChild(deleteBtn);
+                list.appendChild(li);
+            });
+        }
+
+        function renderSiteSelectList() {
+            const list = document.getElementById('siteSelectList');
+            list.innerHTML = '';
+            
+            Object.keys(sites).forEach(id => {
+                const site = sites[id];
+                
+                const li = document.createElement('li');
+                li.className = 'site-item';
+                li.onclick = () => selectSite(site.name);
+                
+                const name = document.createElement('span');
+                name.className = 'site-item-name';
+                name.textContent = site.name;
+                
+                li.appendChild(name);
+                list.appendChild(li);
+            });
+        }
+
+        function selectSite(siteName) {
+            document.getElementById('siteInput').value = siteName;
+            toggleSiteSelectModal();
+        }
+
+        window.addSite = function() {
+            const input = document.getElementById('newSiteName');
+            const name = input.value.trim();
+            
+            if (!name) {
+                alert('현장 이름을 입력하세요.');
+                return;
+            }
+            
+            const sitesRef = window.dbRef(window.db, 'sites');
+            const newSiteRef = window.dbPush(sitesRef);
+            window.dbSet(newSiteRef, { name: name });
+            
+            input.value = '';
+        };
+
+        function deleteSite(id) {
+            if (!confirm('이 현장을 삭제하시겠습니까?')) return;
+            const siteRef = window.dbRef(window.db, `sites/${id}`);
+            window.dbRemove(siteRef);
         }
         
         function calculateBusinessDays(startDate, endDate) {
@@ -1242,15 +1435,29 @@
         }
         
         // 모달 외부 클릭 시 닫기
-        document.getElementById('datePickerModal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('datePickerModal')) {
-                closeDatePicker();
+        document.getElementById('timelineModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('timelineModal')) {
+                closeTimelineModal();
+            }
+        });
+
+        document.getElementById('siteModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('siteModal')) {
+                toggleSiteModal();
+            }
+        });
+
+        document.getElementById('siteSelectModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('siteSelectModal')) {
+                toggleSiteSelectModal();
             }
         });
         
         // Enter 키 이벤트
         document.getElementById('siteInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') addWork();
+            if (e.key === 'Enter') {
+                document.getElementById('workInput').focus();
+            }
         });
         
         document.getElementById('workInput').addEventListener('keypress', (e) => {
@@ -1259,6 +1466,10 @@
         
         document.getElementById('newUserInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') addNewUser();
+        });
+
+        document.getElementById('newSiteName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addSite();
         });
     </script>
 </body>
