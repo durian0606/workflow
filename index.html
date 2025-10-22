@@ -842,7 +842,7 @@
     </div>
 
     <!-- Kakao Map API -->
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_APP_KEY&libraries=services"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=edfe0792f24f219880fc608009d59a0f&libraries=services"></script>
 
     <!-- Firebase SDK -->
     <script type="module">
@@ -892,8 +892,15 @@
         function initMap() {
             // 카카오맵 API가 로드되었는지 확인
             if (typeof kakao === 'undefined' || !kakao.maps) {
-                console.error('카카오맵 API가 로드되지 않았습니다. API 키를 확인해주세요.');
-                document.getElementById('map').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;text-align:center;padding:20px;">카카오맵 API 키를 설정해주세요<br>코드에서 YOUR_APP_KEY를 실제 키로 교체하세요</div>';
+                console.error('카카오맵 API가 로드되지 않았습니다.');
+                document.getElementById('map').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;text-align:center;padding:20px;">카카오맵을 불러오는 중입니다...</div>';
+                
+                // 재시도
+                setTimeout(() => {
+                    if (typeof kakao !== 'undefined' && kakao.maps) {
+                        initMap();
+                    }
+                }, 1000);
                 return;
             }
 
@@ -913,9 +920,15 @@
                 const zoomControl = new kakao.maps.ZoomControl();
                 map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
                 
-                console.log('지도 초기화 성공!');
+                // 지도 크기 재조정 (모바일 대응)
+                setTimeout(() => {
+                    map.relayout();
+                }, 100);
+                
+                console.log('✅ 지도 초기화 성공!');
             } catch (error) {
-                console.error('지도 초기화 실패:', error);
+                console.error('❌ 지도 초기화 실패:', error);
+                document.getElementById('map').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;text-align:center;padding:20px;">지도를 불러올 수 없습니다.<br>페이지를 새로고침 해주세요.</div>';
             }
         }
 
@@ -1031,9 +1044,9 @@
             loadWorks();
             loadSites();
             
-            // 로그인 후 지도 초기화 - 약간 지연시켜서 DOM 렌더링 완료 후 실행
+            // 지도 초기화 - 모바일 대응을 위해 충분한 지연
             setTimeout(() => {
-                console.log('지도 초기화 시작...');
+                console.log('🗺️ 지도 초기화 시작...');
                 initMap();
                 
                 // 지도가 생성되었는지 확인 후 위치 표시
@@ -1041,8 +1054,8 @@
                     if (map) {
                         showCurrentLocation();
                     }
-                }, 500);
-            }, 300);
+                }, 800);
+            }, 500);
         };
 
         // 로그아웃
