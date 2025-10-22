@@ -376,7 +376,24 @@
             border-left: 4px solid #0d7377;
         }
         
-        .task-checkbox {
+        .task-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .task-card-body {
+            flex: 1;
+        }
+
+        .task-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #f0f0f0;
+        }
             width: 20px;
             height: 20px;
             min-width: 20px;
@@ -391,7 +408,20 @@
             border-color: #0d7377;
         }
         
-        .task-card.completed .task-checkbox {
+        .task-card.completed         .drag-handle {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            color: #ccc;
+            font-size: 18px;
+            cursor: grab;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .task-checkbox {
             background: #0d7377;
             border-color: #0d7377;
             position: relative;
@@ -416,7 +446,8 @@
             font-size: 14px;
             color: #333;
             font-weight: 500;
-            line-height: 1.4;
+            line-height: 1.5;
+            margin-bottom: 6px;
         }
         
         .task-card.completed .task-title {
@@ -429,7 +460,6 @@
             align-items: center;
             gap: 6px;
             flex-wrap: wrap;
-            margin-top: 4px;
         }
         
         .task-date {
@@ -438,19 +468,19 @@
         }
 
         .test-date-label {
-            font-size: 11px;
+            font-size: 10px;
             background: #e8f4f5;
             color: #0d7377;
-            padding: 2px 8px;
-            border-radius: 10px;
+            padding: 2px 6px;
+            border-radius: 8px;
         }
 
         .task-assignee {
-            font-size: 11px;
+            font-size: 10px;
             background: #f0f9f9;
             color: #0d7377;
-            padding: 2px 8px;
-            border-radius: 10px;
+            padding: 2px 6px;
+            border-radius: 8px;
         }
         
         .task-right {
@@ -475,10 +505,10 @@
             padding: 4px 8px;
             border: 1px solid #e0e0e0;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 10px;
             background: white;
             cursor: pointer;
-            min-width: 70px;
+            min-width: 60px;
         }
         
         .assignee-select:focus {
@@ -494,10 +524,10 @@
         .action-btn {
             background: none;
             border: none;
-            color: #999;
+            color: #ccc;
             cursor: pointer;
             padding: 4px;
-            font-size: 16px;
+            font-size: 14px;
             border-radius: 4px;
             transition: all 0.2s;
         }
@@ -812,7 +842,7 @@
     </div>
 
     <!-- Kakao Map API -->
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=edfe0792f24f219880fc608009d59a0f&libraries=services"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_APP_KEY&libraries=services"></script>
 
     <!-- Firebase SDK -->
     <script type="module">
@@ -849,6 +879,8 @@
         let currentUser = null;
         let map = null;
         let currentMarker = null;
+        let draggedElement = null;
+        let draggedWorkId = null;
         
         // 초기화
         window.onload = function() {
@@ -1129,9 +1161,13 @@
                 header.innerHTML = '📌 내 작업 진행 중 <span style="color: #0d7377; font-weight: 700;">(' + myActiveWorks.length + ')</span>';
                 container.appendChild(header);
                 
+                const grid = document.createElement('div');
+                grid.className = 'task-grid';
+                grid.id = 'myTaskGrid';
                 myActiveWorks.forEach(work => {
-                    container.appendChild(createWorkCard(work, false));
+                    grid.appendChild(createWorkCard(work, false));
                 });
+                container.appendChild(grid);
             }
             
             // 팀 작업 진행 중
@@ -1148,9 +1184,13 @@
                 header.innerHTML = '👥 팀 작업 진행 중 <span style="color: #666; font-weight: 700;">(' + teamActiveWorks.length + ')</span>';
                 container.appendChild(header);
                 
+                const grid = document.createElement('div');
+                grid.className = 'task-grid';
+                grid.id = 'teamTaskGrid';
                 teamActiveWorks.forEach(work => {
-                    container.appendChild(createWorkCard(work, false));
+                    grid.appendChild(createWorkCard(work, false));
                 });
+                container.appendChild(grid);
             }
             
             // 완료된 작업
@@ -1167,9 +1207,13 @@
                 header.textContent = `완료됨 ${allCompletedWorks.length}`;
                 container.appendChild(header);
                 
+                const grid = document.createElement('div');
+                grid.className = 'task-grid';
+                grid.id = 'completedTaskGrid';
                 allCompletedWorks.forEach(work => {
-                    container.appendChild(createWorkCard(work, true));
+                    grid.appendChild(createWorkCard(work, true));
                 });
+                container.appendChild(grid);
             }
             
             // 작업이 하나도 없을 때
@@ -1188,21 +1232,33 @@
         function createWorkCard(work, isCompleted) {
             const card = document.createElement('div');
             card.className = 'task-card' + (isCompleted ? ' completed' : '');
+            card.draggable = !isCompleted; // 완료된 작업은 드래그 불가
+            card.dataset.workId = work.id;
+            
             if (work.assignee === currentUser) {
                 card.classList.add('my-task');
             }
+
+            // 드래그 핸들
+            if (!isCompleted) {
+                const dragHandle = document.createElement('div');
+                dragHandle.className = 'drag-handle';
+                dragHandle.innerHTML = '⋮⋮';
+                card.appendChild(dragHandle);
+            }
+
+            // 드래그 이벤트
+            if (!isCompleted) {
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+                card.addEventListener('dragover', handleDragOver);
+                card.addEventListener('drop', handleDrop);
+                card.addEventListener('dragleave', handleDragLeave);
+            }
             
             // 시험 관련 작업이면 타임라인 표시
-            if (work.testDate) {
-                card.onclick = (e) => {
-                    if (e.target.classList.contains('task-checkbox') || 
-                        e.target.classList.contains('assignee-select') ||
-                        e.target.classList.contains('action-btn')) {
-                        return;
-                    }
-                    showTimeline(work);
-                };
-            }
+            const cardHeader = document.createElement('div');
+            cardHeader.className = 'task-card-header';
             
             const checkbox = document.createElement('div');
             checkbox.className = 'task-checkbox';
@@ -1211,12 +1267,20 @@
                 toggleComplete(work.id);
             };
             
-            const content = document.createElement('div');
-            content.className = 'task-content';
+            const cardBody = document.createElement('div');
+            cardBody.className = 'task-card-body';
             
             const title = document.createElement('div');
             title.className = 'task-title';
             title.textContent = `${work.site} - ${work.displayWork}`;
+            
+            if (work.testDate) {
+                title.style.cursor = 'pointer';
+                title.onclick = (e) => {
+                    e.stopPropagation();
+                    showTimeline(work);
+                };
+            }
             
             const meta = document.createElement('div');
             meta.className = 'task-meta';
@@ -1236,27 +1300,27 @@
                 meta.appendChild(testDateTag);
             }
             
-            content.appendChild(title);
+            cardBody.appendChild(title);
             if (meta.children.length > 0) {
-                content.appendChild(meta);
+                cardBody.appendChild(meta);
             }
-            card.appendChild(checkbox);
-            card.appendChild(content);
             
-            const rightSection = document.createElement('div');
-            rightSection.className = 'task-right';
+            cardHeader.appendChild(checkbox);
+            cardHeader.appendChild(cardBody);
+            card.appendChild(cardHeader);
+            
+            // Footer (담당자 선택 & 삭제)
+            const cardFooter = document.createElement('div');
+            cardFooter.className = 'task-card-footer';
             
             if (!isCompleted) {
-                const assigneeSection = document.createElement('div');
-                assigneeSection.className = 'assignee-section';
-                
                 const select = document.createElement('select');
                 select.className = 'assignee-select';
                 select.onclick = (e) => e.stopPropagation();
                 
                 const defaultOption = document.createElement('option');
                 defaultOption.value = '';
-                defaultOption.textContent = '-';
+                defaultOption.textContent = '담당자';
                 select.appendChild(defaultOption);
                 
                 assignees.forEach(assignee => {
@@ -1270,13 +1334,10 @@
                 });
                 
                 select.onchange = () => saveAssignee(work.id, select.value);
-                
-                assigneeSection.appendChild(select);
-                rightSection.appendChild(assigneeSection);
+                cardFooter.appendChild(select);
+            } else {
+                cardFooter.appendChild(document.createElement('div'));
             }
-            
-            const actions = document.createElement('div');
-            actions.className = 'task-actions';
             
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'action-btn';
@@ -1286,11 +1347,69 @@
                 deleteWork(work.id);
             };
             
-            actions.appendChild(deleteBtn);
-            rightSection.appendChild(actions);
-            card.appendChild(rightSection);
+            cardFooter.appendChild(deleteBtn);
+            card.appendChild(cardFooter);
             
             return card;
+        }
+
+        // 드래그 앤 드롭 핸들러
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            draggedWorkId = e.target.dataset.workId;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.task-card').forEach(card => {
+                card.classList.remove('drag-over');
+            });
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            e.dataTransfer.dropEffect = 'move';
+            
+            const target = e.target.closest('.task-card');
+            if (target && target !== draggedElement) {
+                target.classList.add('drag-over');
+            }
+            return false;
+        }
+
+        function handleDragLeave(e) {
+            const target = e.target.closest('.task-card');
+            if (target) {
+                target.classList.remove('drag-over');
+            }
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            
+            const target = e.target.closest('.task-card');
+            if (target && target !== draggedElement) {
+                const grid = target.parentNode;
+                const allCards = [...grid.children];
+                const draggedIndex = allCards.indexOf(draggedElement);
+                const targetIndex = allCards.indexOf(target);
+                
+                if (draggedIndex < targetIndex) {
+                    target.parentNode.insertBefore(draggedElement, target.nextSibling);
+                } else {
+                    target.parentNode.insertBefore(draggedElement, target);
+                }
+                
+                target.classList.remove('drag-over');
+            }
+            
+            return false;
         }
 
         // 타임라인 표시
