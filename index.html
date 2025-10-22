@@ -1261,15 +1261,15 @@
                 card.addEventListener('dragleave', handleDragLeave);
             }
 
-            // 드래그 핸들
+            // ⋮⋮ 드래그 핸들
             if (!isCompleted) {
                 const dragHandle = document.createElement('div');
                 dragHandle.className = 'drag-handle';
-                dragHandle.innerHTML = '⋮⋮';
+                dragHandle.textContent = '⋮⋮';
                 card.appendChild(dragHandle);
             }
             
-            // 체크박스
+            // ○ 체크박스
             const checkbox = document.createElement('div');
             checkbox.className = 'task-checkbox';
             checkbox.onclick = (e) => {
@@ -1278,7 +1278,7 @@
             };
             card.appendChild(checkbox);
             
-            // 작업 내용
+            // 현장명 - 작업내용
             const cardBody = document.createElement('div');
             cardBody.className = 'task-card-body';
             
@@ -1295,25 +1295,26 @@
             }
             
             cardBody.appendChild(title);
-            card.appendChild(cardBody);
             
-            // 담당자 표시
+            // 담당자명 (파란 태그)
             if (work.assignee) {
                 const assigneeTag = document.createElement('span');
                 assigneeTag.className = 'task-assignee';
                 assigneeTag.textContent = work.assignee;
-                card.appendChild(assigneeTag);
+                cardBody.appendChild(assigneeTag);
             }
             
-            // 시험일 표시
+            // 시험날짜 (파란 태그)
             if (work.testDate) {
                 const testDateTag = document.createElement('span');
                 testDateTag.className = 'test-date-label';
                 testDateTag.textContent = work.testDate;
-                card.appendChild(testDateTag);
+                cardBody.appendChild(testDateTag);
             }
             
-            // 담당자 선택
+            card.appendChild(cardBody);
+            
+            // 담당자 변경 선택란
             if (!isCompleted) {
                 const select = document.createElement('select');
                 select.className = 'assignee-select';
@@ -1338,7 +1339,7 @@
                 card.appendChild(select);
             }
             
-            // 삭제 버튼
+            // 🗑️ 휴지통 버튼
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'action-btn';
             deleteBtn.textContent = '🗑️';
