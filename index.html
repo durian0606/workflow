@@ -258,33 +258,32 @@
         .nav-btn:hover {
             background: #14ccb8;
         }
-        
+
         .task-input-container {
             background: white;
             padding: 20px;
             border-bottom: 1px solid #e0e0e0;
         }
-        
+
         .task-form {
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
-        
+
         .form-row {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
-        
+
         .task-input {
             flex: 1;
-            padding: 12px 15px;
+            padding: 12px 16px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 14px;
-            transition: border 0.2s;
         }
-        
+
         .task-input:focus {
             outline: none;
             border-color: #0d7377;
@@ -292,48 +291,47 @@
 
         .site-select-btn {
             padding: 12px 20px;
-            background: #f5f7fa;
+            background: #f0f0f0;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
-            color: #333;
-            transition: all 0.2s;
+            white-space: nowrap;
         }
 
         .site-select-btn:hover {
-            background: #e8eef3;
-            border-color: #0d7377;
+            background: #e0e0e0;
         }
-        
+
         .add-btn {
+            padding: 12px 24px;
             background: #0d7377;
             color: white;
             border: none;
-            padding: 12px 24px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
             font-weight: 500;
             transition: background 0.2s;
         }
-        
+
         .add-btn:hover {
             background: #14ccb8;
         }
 
         .task-container {
+            flex: 1;
+            overflow-y: auto;
             padding: 20px;
         }
 
-        /* 지도 섹션 */
+        /* 지도 */
         .map-section {
             background: white;
+            margin: 20px;
             padding: 20px;
-            margin: 0 20px 20px 20px;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            flex: 0 0 auto;
         }
 
         .map-section-header {
@@ -349,13 +347,13 @@
             color: #333;
         }
         
-        /* 지도 */
         #map {
             width: 100%;
             height: 400px;
             border-radius: 8px;
             overflow: hidden;
         }
+
         .task-card {
             background: white;
             border-radius: 10px;
@@ -365,6 +363,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-wrap: wrap;
             transition: all 0.2s;
             cursor: pointer;
         }
@@ -388,10 +387,10 @@
         .task-card-body {
             flex: 1;
             min-width: 0;
-            display: flex;           /* 추가 */
-            align-items: center;     /* 추가 */
-            gap: 8px;                /* 추가 */
-            flex-wrap: wrap;         /* 추가 */
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
         .task-card-footer {
@@ -399,6 +398,7 @@
             align-items: center;
             gap: 8px;
         }
+
         .task-checkbox {
             width: 20px;
             height: 20px;
@@ -421,11 +421,18 @@
             padding: 0 4px;
         }
 
+        .drag-handle {
+            color: #ccc;
+            font-size: 16px;
+            cursor: grab;
+            padding: 0 4px;
+        }
+
         .drag-handle:active {
             cursor: grabbing;
         }
 
-        .task-checkbox {
+        .task-card.completed .task-checkbox {
             background: #0d7377;
             border-color: #0d7377;
             position: relative;
@@ -471,6 +478,12 @@
             color: #666;
         }
 
+        .date-label {
+            font-size: 11px;
+            color: #666;
+            margin-right: 4px;
+        }
+
         .test-date-label {
             font-size: 12px;
             background: #e8f4f5;
@@ -478,6 +491,34 @@
             padding: 3px 8px;
             border-radius: 8px;
             white-space: nowrap;
+        }
+
+        .due-date-btn {
+            font-size: 12px;
+            background: #fff3cd;
+            color: #856404;
+            padding: 3px 8px;
+            border-radius: 8px;
+            white-space: nowrap;
+            border: 1px solid #ffc107;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .due-date-btn:hover {
+            background: #ffc107;
+            color: white;
+        }
+
+        .due-date-btn.has-date {
+            background: #d4edda;
+            color: #155724;
+            border-color: #28a745;
+        }
+
+        .due-date-btn.has-date:hover {
+            background: #28a745;
+            color: white;
         }
 
         .task-assignee {
@@ -553,10 +594,37 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            cursor: pointer;
+            user-select: none;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .section-header:hover {
+            background: rgba(0,0,0,0.03);
         }
 
         .section-header.my-work {
             color: #0d7377;
+        }
+
+        .section-toggle {
+            margin-left: auto;
+            font-size: 14px;
+            transition: transform 0.3s;
+        }
+
+        .section-header.collapsed .section-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .task-grid {
+            transition: all 0.3s;
+        }
+
+        .task-grid.collapsed {
+            display: none;
         }
 
         .section-divider {
@@ -574,12 +642,6 @@
             font-size: 48px;
             margin-bottom: 16px;
             opacity: 0.5;
-        }
-
-        /* 지도 */
-        #map {
-            width: 100%;
-            height: 100%;
         }
 
         .map-controls {
@@ -609,100 +671,84 @@
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0,0,0,0.5);
-            z-index: 10000;
+            z-index: 1000;
             align-items: center;
             justify-content: center;
         }
-        
+
         .modal-overlay.active {
             display: flex;
         }
-        
+
         .modal-content {
             background: white;
-            border-radius: 12px;
-            padding: 24px;
+            border-radius: 16px;
             width: 90%;
             max-width: 500px;
             max-height: 80vh;
             overflow-y: auto;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-        
+
         .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e0e0e0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 1;
         }
-        
+
         .modal-title {
             font-size: 18px;
             font-weight: 600;
             color: #333;
         }
-        
+
         .close-btn {
             background: none;
             border: none;
-            font-size: 24px;
+            font-size: 28px;
             color: #999;
             cursor: pointer;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-        }
-
-        /* 작업 타임라인 모달 */
-        .timeline-item {
-            padding: 16px;
-            background: #f5f7fa;
-            border-radius: 8px;
-            margin-bottom: 12px;
+            width: 32px;
+            height: 32px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
         }
 
-        .timeline-item.active {
-            background: #e8f4f5;
-            border-left: 4px solid #0d7377;
-        }
-
-        .timeline-work {
-            font-size: 15px;
+        .close-btn:hover {
+            background: #f0f0f0;
             color: #333;
-            font-weight: 500;
         }
 
-        .timeline-date {
-            font-size: 13px;
-            color: #666;
-        }
-
-        /* 현장 선택 모달 */
         .site-list {
             list-style: none;
-            margin-bottom: 20px;
+            padding: 0;
+            margin: 0;
         }
 
         .site-item {
-            padding: 14px;
-            background: #f5f7fa;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
+            padding: 16px 24px;
+            border-bottom: 1px solid #f0f0f0;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
         }
 
         .site-item:hover {
-            background: #e8eef3;
+            background: #f9f9f9;
             transform: translateX(4px);
         }
 
@@ -725,6 +771,107 @@
         .add-site-form {
             display: flex;
             gap: 8px;
+            padding: 20px 24px;
+        }
+
+        /* 타임라인 */
+        #timelineContent {
+            padding: 20px 24px;
+        }
+
+        .timeline-item {
+            padding: 16px;
+            border-left: 3px solid #e0e0e0;
+            margin-left: 12px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 20px;
+            width: 13px;
+            height: 13px;
+            background: white;
+            border: 3px solid #e0e0e0;
+            border-radius: 50%;
+        }
+
+        .timeline-item.active {
+            border-left-color: #0d7377;
+            background: #f0fffe;
+        }
+
+        .timeline-item.active::before {
+            background: #0d7377;
+            border-color: #0d7377;
+        }
+
+        .timeline-work {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .timeline-date {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* 작업기한 모달 */
+        .due-date-modal {
+            padding: 20px 24px;
+        }
+
+        .due-date-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .due-date-input:focus {
+            outline: none;
+            border-color: #0d7377;
+        }
+
+        .due-date-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .due-date-save-btn {
+            padding: 10px 20px;
+            background: #0d7377;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .due-date-save-btn:hover {
+            background: #14ccb8;
+        }
+
+        .due-date-cancel-btn {
+            padding: 10px 20px;
+            background: #e0e0e0;
+            color: #333;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .due-date-cancel-btn:hover {
+            background: #d0d0d0;
         }
 
         @media (max-width: 768px) {
@@ -847,6 +994,23 @@
         </div>
     </div>
 
+    <!-- 작업기한 설정 모달 -->
+    <div class="modal-overlay" id="dueDateModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">작업기한 설정</h3>
+                <button class="close-btn" onclick="closeDueDateModal()">×</button>
+            </div>
+            <div class="due-date-modal">
+                <input type="date" class="due-date-input" id="dueDateInput">
+                <div class="due-date-actions">
+                    <button class="due-date-cancel-btn" onclick="closeDueDateModal()">취소</button>
+                    <button class="due-date-save-btn" onclick="saveDueDate()">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Kakao Map API -->
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=edfe0792f24f219880fc608009d59a0f&libraries=services"></script>
 
@@ -854,156 +1018,79 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-        
+
         const firebaseConfig = {
-            apiKey: "AIzaSyAMv0BmH24fyd0F8CUTkSYSXMlvbcnUXU4",
-            authDomain: "work-todo-6ab7f.firebaseapp.com",
-            databaseURL: "https://work-todo-6ab7f-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "work-todo-6ab7f",
-            storageBucket: "work-todo-6ab7f.firebasestorage.app",
-            messagingSenderId: "263893669261",
-            appId: "1:263893669261:web:bdce10bec177ff1f67d9c4"
+            apiKey: "AIzaSyB1r1b-Kxl8w22gZpT0jxsqYsYr3RuNc_Y",
+            authDomain: "shinheung-1986.firebaseapp.com",
+            databaseURL: "https://shinheung-1986-default-rtdb.firebaseio.com",
+            projectId: "shinheung-1986",
+            storageBucket: "shinheung-1986.firebasestorage.app",
+            messagingSenderId: "51686009850",
+            appId: "1:51686009850:web:3c0ee8b0c9d69acd79afcc"
         };
-        
+
         const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        
-        window.db = database;
+        const db = getDatabase(app);
+
+        window.db = db;
         window.dbRef = ref;
         window.dbSet = set;
         window.dbPush = push;
         window.dbOnValue = onValue;
         window.dbUpdate = update;
         window.dbRemove = remove;
-    </script>
 
-    <script>
+        let currentUser = null;
         let currentDate = new Date();
         let works = {};
         let assignees = [];
         let sites = {};
-        let currentUser = null;
         let map = null;
-        let currentMarker = null;
+        let markers = [];
         let draggedElement = null;
         let draggedWorkId = null;
-        
-        // 초기화
-        window.onload = function() {
-            loadAssignees();
-            // 지도는 로그인 후에 초기화
+        let currentEditingWorkId = null;
+
+        // 섹션 접기/펼치기 상태
+        let sectionStates = {
+            myActive: true,
+            teamActive: true,
+            completed: true
         };
 
-        // 카카오맵 초기화
-        function initMap() {
-            // 카카오맵 API가 로드되었는지 확인
-            if (typeof kakao === 'undefined' || !kakao.maps) {
-                console.error('카카오맵 API가 로드되지 않았습니다.');
-                document.getElementById('map').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;text-align:center;padding:20px;">카카오맵을 불러오는 중입니다...</div>';
-                
-                // 재시도
-                setTimeout(() => {
-                    if (typeof kakao !== 'undefined' && kakao.maps) {
-                        initMap();
-                    }
-                }, 1000);
-                return;
-            }
+        // 앱 초기화
+        initApp();
 
-            try {
-                const container = document.getElementById('map');
-                const options = {
-                    center: new kakao.maps.LatLng(37.5665, 126.9780),
-                    level: 3
-                };
-                map = new kakao.maps.Map(container, options);
-                
-                // 지도 타입 컨트롤 추가
-                const mapTypeControl = new kakao.maps.MapTypeControl();
-                map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
-                
-                // 줌 컨트롤 추가
-                const zoomControl = new kakao.maps.ZoomControl();
-                map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
-                
-                // 지도 크기 재조정 (모바일 대응)
-                setTimeout(() => {
-                    map.relayout();
-                }, 100);
-                
-                console.log('✅ 지도 초기화 성공!');
-            } catch (error) {
-                console.error('❌ 지도 초기화 실패:', error);
-                document.getElementById('map').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;text-align:center;padding:20px;">지도를 불러올 수 없습니다.<br>페이지를 새로고침 해주세요.</div>';
-            }
+        function initApp() {
+            loadUsers();
+            loadSites();
+            updateDateDisplay();
+            initMap();
         }
 
-        // 현재 위치 표시
-        window.showCurrentLocation = function() {
-            if (!map) {
-                alert('지도가 초기화되지 않았습니다.');
-                return;
-            }
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    const locPosition = new kakao.maps.LatLng(lat, lng);
-                    
-                    if (currentMarker) {
-                        currentMarker.setMap(null);
-                    }
-                    
-                    currentMarker = new kakao.maps.Marker({
-                        position: locPosition,
-                        map: map
-                    });
-                    
-                    map.setCenter(locPosition);
-                    
-                    // 인포윈도우 표시
-                    const infowindow = new kakao.maps.InfoWindow({
-                        content: '<div style="padding:5px;font-size:12px;">현재 위치</div>'
-                    });
-                    infowindow.open(map, currentMarker);
-                }, function(error) {
-                    alert('위치 정보를 가져올 수 없습니다.');
-                    console.error(error);
-                });
-            } else {
-                alert('이 브라우저는 위치 서비스를 지원하지 않습니다.');
-            }
-        };
-
-        // 사용자 목록 로드
-        function loadAssignees() {
-            const assigneesRef = window.dbRef(window.db, 'assignees');
-            window.dbOnValue(assigneesRef, (snapshot) => {
-                assignees = [];
-                const data = snapshot.val();
-                if (data) {
-                    Object.keys(data).forEach(key => {
-                        assignees.push({ id: key, name: data[key].name });
-                    });
-                }
-                renderUserGrid();
+        // 사용자 로드
+        function loadUsers() {
+            const usersRef = ref(db, 'users');
+            onValue(usersRef, (snapshot) => {
+                const users = snapshot.val() || {};
+                assignees = Object.keys(users).map(id => ({ id, name: users[id].name }));
+                renderUserGrid(users);
             });
         }
 
-        // 사용자 그리드 렌더링
-        function renderUserGrid() {
+        function renderUserGrid(users) {
             const grid = document.getElementById('userGrid');
             grid.innerHTML = '';
             
-            assignees.forEach(user => {
+            Object.keys(users).forEach(id => {
+                const user = users[id];
                 const card = document.createElement('div');
                 card.className = 'user-card';
                 card.onclick = () => login(user.name);
                 
                 const avatar = document.createElement('div');
                 avatar.className = 'user-card-avatar';
-                avatar.textContent = user.name.charAt(0);
+                avatar.textContent = user.name[0];
                 
                 const name = document.createElement('div');
                 name.className = 'user-card-name';
@@ -1015,7 +1102,6 @@
             });
         }
 
-        // 새 사용자 추가
         window.addNewUser = function() {
             const input = document.getElementById('newUserInput');
             const name = input.value.trim();
@@ -1025,63 +1111,57 @@
                 return;
             }
             
-            if (assignees.some(a => a.name === name)) {
-                alert('이미 존재하는 사용자입니다.');
-                return;
-            }
-            
-            const assigneesRef = window.dbRef(window.db, 'assignees');
-            const newAssigneeRef = window.dbPush(assigneesRef);
-            window.dbSet(newAssigneeRef, { name: name });
+            const usersRef = ref(db, 'users');
+            const newUserRef = push(usersRef);
+            set(newUserRef, { name: name });
             
             input.value = '';
         };
 
-        // 로그인
         window.login = function(userName) {
             currentUser = userName;
             document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('appContainer').classList.add('active');
-            
-            document.getElementById('userAvatar').textContent = userName.charAt(0);
+            document.getElementById('userAvatar').textContent = userName[0];
             document.getElementById('headerUserName').textContent = userName;
-            
-            updateDateDisplay();
             loadWorks();
-            loadSites();
-            
-            // 지도 초기화 - 모바일 대응을 위해 충분한 지연
-            setTimeout(() => {
-                console.log('🗺️ 지도 초기화 시작...');
-                initMap();
-                
-                // 지도가 생성되었는지 확인 후 위치 표시
-                setTimeout(() => {
-                    if (map) {
-                        showCurrentLocation();
-                    }
-                }, 800);
-            }, 500);
         };
 
-        // 로그아웃
         window.logout = function() {
             currentUser = null;
             document.getElementById('loginContainer').style.display = 'flex';
             document.getElementById('appContainer').classList.remove('active');
         };
 
-        // 날짜 변경
+        // 작업 로드
+        function loadWorks() {
+            const worksRef = ref(db, 'works');
+            onValue(worksRef, (snapshot) => {
+                works = snapshot.val() || {};
+                renderWorks();
+            });
+        }
+
+        // 현장 로드
+        function loadSites() {
+            const sitesRef = ref(db, 'sites');
+            onValue(sitesRef, (snapshot) => {
+                sites = snapshot.val() || {};
+                renderSiteList();
+            });
+        }
+
+        // 날짜 표시 업데이트
+        function updateDateDisplay() {
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            document.getElementById('dateDisplay').textContent = currentDate.toLocaleDateString('ko-KR', options);
+        }
+
         window.changeDate = function(days) {
             currentDate.setDate(currentDate.getDate() + days);
             updateDateDisplay();
             renderWorks();
         };
-        
-        function updateDateDisplay() {
-            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' };
-            document.getElementById('dateDisplay').textContent = currentDate.toLocaleDateString('ko-KR', options);
-        }
 
         // 작업 추가
         window.addWork = function() {
@@ -1093,12 +1173,12 @@
                 return;
             }
             
-            const worksRef = window.dbRef(window.db, 'works');
-            const newWorkRef = window.dbPush(worksRef);
-            window.dbSet(newWorkRef, {
-                date: currentDate.toISOString().split('T')[0],
+            const worksRef = ref(db, 'works');
+            const newWorkRef = push(worksRef);
+            set(newWorkRef, {
                 site: site,
                 work: work,
+                date: currentDate.toISOString().split('T')[0],
                 assignee: currentUser,
                 completed: false,
                 createdAt: new Date().toISOString()
@@ -1107,25 +1187,7 @@
             document.getElementById('siteInput').value = '';
             document.getElementById('workInput').value = '';
         };
-        
-        // 작업 로드
-        function loadWorks() {
-            const worksRef = window.dbRef(window.db, 'works');
-            window.dbOnValue(worksRef, (snapshot) => {
-                works = snapshot.val() || {};
-                renderWorks();
-            });
-        }
 
-        // 현장 로드
-        function loadSites() {
-            const sitesRef = window.dbRef(window.db, 'sites');
-            window.dbOnValue(sitesRef, (snapshot) => {
-                sites = snapshot.val() || {};
-                renderSiteList();
-            });
-        }
-        
         // 작업 렌더링
         function renderWorks() {
             const searchDate = currentDate.toISOString().split('T')[0];
@@ -1176,15 +1238,16 @@
             const myActiveWorks = myWorks.filter(w => !w.completed);
             if (myActiveWorks.length > 0) {
                 const header = document.createElement('div');
-                header.className = 'section-header my-work';
-                header.innerHTML = '📌 내 작업 진행 중 <span style="color: #0d7377; font-weight: 700;">(' + myActiveWorks.length + ')</span>';
+                header.className = 'section-header my-work' + (sectionStates.myActive ? '' : ' collapsed');
+                header.innerHTML = `📌 내 작업 진행 중 <span style="color: #0d7377; font-weight: 700;">(${myActiveWorks.length})</span><span class="section-toggle">▼</span>`;
+                header.onclick = () => toggleSection('myActive');
                 container.appendChild(header);
                 
                 const grid = document.createElement('div');
-                grid.className = 'task-grid';
+                grid.className = 'task-grid' + (sectionStates.myActive ? '' : ' collapsed');
                 grid.id = 'myTaskGrid';
                 myActiveWorks.forEach(work => {
-                    grid.appendChild(createWorkCard(work, false));
+                    grid.appendChild(createWorkCard(work, false, true));
                 });
                 container.appendChild(grid);
             }
@@ -1199,15 +1262,16 @@
                 }
                 
                 const header = document.createElement('div');
-                header.className = 'section-header';
-                header.innerHTML = '👥 팀 작업 진행 중 <span style="color: #666; font-weight: 700;">(' + teamActiveWorks.length + ')</span>';
+                header.className = 'section-header' + (sectionStates.teamActive ? '' : ' collapsed');
+                header.innerHTML = `👥 팀 작업 진행 중 <span style="color: #666; font-weight: 700;">(${teamActiveWorks.length})</span><span class="section-toggle">▼</span>`;
+                header.onclick = () => toggleSection('teamActive');
                 container.appendChild(header);
                 
                 const grid = document.createElement('div');
-                grid.className = 'task-grid';
+                grid.className = 'task-grid' + (sectionStates.teamActive ? '' : ' collapsed');
                 grid.id = 'teamTaskGrid';
                 teamActiveWorks.forEach(work => {
-                    grid.appendChild(createWorkCard(work, false));
+                    grid.appendChild(createWorkCard(work, false, false));
                 });
                 container.appendChild(grid);
             }
@@ -1222,15 +1286,16 @@
                 }
                 
                 const header = document.createElement('div');
-                header.className = 'section-header';
-                header.textContent = `완료됨 ${allCompletedWorks.length}`;
+                header.className = 'section-header' + (sectionStates.completed ? '' : ' collapsed');
+                header.innerHTML = `완료됨 ${allCompletedWorks.length}<span class="section-toggle">▼</span>`;
+                header.onclick = () => toggleSection('completed');
                 container.appendChild(header);
                 
                 const grid = document.createElement('div');
-                grid.className = 'task-grid';
+                grid.className = 'task-grid' + (sectionStates.completed ? '' : ' collapsed');
                 grid.id = 'completedTaskGrid';
                 allCompletedWorks.forEach(work => {
-                    grid.appendChild(createWorkCard(work, true));
+                    grid.appendChild(createWorkCard(work, true, false));
                 });
                 container.appendChild(grid);
             }
@@ -1246,20 +1311,26 @@
                 container.appendChild(emptyState);
             }
         }
-        
+
+        // 섹션 접기/펼치기
+        window.toggleSection = function(sectionKey) {
+            sectionStates[sectionKey] = !sectionStates[sectionKey];
+            renderWorks();
+        };
+
         // 작업 카드 생성
-        function createWorkCard(work, isCompleted) {
+        function createWorkCard(work, isCompleted, isMyTask) {
             const card = document.createElement('div');
             card.className = 'task-card' + (isCompleted ? ' completed' : '');
-            card.draggable = !isCompleted;
+            card.draggable = !isCompleted && isMyTask;
             card.dataset.workId = work.id;
             
-            if (work.assignee === currentUser) {
+            if (work.assignee === currentUser && !isCompleted) {
                 card.classList.add('my-task');
             }
 
-            // 드래그 이벤트
-            if (!isCompleted) {
+            // 드래그 이벤트 (내 작업만)
+            if (!isCompleted && isMyTask) {
                 card.addEventListener('dragstart', handleDragStart);
                 card.addEventListener('dragend', handleDragEnd);
                 card.addEventListener('dragover', handleDragOver);
@@ -1267,8 +1338,8 @@
                 card.addEventListener('dragleave', handleDragLeave);
             }
 
-            // ⋮⋮ 드래그 핸들
-            if (!isCompleted) {
+            // ⋮⋮ 드래그 핸들 (내 작업만)
+            if (!isCompleted && isMyTask) {
                 const dragHandle = document.createElement('div');
                 dragHandle.className = 'drag-handle';
                 dragHandle.textContent = '⋮⋮';
@@ -1301,14 +1372,12 @@
             }
             
             cardBody.appendChild(title);
-            
-            // 담당자명 (파란 태그)
-            if (work.assignee) {
-                const assigneeTag = document.createElement('span');
-                assigneeTag.className = 'task-assignee';
-                assigneeTag.textContent = work.assignee;
-                cardBody.appendChild(assigneeTag);
-            }
+
+            // 작업등록일자 레이블 추가
+            const dateLabel = document.createElement('span');
+            dateLabel.className = 'date-label';
+            dateLabel.textContent = '작업등록일자:';
+            cardBody.appendChild(dateLabel);
             
             // 시험날짜 (파란 태그)
             if (work.testDate) {
@@ -1317,6 +1386,16 @@
                 testDateTag.textContent = work.testDate;
                 cardBody.appendChild(testDateTag);
             }
+
+            // 작업기한 버튼
+            const dueDateBtn = document.createElement('button');
+            dueDateBtn.className = 'due-date-btn' + (work.dueDate ? ' has-date' : '');
+            dueDateBtn.textContent = work.dueDate ? `작업기한: ${work.dueDate}` : '작업기한 설정';
+            dueDateBtn.onclick = (e) => {
+                e.stopPropagation();
+                openDueDateModal(work.id, work.dueDate);
+            };
+            cardBody.appendChild(dueDateBtn);
             
             card.appendChild(cardBody);
             
@@ -1358,7 +1437,32 @@
             return card;
         }
 
-        // 드래그 앤 드롭 핸들러
+        // 작업기한 모달 열기
+        window.openDueDateModal = function(workId, currentDueDate) {
+            currentEditingWorkId = workId;
+            const modal = document.getElementById('dueDateModal');
+            const input = document.getElementById('dueDateInput');
+            input.value = currentDueDate || '';
+            modal.classList.add('active');
+        };
+
+        // 작업기한 모달 닫기
+        window.closeDueDateModal = function() {
+            document.getElementById('dueDateModal').classList.remove('active');
+            currentEditingWorkId = null;
+        };
+
+        // 작업기한 저장
+        window.saveDueDate = function() {
+            const dueDate = document.getElementById('dueDateInput').value;
+            if (currentEditingWorkId) {
+                const workRef = ref(db, `works/${currentEditingWorkId}`);
+                update(workRef, { dueDate: dueDate });
+            }
+            closeDueDateModal();
+        };
+
+        // 드래그 앤 드롭 핸들러 (내 작업 내에서만)
         function handleDragStart(e) {
             draggedElement = e.target;
             draggedWorkId = e.target.dataset.workId;
@@ -1377,10 +1481,12 @@
             if (e.preventDefault) {
                 e.preventDefault();
             }
-            e.dataTransfer.dropEffect = 'move';
             
             const target = e.target.closest('.task-card');
-            if (target && target !== draggedElement) {
+            // 내 작업 그리드 내에서만 드롭 가능
+            if (target && target !== draggedElement && 
+                target.parentElement.id === 'myTaskGrid') {
+                e.dataTransfer.dropEffect = 'move';
                 target.classList.add('drag-over');
             }
             return false;
@@ -1399,7 +1505,10 @@
             }
             
             const target = e.target.closest('.task-card');
-            if (target && target !== draggedElement) {
+            
+            // 내 작업 그리드 내에서만 드롭 허용
+            if (target && target !== draggedElement && 
+                target.parentElement.id === 'myTaskGrid') {
                 const grid = target.parentNode;
                 const allCards = [...grid.children];
                 const draggedIndex = allCards.indexOf(draggedElement);
@@ -1439,7 +1548,6 @@
             
             timeline.forEach(item => {
                 const itemDate = new Date(testDate);
-                let addedDays = 0;
                 
                 if (item.days <= 2) {
                     // 영업일 기준
@@ -1482,29 +1590,29 @@
         window.closeTimelineModal = function() {
             document.getElementById('timelineModal').classList.remove('active');
         };
-        
+
         // 작업 완료 토글
         function toggleComplete(workId) {
             const work = works[workId];
             if (!work) return;
             
-            const workRef = window.dbRef(window.db, `works/${workId}`);
-            window.dbUpdate(workRef, {
+            const workRef = ref(db, `works/${workId}`);
+            update(workRef, {
                 completed: !work.completed
             });
         }
-        
+
         // 담당자 저장
         function saveAssignee(workId, assignee) {
-            const workRef = window.dbRef(window.db, `works/${workId}`);
-            window.dbUpdate(workRef, { assignee: assignee });
+            const workRef = ref(db, `works/${workId}`);
+            update(workRef, { assignee: assignee });
         }
-        
+
         // 작업 삭제
         function deleteWork(workId) {
             if (!confirm('이 작업을 삭제하시겠습니까?')) return;
-            const workRef = window.dbRef(window.db, `works/${workId}`);
-            window.dbRemove(workRef);
+            const workRef = ref(db, `works/${workId}`);
+            remove(workRef);
         }
 
         // 현장 관리
@@ -1541,7 +1649,10 @@
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'site-item-delete';
                 deleteBtn.textContent = '삭제';
-                deleteBtn.onclick = () => deleteSite(id);
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteSite(id);
+                };
                 
                 li.appendChild(name);
                 li.appendChild(deleteBtn);
@@ -1583,19 +1694,20 @@
                 return;
             }
             
-            const sitesRef = window.dbRef(window.db, 'sites');
-            const newSiteRef = window.dbPush(sitesRef);
-            window.dbSet(newSiteRef, { name: name });
+            const sitesRef = ref(db, 'sites');
+            const newSiteRef = push(sitesRef);
+            set(newSiteRef, { name: name });
             
             input.value = '';
         };
 
         function deleteSite(id) {
             if (!confirm('이 현장을 삭제하시겠습니까?')) return;
-            const siteRef = window.dbRef(window.db, `sites/${id}`);
-            window.dbRemove(siteRef);
+            const siteRef = ref(db, `sites/${id}`);
+            remove(siteRef);
         }
-        
+
+        // 날짜 계산
         function calculateBusinessDays(startDate, endDate) {
             if (startDate > endDate) return -1;
             
@@ -1609,13 +1721,34 @@
             }
             return count;
         }
-        
+
         function calculateAbsoluteDays(startDate, endDate) {
             const oneDay = 24 * 60 * 60 * 1000;
             const diffDays = Math.round((endDate - startDate) / oneDay);
             return diffDays;
         }
-        
+
+        // 지도 초기화
+        function initMap() {
+            const container = document.getElementById('map');
+            const options = {
+                center: new kakao.maps.LatLng(37.5665, 126.9780),
+                level: 3
+            };
+            map = new kakao.maps.Map(container, options);
+        }
+
+        window.showCurrentLocation = function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const locPosition = new kakao.maps.LatLng(lat, lng);
+                    map.setCenter(locPosition);
+                });
+            }
+        };
+
         // 모달 외부 클릭 시 닫기
         document.getElementById('timelineModal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('timelineModal')) {
@@ -1634,18 +1767,24 @@
                 toggleSiteSelectModal();
             }
         });
-        
+
+        document.getElementById('dueDateModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('dueDateModal')) {
+                closeDueDateModal();
+            }
+        });
+
         // Enter 키 이벤트
         document.getElementById('siteInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 document.getElementById('workInput').focus();
             }
         });
-        
+
         document.getElementById('workInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') addWork();
         });
-        
+
         document.getElementById('newUserInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') addNewUser();
         });
