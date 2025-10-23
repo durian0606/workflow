@@ -471,6 +471,12 @@
             color: #666;
         }
 
+        .date-label {
+            font-size: 11px;
+            color: #666;
+            margin-right: 4px;
+        }
+        
         .test-date-label {
             font-size: 12px;
             background: #e8f4f5;
@@ -1302,13 +1308,11 @@
             
             cardBody.appendChild(title);
             
-            // 담당자명 (파란 태그)
-            if (work.assignee) {
-                const assigneeTag = document.createElement('span');
-                assigneeTag.className = 'task-assignee';
-                assigneeTag.textContent = work.assignee;
-                cardBody.appendChild(assigneeTag);
-            }
+            // 작업등록일자 레이블
+            const dateLabel = document.createElement('span');
+            dateLabel.className = 'date-label';
+            dateLabel.textContent = '작업등록일자:';
+            cardBody.appendChild(dateLabel);
             
             // 시험날짜 (파란 태그)
             if (work.testDate) {
