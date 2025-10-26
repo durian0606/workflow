@@ -1286,6 +1286,8 @@
 
     // 🆕 현재 위치부터 시작하는 경로 표시
     window.showRouteFromCurrentLocation = function() {
+      console.log('🚀 경로 표시 시작');
+      
       if (!map) {
         alert('지도가 초기화되지 않았습니다.');
         return;
@@ -1312,6 +1314,8 @@
         }
       });
 
+      console.log('📋 내 작업 진행 중:', myActiveWorks.length, '개');
+
       if (myActiveWorks.length === 0) {
         alert('표시할 작업이 없습니다.');
         return;
@@ -1322,20 +1326,54 @@
         document.getElementById('loadingOverlay').classList.add('active');
         document.getElementById('routeBtn').disabled = true;
 
+        console.log('📍 현재 위치 요청 중...');
+
+        // 타임아웃 설정 (10초)
+        const timeout = setTimeout(() => {
+          document.getElementById('loadingOverlay').classList.remove('active');
+          document.getElementById('routeBtn').disabled = false;
+          alert('위치 정보를 가져오는데 시간이 너무 오래 걸립니다. 다시 시도해주세요.');
+          console.error('❌ 위치 요청 타임아웃');
+        }, 10000);
+
         navigator.geolocation.getCurrentPosition(
           function(position) {
+            clearTimeout(timeout);
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
+            console.log('✅ 현재 위치:', lat, lng);
             currentPosition = new kakao.maps.LatLng(lat, lng);
 
             // 경로 그리기
             drawRouteFromCurrentLocation(currentPosition, myActiveWorks);
           },
           function(error) {
+            clearTimeout(timeout);
             document.getElementById('loadingOverlay').classList.remove('active');
             document.getElementById('routeBtn').disabled = false;
-            alert('위치 정보를 가져올 수 없습니다. 브라우저 설정을 확인해주세요.');
-            console.error(error);
+            
+            let errorMsg = '위치 정보를 가져올 수 없습니다.\n\n';
+            switch(error.code) {
+              case error.PERMISSION_DENIED:
+                errorMsg += '위치 권한이 거부되었습니다.\n브라우저 설정에서 위치 권한을 허용해주세요.';
+                break;
+              case error.POSITION_UNAVAILABLE:
+                errorMsg += '위치 정보를 사용할 수 없습니다.';
+                break;
+              case error.TIMEOUT:
+                errorMsg += '위치 정보 요청 시간이 초과되었습니다.';
+                break;
+              default:
+                errorMsg += '알 수 없는 오류가 발생했습니다.';
+            }
+            
+            alert(errorMsg);
+            console.error('❌ 위치 정보 에러:', error);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
           }
         );
       } else {
@@ -1345,6 +1383,8 @@
 
     // 🆕 현재 위치부터 현장들을 순서대로 연결하는 경로 그리기
     function drawRouteFromCurrentLocation(currentPos, myActiveWorks) {
+      console.log('🗺️ 경로 그리기 시작');
+      
       // 기존 마커와 선 제거
       if (currentLocationMarker) {
         currentLocationMarker.setMap(null);
@@ -1367,7 +1407,7 @@
         }
       });
 
-      console.log('🗺️ 경로 표시할 현장:', uniqueSites);
+      console.log('🏗️ 고유 현장:', uniqueSites);
 
       // 주소를 좌표로 변환
       const geocoder = new kakao.maps.services.Geocoder();
@@ -1377,19 +1417,22 @@
       uniqueSites.forEach((siteName, index) => {
         const site = Object.values(sites).find(s => s.name === siteName);
         if (!site || !site.address) {
-          console.warn(`현장 "${siteName}"의 주소 정보가 없습니다.`);
+          console.warn(`⚠️ 현장 "${siteName}"의 주소 정보가 없습니다.`);
           return;
         }
+
+        console.log(`📍 주소 검색: ${siteName} - ${site.address}`);
 
         const promise = new Promise((resolve) => {
           geocoder.addressSearch(site.address, function(result, status) {
             if (status === kakao.maps.services.Status.OK) {
               const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
               positions.push({ coords, siteName, index: index + 1 });
+              console.log(`✅ 좌표 변환 성공: ${siteName}`);
               resolve();
             } else {
-              console.warn(`주소 검색 실패: ${site.address}`);
-              resolve();
+              console.warn(`❌ 주소 검색 실패: ${site.address} (상태: ${status})`);
+              resolve(); // 실패해도 resolve로 진행
             }
           });
         });
@@ -1399,14 +1442,19 @@
 
       // 모든 주소 검색이 완료된 후 마커와 경로 표시
       Promise.all(promises).then(() => {
+        console.log('📊 변환된 위치:', positions.length, '개');
+        
         positions.sort((a, b) => a.index - b.index);
 
         if (positions.length < 2) {
           document.getElementById('loadingOverlay').classList.remove('active');
           document.getElementById('routeBtn').disabled = false;
-          alert('경로를 표시할 현장이 없습니다.');
+          alert('경로를 표시할 현장의 주소를 찾을 수 없습니다.\n현장 관리에서 주소를 확인해주세요.');
+          console.error('❌ 유효한 위치가 2개 미만');
           return;
         }
+
+        console.log('🎨 마커 그리기 시작');
 
         // 현재 위치 마커 (시작점)
         const startMarkerContent = `
@@ -1475,6 +1523,8 @@
           infowindow.open(map, marker);
         }
 
+        console.log('✏️ 경로선 그리기');
+
         // 경로선 그리기
         const linePath = positions.map(pos => pos.coords);
         
@@ -1520,6 +1570,11 @@
         document.getElementById('routeBtn').disabled = false;
 
         console.log(`✅ ${positions.length - 1}개 현장 경로 표시 완료`);
+      }).catch(error => {
+        console.error('❌ 경로 표시 중 에러:', error);
+        document.getElementById('loadingOverlay').classList.remove('active');
+        document.getElementById('routeBtn').disabled = false;
+        alert('경로를 표시하는 중 오류가 발생했습니다.');
       });
     }
 
