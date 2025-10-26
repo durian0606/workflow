@@ -1792,8 +1792,7 @@
         assignee: currentUser,
         completed: false,
         createdAt: new Date().toISOString(),
-        deadline: work === '시험' ? null : todayStr,
-        order: Date.now()
+        deadline: work === '시험' ? null : todayStr
       });
 
       if (work === '시험') {
@@ -2051,29 +2050,17 @@
         const dragHandle = document.createElement('div');
         dragHandle.className = 'drag-handle';
         dragHandle.textContent = '⋮⋮';
+        dragHandle.draggable = true;
 
-        // 드래그 핸들을 눌렀을 때만 카드를 드래그 가능하게
         dragHandle.addEventListener('mousedown', (e) => {
-          e.preventDefault();
           card.draggable = true;
         });
 
         dragHandle.addEventListener('mouseup', (e) => {
-          setTimeout(() => {
-            card.draggable = false;
-          }, 100);
+          card.draggable = false;
         });
 
         card.appendChild(dragHandle);
-
-        // 🆕 순서 번호 추가
-        if (work.orderNumber) {
-          const orderNum = document.createElement('div');
-          orderNum.className = 'order-number';
-          orderNum.textContent = work.orderNumber;
-          card.appendChild(orderNum);
-        }
-      }
 
         // 🆕 순서 번호 추가
         if (work.orderNumber) {
@@ -2266,52 +2253,27 @@
       if (e.stopPropagation) {
         e.stopPropagation();
       }
-      e.preventDefault();
 
-      this.classList.remove('drag-over');
-
-      if (draggedElement !== this && draggedWorkId) {
+      if (draggedElement !== this) {
         const draggedWork = works[draggedWorkId];
         const targetWork = works[this.dataset.workId];
 
-        console.log('🔄 드래그:', draggedWork?.site, '→ 타겟:', targetWork?.site);
+      // 순서 교환
+      const tempOrder = draggedWork.order || 999;
+      const draggedRef = window.dbRef(window.db, `works/${draggedWorkId}`);
+      const targetRef = window.dbRef(window.db, `works/${this.dataset.workId}`);
 
-        if (draggedWork && targetWork && 
-            draggedWork.assignee === currentUser && 
-            targetWork.assignee === currentUser &&
-            !draggedWork.completed && !targetWork.completed) {
+      window.dbUpdate(draggedRef, {
+        order: targetWork.order || 999
+      });
+      window.dbUpdate(targetRef, {
+        order: tempOrder
+      });
 
-          const searchDate = currentDate.toISOString().split('T')[0];
-
-          const myWorks = Object.keys(works)
-            .filter(id => {
-              const w = works[id];
-              if (w.assignee !== currentUser || w.completed) return false;
-
-              if (w.work === '시험' || w.parentWorkId) {
-                return w.date === searchDate;
-              } else {
-                return w.date <= searchDate;
-              }
-            })
-            .map(id => ({ id, order: works[id].order || 999 }))
-            .sort((a, b) => a.order - b.order);
-
-          const draggedIndex = myWorks.findIndex(w => w.id === draggedWorkId);
-          const targetIndex = myWorks.findIndex(w => w.id === this.dataset.workId);
-
-          if (draggedIndex !== -1 && targetIndex !== -1) {
-            const [removed] = myWorks.splice(draggedIndex, 1);
-            myWorks.splice(targetIndex, 0, removed);
-
-            myWorks.forEach((work, index) => {
-              const workRef = window.dbRef(window.db, `works/${work.id}`);
-              window.dbUpdate(workRef, { order: index });
-            });
-          }
-        }
+      console.log(`✅ 순서 변경: ${draggedWork.site} ↔ ${targetWork.site}`);
       }
 
+      this.classList.remove('drag-over');
       return false;
     }
 
