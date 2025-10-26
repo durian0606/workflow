@@ -170,7 +170,7 @@
       justify-content: space-between;
       gap: 12px;
     }
-    
+
     .header-left {
       display: flex;
       align-items: center;
@@ -437,7 +437,7 @@
       justify-content: center;
       user-select: none;
     }
-    
+
     .task-card.completed .drag-handle {
       color: #ccc;
       font-size: 16px;
@@ -525,43 +525,43 @@
       gap: 8px;
     }
 
-      .person-select-container {
-        display: flex;
-        align-items: center;
-        margin-top: 6px;
-        margin-left: auto;
-        max-width: 100px;
-      }
+    .person-select-container {
+      display: flex;
+      flex-direction: column;  /* 세로 배치로 변경 */
+      align-items: flex-end;  /* 오른쪽 정렬 */
+      margin-top: 6px;
+      margin-left: auto;
+      max-width: 100px;
+    }
 
-      .select-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        width: 100%;
-      }
+    .select-wrapper {
+      display: flex;
+      flex-direction: column;  /* 세로 배치로 변경 */
+      gap: 3px;  /* 레이블과 select 사이 간격 */
+      width: 100%;
+    } 
 
-      .select-label {
-        font-size: 10px;
-        color: #666;
-        font-weight: 500;
-        white-space: nowrap;
-      }
+    .select-label {
+      font-size: 9px;
+      color: #666;
+      font-weight: 500;
+      text-align: right;  /* 오른쪽 정렬 */
+    }
 
-      .assignee-select {
-        flex: 1;
-        padding: 4px 5px;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        font-size: 11px;
-        background: white;
-        cursor: pointer;
-        min-width: 20px;
-      }
+    .assignee-select {
+      width: 100%;  /* 전체 너비 사용 */
+      padding: 5px 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 11px;
+      background: white;
+      cursor: pointer;
+    }
 
-      .assignee-select:focus {
-        outline: none;
-        border-color: #0d7377;
-      }
+    .assignee-select:focus {
+      outline: none;
+      border-color: #0d7377;
+    }
 
     .task-actions {
       display: flex;
@@ -787,7 +787,7 @@
       cursor: pointer;
     }
 
-        /* 완료 기한 선택 모달 */
+    /* 완료 기한 선택 모달 */
     .deadline-modal {
       display: none;
       position: fixed;
@@ -911,7 +911,7 @@
       font-size: 12px;
       font-weight: 500;
     }
-    
+
     .add-site-form {
       display: flex;
       gap: 8px;
@@ -926,7 +926,8 @@
         margin: 10px;
         padding: 15px;
       }
-          /* 기한 초과 작업 스타일 */
+
+      /* 기한 초과 작업 스타일 */
       .task-card.overdue {
         border-left: 4px solid #f44336;
         background: #ffebee;
@@ -944,9 +945,12 @@
       }
 
       @keyframes pulse {
-        0%, 100% {
+
+        0%,
+        100% {
           opacity: 1;
         }
+
         50% {
           opacity: 0.7;
         }
@@ -963,6 +967,7 @@
         font-weight: 600;
         animation: pulse 1.5s infinite;
       }
+
       /* 완료 섹션 스크롤바 스타일 */
       .task-grid {
         scrollbar-width: thin;
@@ -985,10 +990,8 @@
 
       .task-grid::-webkit-scrollbar-thumb:hover {
         background: #14ccb8;
-      }      
+      }
     }
-    
-    
   </style>
 </head>
 
@@ -1094,7 +1097,7 @@
     </div>
   </div>
 
-    <!-- 완료 기한 선택 모달 -->
+  <!-- 완료 기한 선택 모달 -->
   <div class="deadline-modal" id="deadlineModal">
     <div class="deadline-modal-content">
       <div class="deadline-modal-header">완료 기한 선택</div>
@@ -1118,7 +1121,7 @@
       </div>
     </div>
   </div>
-  
+
   <!-- 현장 선택 모달 -->
   <div class="modal-overlay" id="siteSelectModal">
     <div class="modal-content">
@@ -1381,7 +1384,7 @@
         assignee: currentUser,
         completed: false,
         createdAt: new Date().toISOString(),
-        deadline: work === '시험' ? null : todayStr  // 시험이 아닌 경우 기본 기한은 오늘
+        deadline: work === '시험' ? null : todayStr // 시험이 아닌 경우 기본 기한은 오늘
       });
       // "시험" 작업인 경우 자동으로 후속 작업들 생성
       if (work === '시험') {
@@ -1462,52 +1465,45 @@
         renderSiteList();
       });
     }
-   
+
     function renderWorks() {
       const searchDate = currentDate.toISOString().split('T')[0];
       const myWorks = [];
       const teamWorks = [];
-      const completedWorks = [];  // 완료된 작업 별도 관리
-
+      const completedWorks = []; // 완료된 작업 별도 관리
       Object.keys(works).forEach(workId => {
         const work = works[workId];
         let shouldShow = false;
-
         // 완료된 작업은 별도로 처리
         if (work.completed) {
           const deadline = work.deadline || work.date;
           const isOverdue = work.completedDate && deadline < work.completedDate;
-
           completedWorks.push({
             ...work,
             id: workId,
             displayWork: work.displayWork || work.work,
             isOverdue: isOverdue
           });
-          return;  // 완료 작업은 여기서 처리 종료
+          return; // 완료 작업은 여기서 처리 종료
         }
-
         // 미완료 작업 표시 로직
         // 시험 관련 작업 (시험, 캡핑, 탈형, 강도시험)
         if (work.work === '시험' || work.parentWorkId) {
           shouldShow = work.date === searchDate;
-        } 
+        }
         // 일반 작업 - 등록일 이후면 표시
         else {
           shouldShow = work.date <= searchDate;
         }
-
         if (shouldShow) {
           const deadline = work.deadline || work.date;
-          const isOverdue = deadline < searchDate;  // 기한 초과 여부
-
+          const isOverdue = deadline < searchDate; // 기한 초과 여부
           const visibleWork = {
             ...work,
             id: workId,
             displayWork: work.displayWork || work.work,
             isOverdue: isOverdue
           };
-
           if (work.assignee === currentUser) {
             myWorks.push(visibleWork);
           } else {
@@ -1515,7 +1511,6 @@
           }
         }
       });
-
       // 완료된 작업을 완료 날짜 기준 최신순으로 정렬
       completedWorks.sort((a, b) => {
         const dateA = a.completedDate || a.date;
@@ -1576,8 +1571,8 @@
         const grid = document.createElement('div');
         grid.className = 'task-grid' + (sectionStates.completed ? '' : ' collapsed');
         grid.id = 'completedTaskGrid';
-        grid.style.maxHeight = '400px';  // 최대 높이 설정
-        grid.style.overflowY = 'auto';   // 스크롤 추가
+        grid.style.maxHeight = '400px'; // 최대 높이 설정
+        grid.style.overflowY = 'auto'; // 스크롤 추가
         completedWorks.forEach(work => {
           grid.appendChild(createWorkCard(work, true));
         });
@@ -1603,12 +1598,10 @@
     function createWorkCard(work, isCompleted) {
       const card = document.createElement('div');
       card.className = 'task-card' + (isCompleted ? ' completed' : '');
-
       // 기한 초과 스타일 추가
       if (!isCompleted && work.isOverdue) {
         card.classList.add('overdue');
       }
-
       card.draggable = false;
       card.dataset.workId = work.id;
       if (work.assignee === currentUser) {
@@ -1651,7 +1644,6 @@
       const title = document.createElement('div');
       title.className = 'task-title';
       title.textContent = `${work.site} - ${work.displayWork}`;
-
       // 기한 초과 경고 표시
       if (!isCompleted && work.isOverdue) {
         const warningBadge = document.createElement('span');
@@ -1660,7 +1652,6 @@
         title.appendChild(document.createTextNode(' '));
         title.appendChild(warningBadge);
       }
-
       if (work.testDate) {
         title.style.cursor = 'pointer';
         title.onclick = (e) => {
@@ -1669,7 +1660,6 @@
         };
       }
       cardBody.appendChild(title);
-      
       // 시험 작업이 아닌 경우 완료 기한 표시
       if (work.work !== '시험' && !work.parentWorkId) {
         const deadlineContainer = document.createElement('div');
@@ -1680,67 +1670,52 @@
             openDeadlineModal(work.id, work.deadline || work.date);
           }
         };
-
         const deadlineLabel = document.createElement('span');
         deadlineLabel.className = 'deadline-label-text';
         deadlineLabel.textContent = '완료 기한:';
-
         const deadlineDate = document.createElement('span');
         deadlineDate.className = 'deadline-date-tag';
-
         // 기한 초과 스타일 추가
         if (!isCompleted && work.isOverdue) {
           deadlineDate.classList.add('overdue');
         }
-
         deadlineDate.textContent = work.deadline || work.date;
-
         deadlineContainer.appendChild(deadlineLabel);
         deadlineContainer.appendChild(deadlineDate);
         cardBody.appendChild(deadlineContainer);
       }
-
       // 시험 관련 작업인 경우 작업등록일자 표시
       if (work.testDate) {
         const dateLabel = document.createElement('span');
         dateLabel.className = 'date-label';
         dateLabel.textContent = '작업등록일자:';
         cardBody.appendChild(dateLabel);
-
         const testDateTag = document.createElement('span');
         testDateTag.className = 'test-date-label';
         testDateTag.textContent = work.testDate;
         cardBody.appendChild(testDateTag);
       }
-
       // 완료된 작업인 경우 완료 정보 표시
       if (isCompleted && work.completedDate) {
         const completedInfo = document.createElement('div');
         completedInfo.style.cssText = 'margin-top: 8px; font-size: 12px; color: #4caf50;';
-
         const completedLabel = document.createElement('span');
         completedLabel.textContent = '✓ 완료: ';
         completedLabel.style.fontWeight = '600';
-
         const completedDate = document.createElement('span');
         completedDate.textContent = work.completedDate;
-
         const completedBy = document.createElement('span');
         completedBy.textContent = ` (담당: ${work.assignee || '미정'})`;
         completedBy.style.color = '#666';
-
         completedInfo.appendChild(completedLabel);
         completedInfo.appendChild(completedDate);
         completedInfo.appendChild(completedBy);
         cardBody.appendChild(completedInfo);
       }
-      
       card.appendChild(cardBody);
-      
       // 담당자 선택 영역 (완료/미완료 모두 표시)
       const personContainer = document.createElement('div');
       personContainer.className = 'person-select-container';
-
       // ========== 담당자 영역 ==========
       const assigneeWrapper = document.createElement('div');
       assigneeWrapper.className = 'select-wrapper';
@@ -1769,7 +1744,6 @@
       }
       assigneeWrapper.appendChild(assigneeLabel);
       assigneeWrapper.appendChild(assigneeSelect);
-
       // 컨테이너에 담당자 추가
       personContainer.appendChild(assigneeWrapper);
       card.appendChild(personContainer);
@@ -1915,12 +1889,10 @@
       const work = works[workId];
       if (!work) return;
       const workRef = window.dbRef(window.db, `works/${workId}`);
-
       const isCompleting = !work.completed;
       const updateData = {
         completed: isCompleting
       };
-
       // 완료 처리할 때 완료 날짜 저장
       if (isCompleting) {
         updateData.completedDate = new Date().toISOString().split('T')[0];
@@ -1928,7 +1900,6 @@
         // 완료 취소할 때 완료 날짜 제거
         updateData.completedDate = null;
       }
-
       window.dbUpdate(workRef, updateData);
     }
     // 담당자 저장
@@ -1938,7 +1909,6 @@
         assignee: assignee
       });
     }
-
     // 작업 삭제
     function deleteWork(workId) {
       const work = works[workId];
@@ -2104,42 +2074,33 @@
     document.getElementById('newSiteName').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') addSite();
     });
-    
     // 완료 기한 관련 변수
     let currentEditingWorkId = null;
-
     // 완료 기한 모달 열기
     function openDeadlineModal(workId, currentDeadline) {
       currentEditingWorkId = workId;
       const modal = document.getElementById('deadlineModal');
-
       // 날짜 옵션 업데이트
       const today = new Date();
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
-
       // 이번주 금요일 계산
       const friday = new Date(today);
       const day = today.getDay();
       const diff = (5 - day + 7) % 7;
       friday.setDate(friday.getDate() + (diff === 0 ? 7 : diff));
-
       document.getElementById('todayDate').textContent = today.toISOString().split('T')[0];
       document.getElementById('tomorrowDate').textContent = tomorrow.toISOString().split('T')[0];
       document.getElementById('thisWeekDate').textContent = friday.toISOString().split('T')[0];
       document.getElementById('customDeadlineInput').value = currentDeadline;
-
       modal.classList.add('active');
     }
-
     // 완료 기한 선택
     window.selectDeadline = function(option) {
       if (!currentEditingWorkId) return;
-
       let selectedDate;
       const today = new Date();
-
-      switch(option) {
+      switch (option) {
         case 'today':
           selectedDate = today.toISOString().split('T')[0];
           break;
@@ -2163,25 +2124,22 @@
           }
           break;
       }
-
       // Firebase 업데이트
       const workRef = window.dbRef(window.db, `works/${currentEditingWorkId}`);
       window.dbUpdate(workRef, {
         deadline: selectedDate
       });
-
       // 모달 닫기
       document.getElementById('deadlineModal').classList.remove('active');
       currentEditingWorkId = null;
     };
-
     // 모달 외부 클릭 시 닫기
     document.getElementById('deadlineModal').addEventListener('click', (e) => {
       if (e.target === document.getElementById('deadlineModal')) {
         document.getElementById('deadlineModal').classList.remove('active');
         currentEditingWorkId = null;
       }
-    });    
+    });
   </script>
 </body>
 
