@@ -380,6 +380,20 @@
       user-select: none;
       padding: 4px;
     }
+    
+    .order-number {
+      background: #0d7377;
+      color: white;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 13px;
+      flex-shrink: 0;
+    }    
 
     .drag-handle:active {
       cursor: grabbing;
@@ -1920,6 +1934,10 @@
       container.innerHTML = '';
 
       const myActiveWorks = myWorks.filter(w => !w.completed);
+
+      // 🆕 순서대로 정렬
+      myActiveWorks.sort((a, b) => (a.order || 999) - (b.order || 999));
+
       if (myActiveWorks.length > 0) {
         const header = document.createElement('div');
         header.className = 'section-header my-work' + (sectionStates.myActive ? '' : ' collapsed');
@@ -1930,9 +1948,13 @@
         const grid = document.createElement('div');
         grid.className = 'task-grid' + (sectionStates.myActive ? '' : ' collapsed');
         grid.id = 'myTaskGrid';
-        myActiveWorks.forEach(work => {
+
+        // 🆕 순서 번호를 포함하여 카드 생성
+        myActiveWorks.forEach((work, index) => {
+          work.orderNumber = index + 1;  // 순서 번호 추가
           grid.appendChild(createWorkCard(work, false));
         });
+
         container.appendChild(grid);
       }
 
@@ -2039,6 +2061,14 @@
         });
 
         card.appendChild(dragHandle);
+
+        // 🆕 순서 번호 추가
+        if (work.orderNumber) {
+          const orderNum = document.createElement('div');
+          orderNum.className = 'order-number';
+          orderNum.textContent = work.orderNumber;
+          card.appendChild(orderNum);
+        }
       }
 
       const checkbox = document.createElement('div');
@@ -2228,16 +2258,19 @@
         const draggedWork = works[draggedWorkId];
         const targetWork = works[this.dataset.workId];
 
-        const tempDate = draggedWork.date;
-        const draggedRef = window.dbRef(window.db, `works/${draggedWorkId}`);
-        const targetRef = window.dbRef(window.db, `works/${this.dataset.workId}`);
+      // 순서 교환
+      const tempOrder = draggedWork.order || 999;
+      const draggedRef = window.dbRef(window.db, `works/${draggedWorkId}`);
+      const targetRef = window.dbRef(window.db, `works/${this.dataset.workId}`);
 
-        window.dbUpdate(draggedRef, {
-          date: targetWork.date
-        });
-        window.dbUpdate(targetRef, {
-          date: tempDate
-        });
+      window.dbUpdate(draggedRef, {
+        order: targetWork.order || 999
+      });
+      window.dbUpdate(targetRef, {
+        order: tempOrder
+      });
+
+      console.log(`✅ 순서 변경: ${draggedWork.site} ↔ ${targetWork.site}`);
       }
 
       this.classList.remove('drag-over');
