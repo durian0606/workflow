@@ -177,6 +177,12 @@
       gap: 12px;
     }
 
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
     .user-avatar {
       width: 40px;
       height: 40px;
@@ -759,7 +765,6 @@
       background: #f5f7fa;
       border-radius: 8px;
       margin-bottom: 8px;
-      cursor: pointer;
       transition: all 0.2s;
       display: flex;
       justify-content: space-between;
@@ -768,13 +773,24 @@
 
     .site-item:hover {
       background: #e8eef3;
-      transform: translateX(4px);
+    }
+
+    .site-item-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
 
     .site-item-name {
       font-size: 14px;
       color: #333;
-      font-weight: 500;
+      font-weight: 600;
+    }
+
+    .site-item-address {
+      font-size: 12px;
+      color: #666;
     }
 
     .site-item-delete {
@@ -914,7 +930,22 @@
 
     .add-site-form {
       display: flex;
-      gap: 8px;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .site-list-section {
+      margin-top: 20px;
+    }
+
+    .site-list-title {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 12px;
+      font-weight: 600;
     }
 
     @media (max-width: 768px) {
@@ -1013,7 +1044,7 @@
   <!-- 메인 앱 -->
   <div class="app-container" id="appContainer">
     <div class="app-header">
-      <!-- 첫 번째 줄: 로고, 사용자 정보, 로그아웃 -->
+      <!-- 첫 번째 줄: 로고, 사용자 정보, 현장, 로그아웃 -->
       <div class="header-row-1">
         <div class="header-left">
           <div class="user-avatar" id="userAvatar"></div>
@@ -1022,10 +1053,13 @@
             <div class="user-name" id="headerUserName"></div>
           </div>
         </div>
-        <button class="header-btn" onclick="logout()">로그아웃</button>
+        <div class="header-right">
+          <button class="header-btn" onclick="toggleSiteModal()">📍 현장추가</button>
+          <button class="header-btn" onclick="logout()">로그아웃</button>
+        </div>
       </div>
 
-      <!-- 두 번째 줄: 날짜 네비게이션, 현장 버튼 -->
+      <!-- 두 번째 줄: 날짜 네비게이션 -->
       <div class="header-row-2">
         <div class="date-display" id="dateDisplay"></div>
         <div class="nav-buttons">
@@ -1033,7 +1067,6 @@
           <button class="nav-btn" onclick="changeDate(-1)">◀</button>
           <button class="nav-btn" onclick="changeDate(1)">▶</button>
         </div>
-        <button class="header-btn" onclick="toggleSiteModal()">📍 현장</button>
       </div>
     </div>
 
@@ -1057,10 +1090,9 @@
         <!-- 지도 섹션 -->
         <div class="map-section">
           <div class="map-section-header">
-            <h3 class="map-section-title">📍 현장 위치</h3>
+            <h3 class="map-section-title">🚗 이동 경로</h3>
             <div class="map-controls">
               <button class="map-btn" onclick="showCurrentLocation()">내 위치</button>
-              <button class="map-btn" onclick="toggleSiteModal()">현장 추가</button>
             </div>
           </div>
           <div id="map"></div>
@@ -1084,15 +1116,19 @@
   <div class="modal-overlay" id="siteModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title">현장 관리</h3>
+        <h3 class="modal-title">현장 추가</h3>
         <button class="close-btn" onclick="toggleSiteModal()">×</button>
       </div>
 
-      <ul class="site-list" id="siteList"></ul>
-
       <div class="add-site-form">
-        <input type="text" class="task-input" id="newSiteName" placeholder="새 현장 이름">
-        <button class="add-btn" onclick="addSite()">추가</button>
+        <input type="text" class="task-input" id="newSiteName" placeholder="현장명 입력">
+        <input type="text" class="task-input" id="newSiteAddress" placeholder="주소 입력">
+        <button class="add-btn" onclick="addSite()">저장</button>
+      </div>
+
+      <div class="site-list-section">
+        <h4 class="site-list-title">저장된 현장 목록</h4>
+        <ul class="site-list" id="siteList"></ul>
       </div>
     </div>
   </div>
@@ -1178,6 +1214,8 @@
     let currentUser = null;
     let map = null;
     let currentMarker = null;
+    let routeMarkers = [];  // 🆕 추가
+    let routeLine = null;    // 🆕 추가
     let draggedElement = null;
     let draggedWorkId = null;
     // 섹션 접기/펼치기 상태
@@ -1260,6 +1298,120 @@
         alert('이 브라우저는 위치 서비스를 지원하지 않습니다.');
       }
     };
+    
+}
+    };
+    
+    // 🆕 이동 경로 표시 함수 추가 (여기부터 추가)
+    function displayRouteOnMap() {
+      if (!map) {
+        console.log('지도가 초기화되지 않았습니다.');
+        return;
+      }
+
+      // 기존 마커와 선 제거
+      routeMarkers.forEach(marker => marker.setMap(null));
+      routeMarkers = [];
+      if (routeLine) {
+        routeLine.setMap(null);
+        routeLine = null;
+      }
+
+      // 현재 날짜의 내 작업 중 미완료 작업만 가져오기
+      const searchDate = currentDate.toISOString().split('T')[0];
+      const myWorks = [];
+
+      Object.keys(works).forEach(workId => {
+        const work = works[workId];
+        
+        // 시험 관련 작업인 경우
+        if (work.work === '시험' || work.parentWorkId) {
+          if (work.date === searchDate && work.assignee === currentUser && !work.completed) {
+            myWorks.push({ ...work, id: workId });
+          }
+        }
+        // 일반 작업인 경우
+        else {
+          if (!work.completed && work.date <= searchDate && work.assignee === currentUser) {
+            myWorks.push({ ...work, id: workId });
+          }
+        }
+      });
+
+      if (myWorks.length === 0) {
+        console.log('표시할 작업이 없습니다.');
+        return;
+      }
+
+      // 주소를 좌표로 변환하고 마커 표시
+      const geocoder = new kakao.maps.services.Geocoder();
+      const positions = [];
+      let processedCount = 0;
+
+      myWorks.forEach((work, index) => {
+        const site = Object.values(sites).find(s => s.name === work.site);
+        
+        if (!site || !site.address) {
+          processedCount++;
+          checkComplete();
+          return;
+        }
+
+        // 주소로 좌표 검색
+        geocoder.addressSearch(site.address, function(result, status) {
+          if (status === kakao.maps.services.Status.OK) {
+            const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+            positions.push({ coords, site: work.site, index: index + 1 });
+
+            // 마커 생성
+            const marker = new kakao.maps.Marker({
+              position: coords,
+              map: map
+            });
+
+            // 번호 표시 인포윈도우
+            const infowindow = new kakao.maps.InfoWindow({
+              content: `<div style="padding:5px 10px;font-size:12px;font-weight:600;color:#0d7377;">${index + 1}. ${work.site}</div>`,
+              removable: false
+            });
+            infowindow.open(map, marker);
+
+            routeMarkers.push(marker);
+          }
+          
+          processedCount++;
+          checkComplete();
+        });
+      });
+
+      // 모든 주소 검색 완료 후 경로 그리기
+      function checkComplete() {
+        if (processedCount === myWorks.length && positions.length > 0) {
+          // 좌표 정렬 (원래 순서대로)
+          positions.sort((a, b) => a.index - b.index);
+          
+          // 경로선 그리기
+          if (positions.length > 1) {
+            const linePath = positions.map(p => p.coords);
+            routeLine = new kakao.maps.Polyline({
+              path: linePath,
+              strokeWeight: 4,
+              strokeColor: '#0d7377',
+              strokeOpacity: 0.7,
+              strokeStyle: 'solid'
+            });
+            routeLine.setMap(map);
+          }
+
+          // 지도 범위 재설정
+          const bounds = new kakao.maps.LatLngBounds();
+          positions.forEach(p => bounds.extend(p.coords));
+          map.setBounds(bounds);
+        }
+      }
+    }
+    // 🆕 여기까지 추가
+    
     // 사용자 목록 로드
     function loadAssignees() {
       const assigneesRef = window.dbRef(window.db, 'assignees');
@@ -1588,6 +1740,9 @@
                 `;
         container.appendChild(emptyState);
       }
+      
+      // 🆕 이동 경로 표시
+      displayRouteOnMap();
     }
     // 섹션 접기/펼치기 토글
     function toggleSection(sectionKey) {
@@ -1953,14 +2108,27 @@
         const site = sites[id];
         const li = document.createElement('li');
         li.className = 'site-item';
-        const name = document.createElement('span');
+
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'site-item-info';
+
+        const name = document.createElement('div');
         name.className = 'site-item-name';
         name.textContent = site.name;
+
+        const address = document.createElement('div');
+        address.className = 'site-item-address';
+        address.textContent = site.address || '주소 없음';
+
+        infoDiv.appendChild(name);
+        infoDiv.appendChild(address);
+
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'site-item-delete';
         deleteBtn.textContent = '삭제';
         deleteBtn.onclick = () => deleteSite(id);
-        li.appendChild(name);
+
+        li.appendChild(infoDiv);
         li.appendChild(deleteBtn);
         list.appendChild(li);
       });
@@ -1987,18 +2155,33 @@
       toggleSiteSelectModal();
     }
     window.addSite = function() {
-      const input = document.getElementById('newSiteName');
-      const name = input.value.trim();
+      const nameInput = document.getElementById('newSiteName');
+      const addressInput = document.getElementById('newSiteAddress');
+      const name = nameInput.value.trim();
+      const address = addressInput.value.trim();
+
       if (!name) {
-        alert('현장 이름을 입력하세요.');
+        alert('현장명을 입력하세요.');
         return;
       }
+
+      if (!address) {
+        alert('주소를 입력하세요.');
+        return;
+      }
+
       const sitesRef = window.dbRef(window.db, 'sites');
       const newSiteRef = window.dbPush(sitesRef);
       window.dbSet(newSiteRef, {
-        name: name
+        name: name,
+        address: address,
+        createdAt: new Date().toISOString()
       });
-      input.value = '';
+
+      nameInput.value = '';
+      addressInput.value = '';
+
+      alert('현장이 추가되었습니다.');
     };
 
     function deleteSite(id) {
