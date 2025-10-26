@@ -14,8 +14,9 @@
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      height: 100vh;
-      overflow: hidden;
+      min-height: 100vh;  /* height → min-height */
+      overflow-x: hidden; /* 가로만 막기 */
+      overflow-y: auto;   /* 세로는 허용 */
       background: linear-gradient(135deg, #0d7377 0%, #14ccb8 100%);
       touch-action: pan-y;
     }
