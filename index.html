@@ -1793,6 +1793,7 @@
         completed: false,
         createdAt: new Date().toISOString(),
         deadline: work === '시험' ? null : todayStr
+        order: Date.now()
       });
 
       if (work === '시험') {
@@ -2050,14 +2051,22 @@
         const dragHandle = document.createElement('div');
         dragHandle.className = 'drag-handle';
         dragHandle.textContent = '⋮⋮';
-        dragHandle.draggable = true;
 
+        // 드래그 핸들을 눌렀을 때 카드를 드래그 가능하게 만듦
         dragHandle.addEventListener('mousedown', (e) => {
+          e.preventDefault();
           card.draggable = true;
         });
 
         dragHandle.addEventListener('mouseup', (e) => {
-          card.draggable = false;
+          setTimeout(() => {
+            card.draggable = false;
+          }, 100);
+        });
+
+        // 드래그 핸들에서 드래그 시작
+        dragHandle.addEventListener('dragstart', (e) => {
+          e.stopPropagation();
         });
 
         card.appendChild(dragHandle);
@@ -2253,27 +2262,58 @@
       if (e.stopPropagation) {
         e.stopPropagation();
       }
+      e.preventDefault();
 
-      if (draggedElement !== this) {
+      this.classList.remove('drag-over');
+
+      if (draggedElement !== this && draggedWorkId) {
         const draggedWork = works[draggedWorkId];
         const targetWork = works[this.dataset.workId];
 
-      // 순서 교환
-      const tempOrder = draggedWork.order || 999;
-      const draggedRef = window.dbRef(window.db, `works/${draggedWorkId}`);
-      const targetRef = window.dbRef(window.db, `works/${this.dataset.workId}`);
+        console.log('🔄 드래그:', draggedWork?.site, '→ 타겟:', targetWork?.site);
 
-      window.dbUpdate(draggedRef, {
-        order: targetWork.order || 999
-      });
-      window.dbUpdate(targetRef, {
-        order: tempOrder
-      });
+        // 내 작업 진행중 리스트에서만 순서 변경
+        if (draggedWork && targetWork && 
+            draggedWork.assignee === currentUser && 
+            targetWork.assignee === currentUser &&
+            !draggedWork.completed && !targetWork.completed) {
 
-      console.log(`✅ 순서 변경: ${draggedWork.site} ↔ ${targetWork.site}`);
+          // 현재 내 작업들의 순서 가져오기
+          const myWorks = Object.keys(works)
+            .filter(id => {
+              const w = works[id];
+              return w.assignee === currentUser && !w.completed &&
+                     (w.work !== '시험' && !w.parentWorkId ? w.date <= currentDate.toISOString().split('T')[0] : w.date === currentDate.toISOString().split('T')[0]);
+            })
+            .map(id => ({ id, order: works[id].order || 0 }))
+            .sort((a, b) => a.order - b.order);
+
+          console.log('📋 현재 작업 리스트:', myWorks);
+
+          const draggedIndex = myWorks.findIndex(w => w.id === draggedWorkId);
+          const targetIndex = myWorks.findIndex(w => w.id === this.dataset.workId);
+
+          console.log('📍 드래그 인덱스:', draggedIndex, '→ 타겟 인덱스:', targetIndex);
+
+          if (draggedIndex !== -1 && targetIndex !== -1) {
+            // 드래그한 항목 제거
+            const [removed] = myWorks.splice(draggedIndex, 1);
+
+            // 타겟 위치에 삽입
+            myWorks.splice(targetIndex, 0, removed);
+
+            // 새로운 순서로 업데이트
+            myWorks.forEach((work, index) => {
+              const workRef = window.dbRef(window.db, `works/${work.id}`);
+              window.dbUpdate(workRef, { order: index });
+              console.log(`✅ 순서 업데이트: ${works[work.id].site} → order: ${index}`);
+            });
+
+            console.log('✅ 순서 변경 완료!');
+          }
+        }
       }
 
-      this.classList.remove('drag-over');
       return false;
     }
 
