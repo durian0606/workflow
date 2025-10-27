@@ -1961,60 +1961,86 @@
           }, 100);
         });
 
-        // 🆕 모바일용 터치 드래그
+        // 🆕 모바일용 터치 드래그 (개선된 버전)
         let touchStartY = 0;
-        let touchStartElement = null;
-        let ghostElement = null;
+        let touchCurrentY = 0;
+        let isDragging = false;
+        let scrollContainer = null;
 
         dragHandle.addEventListener('touchstart', (e) => {
           e.stopPropagation();
+
           touchStartY = e.touches[0].clientY;
-          touchStartElement = card;
+          isDragging = false; // 아직 드래그 시작 안함
 
-          // 드래그 중인 카드 표시
-          card.classList.add('dragging');
+          // 스크롤 컨테이너 찾기
+          scrollContainer = card.closest('.task-container');
 
-          // 고스트 엘리먼트 생성 (드래그 중 시각 효과)
-          ghostElement = card.cloneNode(true);
-          ghostElement.style.position = 'fixed';
-          ghostElement.style.opacity = '0.7';
-          ghostElement.style.pointerEvents = 'none';
-          ghostElement.style.width = card.offsetWidth + 'px';
-          ghostElement.style.zIndex = '10000';
-          document.body.appendChild(ghostElement);
-
-          updateGhostPosition(e.touches[0]);
+          console.log('🟢 터치 시작:', work.site);
         });
 
         dragHandle.addEventListener('touchmove', (e) => {
-          if (!touchStartElement) return;
-          e.preventDefault();
+          touchCurrentY = e.touches[0].clientY;
+          const deltaY = Math.abs(touchCurrentY - touchStartY);
 
-          updateGhostPosition(e.touches[0]);
+          // 10px 이상 움직이면 드래그로 인식
+          if (deltaY > 10) {
+            if (!isDragging) {
+              isDragging = true;
+              card.classList.add('dragging');
+              console.log('🔵 드래그 시작');
+            }
 
-          // 현재 터치 위치의 엘리먼트 찾기
-          const touch = e.touches[0];
-          const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-          const targetCard = elementBelow?.closest('.task-card');
+            e.preventDefault(); // 드래그 중에만 스크롤 방지
 
-          // 모든 카드의 drag-over 제거
-          document.querySelectorAll('.task-card').forEach(c => c.classList.remove('drag-over'));
+            // 현재 터치 위치의 엘리먼트 찾기
+            const touch = e.touches[0];
 
-          // 타겟 카드에 drag-over 추가
-          if (targetCard && targetCard !== card) {
-            targetCard.classList.add('drag-over');
+            // 중요: 드래그 중인 카드를 임시로 숨기고 아래 엘리먼트 찾기
+            const originalVisibility = card.style.visibility;
+            card.style.visibility = 'hidden';
+
+            const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+
+            card.style.visibility = originalVisibility;
+
+            const targetCard = elementBelow?.closest('.task-card');
+
+            // 모든 카드의 drag-over 제거
+            document.querySelectorAll('.task-card').forEach(c => c.classList.remove('drag-over'));
+
+            // 타겟 카드에 drag-over 추가
+            if (targetCard && targetCard !== card && !targetCard.classList.contains('completed')) {
+              targetCard.classList.add('drag-over');
+              console.log('🎯 타겟 위에:', works[targetCard.dataset.workId]?.site);
+            }
           }
-        });
+        }, { passive: false });
 
         dragHandle.addEventListener('touchend', (e) => {
-          if (!touchStartElement) return;
+          if (!isDragging) {
+            // 드래그가 아니라 그냥 탭이었음
+            console.log('❌ 드래그 없음 (탭)');
+            card.classList.remove('dragging');
+            document.querySelectorAll('.task-card').forEach(c => c.classList.remove('drag-over'));
+            return;
+          }
 
           const touch = e.changedTouches[0];
+
+          // 드래그 중인 카드를 임시로 숨기고 타겟 찾기
+          card.style.visibility = 'hidden';
           const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+          card.style.visibility = 'visible';
+
           const targetCard = elementBelow?.closest('.task-card');
 
+          console.log('🔴 터치 종료');
+          console.log('   드래그:', work.site);
+          console.log('   타겟:', targetCard ? works[targetCard.dataset.workId]?.site : '없음');
+
           // 드래그 종료 처리
-          if (targetCard && targetCard !== card) {
+          if (targetCard && targetCard !== card && !targetCard.classList.contains('completed')) {
             const draggedWorkId = card.dataset.workId;
             const targetWorkId = targetCard.dataset.workId;
 
@@ -2045,6 +2071,8 @@
               const draggedIndex = myWorks.findIndex(w => w.id === draggedWorkId);
               const targetIndex = myWorks.findIndex(w => w.id === targetWorkId);
 
+              console.log('   인덱스:', draggedIndex, '→', targetIndex);
+
               if (draggedIndex !== -1 && targetIndex !== -1) {
                 const [removed] = myWorks.splice(draggedIndex, 1);
                 myWorks.splice(targetIndex, 0, removed);
@@ -2055,6 +2083,11 @@
                 });
 
                 console.log('✅ 모바일 순서 변경 완료!');
+
+                // 햅틱 피드백
+                if (navigator.vibrate) {
+                  navigator.vibrate(50);
+                }
               }
             }
           }
@@ -2062,21 +2095,12 @@
           // 정리
           card.classList.remove('dragging');
           document.querySelectorAll('.task-card').forEach(c => c.classList.remove('drag-over'));
-          if (ghostElement) {
-            ghostElement.remove();
-            ghostElement = null;
-          }
-          touchStartElement = null;
-        });
+          isDragging = false;
+        }, { passive: false });
 
-        function updateGhostPosition(touch) {
-          if (ghostElement) {
-            ghostElement.style.left = (touch.clientX - ghostElement.offsetWidth / 2) + 'px';
-            ghostElement.style.top = (touch.clientY - 30) + 'px';
-          }
-        }
+        card.appendChild(dragHandle);
 
-        card.appendChild(dragHandle);        // 🆕 순서 번호 추가
+        // 순서 번호 추가
         if (work.orderNumber) {
           const orderNum = document.createElement('div');
           orderNum.className = 'order-number';
