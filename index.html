@@ -375,10 +375,11 @@
 
     .drag-handle {
       cursor: grab;
-      font-size: 18px;
+      font-size: 36px;
       color: #999;
       user-select: none;
-      padding: 4px;
+      padding: 8px;
+      line-height: 1;
     }
 
     .order-number {
@@ -1944,6 +1945,7 @@
         card.addEventListener('dragover', handleDragOver);
         card.addEventListener('drop', handleDrop);
         card.addEventListener('dragleave', handleDragLeave);
+        // ✅ 문제 있던 코드 제거됨
       }
       if (!isCompleted) {
         const dragHandle = document.createElement('div');
@@ -1952,6 +1954,7 @@
         // PC용 드래그
         dragHandle.addEventListener('mousedown', (e) => {
           e.preventDefault();
+          e.stopPropagation();  // ✅ 이벤트 전파 방지 추가
           card.draggable = true;
         });
         dragHandle.addEventListener('mouseup', (e) => {
@@ -2053,11 +2056,11 @@
                 myWorks.splice(targetIndex, 0, removed);
                 myWorks.forEach((work, index) => {
                   const workRef = window.dbRef(window.db, `works/${work.id}`);
-                  window.dbUpdate(workRef, {
-                    order: index
-                  });
+                  window.dbUpdate(workRef, { order: index });
                 });
                 console.log('✅ 모바일 순서 변경 완료!');
+                // 🆕 순서 번호 자동 업데이트
+                setTimeout(() => renderWorks(), 100);
                 // 햅틱 피드백
                 if (navigator.vibrate) {
                   navigator.vibrate(50);
@@ -2209,7 +2212,6 @@
 
     function handleDragEnd(e) {
       this.classList.remove('dragging');
-      // 🔥 드래그 끝나면 최종 순서를 Firebase에 저장
       const grid = this.closest('.task-grid');
       if (grid && grid.id === 'myTaskGrid') {
         const cards = Array.from(grid.querySelectorAll('.task-card'));
@@ -2217,12 +2219,12 @@
           const workId = card.dataset.workId;
           if (workId) {
             const workRef = window.dbRef(window.db, `works/${workId}`);
-            window.dbUpdate(workRef, {
-              order: index
-            });
+            window.dbUpdate(workRef, { order: index });
           }
         });
         console.log('✅ 드래그 종료 - 순서 저장 완료!');
+        // 🆕 순서 번호 자동 업데이트를 위해 renderWorks 호출
+        setTimeout(() => renderWorks(), 100);
       }
     }
 
