@@ -1949,41 +1949,32 @@
         const dragHandle = document.createElement('div');
         dragHandle.className = 'drag-handle';
         dragHandle.textContent = '⋮⋮';
-
         // PC용 드래그
         dragHandle.addEventListener('mousedown', (e) => {
           e.preventDefault();
           card.draggable = true;
         });
-
         dragHandle.addEventListener('mouseup', (e) => {
           setTimeout(() => {
             card.draggable = false;
           }, 100);
         });
-
         // 🆕 모바일용 터치 드래그 (개선된 버전)
         let touchStartY = 0;
         let touchCurrentY = 0;
         let isDragging = false;
         let scrollContainer = null;
-
         dragHandle.addEventListener('touchstart', (e) => {
           e.stopPropagation();
-
           touchStartY = e.touches[0].clientY;
           isDragging = false; // 아직 드래그 시작 안함
-
           // 스크롤 컨테이너 찾기
           scrollContainer = card.closest('.task-container');
-
           console.log('🟢 터치 시작:', work.site);
         });
-
         dragHandle.addEventListener('touchmove', (e) => {
           touchCurrentY = e.touches[0].clientY;
           const deltaY = Math.abs(touchCurrentY - touchStartY);
-
           // 10px 이상 움직이면 드래그로 인식
           if (deltaY > 10) {
             if (!isDragging) {
@@ -1991,33 +1982,26 @@
               card.classList.add('dragging');
               console.log('🔵 드래그 시작');
             }
-
             e.preventDefault(); // 드래그 중에만 스크롤 방지
-
             // 현재 터치 위치의 엘리먼트 찾기
             const touch = e.touches[0];
-
             // 중요: 드래그 중인 카드를 임시로 숨기고 아래 엘리먼트 찾기
             const originalVisibility = card.style.visibility;
             card.style.visibility = 'hidden';
-
             const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-
             card.style.visibility = originalVisibility;
-
             const targetCard = elementBelow?.closest('.task-card');
-
             // 모든 카드의 drag-over 제거
             document.querySelectorAll('.task-card').forEach(c => c.classList.remove('drag-over'));
-
             // 타겟 카드에 drag-over 추가
             if (targetCard && targetCard !== card && !targetCard.classList.contains('completed')) {
               targetCard.classList.add('drag-over');
               console.log('🎯 타겟 위에:', works[targetCard.dataset.workId]?.site);
             }
           }
-        }, { passive: false });
-
+        }, {
+          passive: false
+        });
         dragHandle.addEventListener('touchend', (e) => {
           if (!isDragging) {
             // 드래그가 아니라 그냥 탭이었음
@@ -2026,65 +2010,54 @@
             document.querySelectorAll('.task-card').forEach(c => c.classList.remove('drag-over'));
             return;
           }
-
           const touch = e.changedTouches[0];
-
           // 드래그 중인 카드를 임시로 숨기고 타겟 찾기
           card.style.visibility = 'hidden';
           const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
           card.style.visibility = 'visible';
-
           const targetCard = elementBelow?.closest('.task-card');
-
           console.log('🔴 터치 종료');
           console.log('   드래그:', work.site);
           console.log('   타겟:', targetCard ? works[targetCard.dataset.workId]?.site : '없음');
-
           // 드래그 종료 처리
           if (targetCard && targetCard !== card && !targetCard.classList.contains('completed')) {
             const draggedWorkId = card.dataset.workId;
             const targetWorkId = targetCard.dataset.workId;
-
             const draggedWork = works[draggedWorkId];
             const targetWork = works[targetWorkId];
-
-            if (draggedWork && targetWork && 
-                draggedWork.assignee === currentUser && 
-                targetWork.assignee === currentUser &&
-                !draggedWork.completed && !targetWork.completed) {
-
+            if (draggedWork && targetWork &&
+              draggedWork.assignee === currentUser &&
+              targetWork.assignee === currentUser &&
+              !draggedWork.completed && !targetWork.completed) {
               const searchDate = currentDate.toISOString().split('T')[0];
-
               const myWorks = Object.keys(works)
                 .filter(id => {
                   const w = works[id];
                   if (w.assignee !== currentUser || w.completed) return false;
-
                   if (w.work === '시험' || w.parentWorkId) {
                     return w.date === searchDate;
                   } else {
                     return w.date <= searchDate;
                   }
                 })
-                .map(id => ({ id, order: works[id].order || 999 }))
+                .map(id => ({
+                  id,
+                  order: works[id].order || 999
+                }))
                 .sort((a, b) => a.order - b.order);
-
               const draggedIndex = myWorks.findIndex(w => w.id === draggedWorkId);
               const targetIndex = myWorks.findIndex(w => w.id === targetWorkId);
-
               console.log('   인덱스:', draggedIndex, '→', targetIndex);
-
               if (draggedIndex !== -1 && targetIndex !== -1) {
                 const [removed] = myWorks.splice(draggedIndex, 1);
                 myWorks.splice(targetIndex, 0, removed);
-
                 myWorks.forEach((work, index) => {
                   const workRef = window.dbRef(window.db, `works/${work.id}`);
-                  window.dbUpdate(workRef, { order: index });
+                  window.dbUpdate(workRef, {
+                    order: index
+                  });
                 });
-
                 console.log('✅ 모바일 순서 변경 완료!');
-
                 // 햅틱 피드백
                 if (navigator.vibrate) {
                   navigator.vibrate(50);
@@ -2092,15 +2065,14 @@
               }
             }
           }
-
           // 정리
           card.classList.remove('dragging');
           document.querySelectorAll('.task-card').forEach(c => c.classList.remove('drag-over'));
           isDragging = false;
-        }, { passive: false });
-
+        }, {
+          passive: false
+        });
         card.appendChild(dragHandle);
-
         // 순서 번호 추가
         if (work.orderNumber) {
           const orderNum = document.createElement('div');
@@ -2237,20 +2209,48 @@
 
     function handleDragEnd(e) {
       this.classList.remove('dragging');
-      document.querySelectorAll('.task-card').forEach(card => {
-        card.classList.remove('drag-over');
-      });
+      // 🔥 드래그 끝나면 최종 순서를 Firebase에 저장
+      const grid = this.closest('.task-grid');
+      if (grid && grid.id === 'myTaskGrid') {
+        const cards = Array.from(grid.querySelectorAll('.task-card'));
+        cards.forEach((card, index) => {
+          const workId = card.dataset.workId;
+          if (workId) {
+            const workRef = window.dbRef(window.db, `works/${workId}`);
+            window.dbUpdate(workRef, {
+              order: index
+            });
+          }
+        });
+        console.log('✅ 드래그 종료 - 순서 저장 완료!');
+      }
     }
 
     function handleDragOver(e) {
-      if (e.preventDefault) {
-        e.preventDefault();
-      }
-      e.dataTransfer.dropEffect = 'move';
+      e.preventDefault();
+
       const draggedCard = document.querySelector('.dragging');
-      if (this !== draggedCard) {
-        this.classList.add('drag-over');
+      if (!draggedCard || this === draggedCard) return false;
+
+      // 내 작업 진행중 섹션인지 확인
+      const targetGrid = this.closest('.task-grid');
+      const draggedGrid = draggedCard.closest('.task-grid');
+
+      if (!targetGrid || !draggedGrid || targetGrid.id !== 'myTaskGrid' || draggedGrid.id !== 'myTaskGrid') {
+        return false;
       }
+
+      // 실시간으로 DOM에서 카드 순서 바꾸기
+      const rect = this.getBoundingClientRect();
+      const mouseY = e.clientY;
+      const middle = rect.top + rect.height / 2;
+
+      if (mouseY < middle) {
+        this.parentNode.insertBefore(draggedCard, this);
+      } else {
+        this.parentNode.insertBefore(draggedCard, this.nextSibling);
+      }
+
       return false;
     }
 
@@ -2259,69 +2259,60 @@
         e.stopPropagation();
       }
       e.preventDefault();
-
       this.classList.remove('drag-over');
-
       if (draggedElement !== this && draggedWorkId) {
         const draggedWork = works[draggedWorkId];
         const targetWork = works[this.dataset.workId];
-
         console.log('🔄 PC 드래그:', draggedWork?.site, '→ 타겟:', targetWork?.site);
-
         // 내 작업 진행중 리스트에서만 순서 변경
-        if (draggedWork && targetWork && 
-            draggedWork.assignee === currentUser && 
-            targetWork.assignee === currentUser &&
-            !draggedWork.completed && !targetWork.completed) {
-
+        if (draggedWork && targetWork &&
+          draggedWork.assignee === currentUser &&
+          targetWork.assignee === currentUser &&
+          !draggedWork.completed && !targetWork.completed) {
           const searchDate = currentDate.toISOString().split('T')[0];
-
           // 현재 내 작업들의 순서 가져오기 (날짜 필터 포함)
           const myWorks = Object.keys(works)
-          .filter(id => {
-            const w = works[id];
-            if (w.assignee !== currentUser || w.completed) return false;
-
-            // 날짜 필터링
-            if (w.work === '시험' || w.parentWorkId) {
-              return w.date === searchDate;
-            } else {
-              return w.date <= searchDate;
-            }
-          })
-          .map(id => ({ id, order: works[id].order || 999 }))
-          .sort((a, b) => a.order - b.order);
-
+            .filter(id => {
+              const w = works[id];
+              if (w.assignee !== currentUser || w.completed) return false;
+              // 날짜 필터링
+              if (w.work === '시험' || w.parentWorkId) {
+                return w.date === searchDate;
+              } else {
+                return w.date <= searchDate;
+              }
+            })
+            .map(id => ({
+              id,
+              order: works[id].order || 999
+            }))
+            .sort((a, b) => a.order - b.order);
           console.log('📋 현재 작업 리스트:', myWorks.length, '개');
-
           const draggedIndex = myWorks.findIndex(w => w.id === draggedWorkId);
           const targetIndex = myWorks.findIndex(w => w.id === this.dataset.workId);
-
           console.log('📍 드래그 인덱스:', draggedIndex, '→ 타겟 인덱스:', targetIndex);
-
           if (draggedIndex !== -1 && targetIndex !== -1) {
             // 드래그한 항목 제거
             const [removed] = myWorks.splice(draggedIndex, 1);
-
             // 타겟 위치에 삽입
             myWorks.splice(targetIndex, 0, removed);
-
             // 새로운 순서로 업데이트
             myWorks.forEach((work, index) => {
               const workRef = window.dbRef(window.db, `works/${work.id}`);
-              window.dbUpdate(workRef, { order: index });
+              window.dbUpdate(workRef, {
+                order: index
+              });
               console.log(`✅ 순서 업데이트: ${works[work.id].site} → order: ${index}`);
             });
-
             console.log('✅ PC 순서 변경 완료!');
           }
         }
       }
-
       return false;
     }
-
+    
     function handleDragLeave(e) {
+      // 드래그 중인 요소가 다른 요소를 벗어날 때 시각적 피드백 제거
       this.classList.remove('drag-over');
     }
     // 시험 작업 타임라인 표시
