@@ -1726,7 +1726,8 @@
         assignee: currentUser,
         completed: false,
         createdAt: new Date().toISOString(),
-        deadline: work === '시험' ? null : todayStr
+        deadline: work === '시험' ? null : todayStr,
+        order: Date.now()  // 🔥 이 줄 추가!
       });
       if (work === '시험') {
         const testDateStr = todayStr;
