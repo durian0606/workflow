@@ -1727,7 +1727,7 @@
         completed: false,
         createdAt: new Date().toISOString(),
         deadline: work === '시험' ? null : todayStr,
-        order: Date.now()  // 🔥 이 줄 추가!
+        order: Date.now()
       });
       if (work === '시험') {
         const testDateStr = todayStr;
@@ -2258,22 +2258,66 @@
       if (e.stopPropagation) {
         e.stopPropagation();
       }
-      if (draggedElement !== this) {
+      e.preventDefault();
+
+      this.classList.remove('drag-over');
+
+      if (draggedElement !== this && draggedWorkId) {
         const draggedWork = works[draggedWorkId];
         const targetWork = works[this.dataset.workId];
-        // 순서 교환
-        const tempOrder = draggedWork.order || 999;
-        const draggedRef = window.dbRef(window.db, `works/${draggedWorkId}`);
-        const targetRef = window.dbRef(window.db, `works/${this.dataset.workId}`);
-        window.dbUpdate(draggedRef, {
-          order: targetWork.order || 999
-        });
-        window.dbUpdate(targetRef, {
-          order: tempOrder
-        });
-        console.log(`✅ 순서 변경: ${draggedWork.site} ↔ ${targetWork.site}`);
+
+        console.log('🔄 PC 드래그:', draggedWork?.site, '→ 타겟:', targetWork?.site);
+
+        // 내 작업 진행중 리스트에서만 순서 변경
+        if (draggedWork && targetWork && 
+            draggedWork.assignee === currentUser && 
+            targetWork.assignee === currentUser &&
+            !draggedWork.completed && !targetWork.completed) {
+
+          const searchDate = currentDate.toISOString().split('T')[0];
+
+          // 현재 내 작업들의 순서 가져오기 (날짜 필터 포함)
+          const myWorks = Object.keys(works)
+          .filter(id => {
+            const w = works[id];
+            if (w.assignee !== currentUser || w.completed) return false;
+
+            // 날짜 필터링
+            if (w.work === '시험' || w.parentWorkId) {
+              return w.date === searchDate;
+            } else {
+              return w.date <= searchDate;
+            }
+          })
+          .map(id => ({ id, order: works[id].order || 999 }))
+          .sort((a, b) => a.order - b.order);
+
+          console.log('📋 현재 작업 리스트:', myWorks.length, '개');
+
+          const draggedIndex = myWorks.findIndex(w => w.id === draggedWorkId);
+          const targetIndex = myWorks.findIndex(w => w.id === this.dataset.workId);
+
+          console.log('📍 드래그 인덱스:', draggedIndex, '→ 타겟 인덱스:', targetIndex);
+
+          if (draggedIndex !== -1 && targetIndex !== -1) {
+            // 드래그한 항목 제거
+            const [removed] = myWorks.splice(draggedIndex, 1);
+
+            // 타겟 위치에 삽입
+            myWorks.splice(targetIndex, 0, removed);
+
+            // 새로운 순서로 업데이트
+            myWorks.forEach((work, index) => {
+              const workRef = window.dbRef(window.db, `works/${work.id}`);
+              window.dbUpdate(workRef, { order: index });
+              console.log(`✅ 순서 업데이트: ${works[work.id].site} → order: ${index}`);
+            });
+
+            console.log('✅ PC 순서 변경 완료!');
+          }
+        }
       }
-      this.classList.remove('drag-over');
+
       return false;
     }
 
