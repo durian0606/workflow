@@ -2045,25 +2045,44 @@
         let touchCurrentY = 0;
         let isDragging = false;
         let scrollContainer = null;
+        let touchStartOrder = []; // 🆕 터치 시작 시 원래 순서 저장
         dragHandle.addEventListener('touchstart', (e) => {
           e.stopPropagation();
           touchStartY = e.touches[0].clientY;
           isDragging = false; // 아직 드래그 시작 안함
           // 스크롤 컨테이너 찾기
           scrollContainer = card.closest('.task-container');
+          
+          // 🆕 PC와 동일: 드래그 시작 시 원래 순서 저장
+          const grid = card.closest('.task-grid');
+          if (grid) {
+            touchStartOrder = Array.from(grid.querySelectorAll('.task-card')).map(c => c.dataset.workId);
+          }
+          
           console.log('🟢 터치 시작:', work.site);
+          console.log('🟢 원래 순서:', touchStartOrder);
         });
         dragHandle.addEventListener('touchmove', (e) => {
           touchCurrentY = e.touches[0].clientY;
           const deltaY = Math.abs(touchCurrentY - touchStartY);
-          // 10px 이상 움직이면 드래그로 인식
-          if (deltaY > 10) {
+          
+          // 🆕 5px 이상 움직이면 드래그로 인식 (더 민감하게)
+          if (deltaY > 5) {
             if (!isDragging) {
               isDragging = true;
               card.classList.add('dragging');
               console.log('🔵 드래그 시작');
+              
+              // 🆕 드래그 시작 시 body 스크롤 완전히 막기
+              document.body.style.overflow = 'hidden';
+              document.body.style.position = 'fixed';
+              document.body.style.width = '100%';
             }
-            e.preventDefault(); // 드래그 중에만 스크롤 방지
+            
+            // 🆕 드래그 중 항상 스크롤 방지
+            e.preventDefault();
+            e.stopPropagation();
+            
             // 현재 터치 위치의 엘리먼트 찾기
             const touch = e.touches[0];
             // 중요: 드래그 중인 카드를 임시로 숨기고 아래 엘리먼트 찾기
@@ -2126,70 +2145,91 @@
           console.log('   드래그:', work.site);
           console.log('   타겟:', targetCard ? works[targetCard.dataset.workId]?.site : '없음');
           
-          // ✅ 드래그 종료 처리 (PC의 handleDragEnd와 동일!)
-          if (targetCard && targetCard !== card && !targetCard.classList.contains('completed')) {
-            const grid = card.closest('.task-grid');
-            if (grid && grid.id === 'myTaskGrid') {
-              // 현재 DOM 순서대로 저장
-              const cards = Array.from(grid.querySelectorAll('.task-card'));
-              const updates = {};
-
-              cards.forEach((c, index) => {
-                const workId = c.dataset.workId;
-                if (workId) {
-                  updates[`works/${workId}/order`] = index;
-                  if (works[workId]) {
-                    works[workId].order = index;
-                  }
-                }
-              });
-
-              window.dbUpdate(window.dbRef(window.db), updates).then(() => {
-                console.log('✅ 모바일 드래그 - 순서 저장 완료');
-                
-                // 🆕 화면 갱신으로 순서 번호 재정렬
-                renderWorks();
-                
-                // 🆕 경로가 표시 중이면 자동으로 업데이트
-                if (isRouteDisplayed && currentPosition) {
-                  console.log('🔄 모바일: 경로 자동 업데이트');
-                  const searchDate = currentDate.toISOString().split('T')[0];
-                  const myActiveWorks = [];
-                  Object.keys(works).forEach(workId => {
-                    const work = works[workId];
-                    if (work.completed) return;
-                    if (work.assignee !== currentUser) return;
-                    let shouldShow = false;
-                    if (work.work === '시험' || work.parentWorkId) {
-                      shouldShow = work.date === searchDate;
-                    } else {
-                      shouldShow = work.date <= searchDate;
-                    }
-                    if (shouldShow) {
-                      myActiveWorks.push(work);
-                    }
-                  });
-                  // 정렬 (새 순서로!)
-                  myActiveWorks.sort((a, b) => {
-                    const orderA = typeof a.order === 'number' ? a.order : 999;
-                    const orderB = typeof b.order === 'number' ? b.order : 999;
-                    if (orderA === orderB) {
-                      return a.id.localeCompare(b.id);
-                    }
-                    return orderA - orderB;
-                  });
-                  if (myActiveWorks.length > 0) {
-                    drawRouteFromCurrentLocation(currentPosition, myActiveWorks);
-                  }
-                }
-              });
-
-              // 햅틱 피드백
-              if (navigator.vibrate) {
-                navigator.vibrate(50);
+          // ✅ 드래그 종료 처리 - PC와 동일한 순서 변경 체크!
+          const grid = card.closest('.task-grid');
+          if (grid && grid.id === 'myTaskGrid') {
+            const cards = Array.from(grid.querySelectorAll('.task-card'));
+            const currentOrder = cards.map(c => c.dataset.workId);
+            
+            // 🆕 PC와 동일: 순서가 실제로 변경되었는지 확인
+            const hasChanged = !touchStartOrder.every((id, index) => id === currentOrder[index]);
+            
+            console.log('🔴 모바일 터치 종료');
+            console.log('   원래 순서:', touchStartOrder);
+            console.log('   현재 순서:', currentOrder);
+            console.log('   변경됨?', hasChanged);
+            
+            if (!hasChanged) {
+              console.log('❌ 순서 변경 없음 - 저장 안 함');
+              // 정리
+              // 정리
+              card.classList.remove('dragging');
+              document.querySelectorAll('.task-card').forEach(c => c.classList.remove('drag-over'));
+              isDragging = false;
+              
+              // 🆕 스크롤 복원
+              document.body.style.overflow = '';
+              document.body.style.position = '';
+              document.body.style.width = '';
+              return;
+            }
+            
+            // 변경되었을 때만 저장
+            const updates = {};
+            cards.forEach((c, index) => {
+              const workId = c.dataset.workId;
+              if (workId && works[workId]) {
+                updates[`works/${workId}/order`] = index;
+                works[workId].order = index;
               }
+            });
+          
+            window.dbUpdate(window.dbRef(window.db), updates).then(() => {
+              console.log('✅ 모바일 드래그 - 순서 저장 완료');
+              
+              // 🆕 화면 갱신으로 순서 번호 재정렬
+              renderWorks();
+              
+              // 🆕 경로가 표시 중이면 자동으로 업데이트
+              if (isRouteDisplayed && currentPosition) {
+                console.log('🔄 모바일: 경로 자동 업데이트');
+                const searchDate = currentDate.toISOString().split('T')[0];
+                const myActiveWorks = [];
+                Object.keys(works).forEach(workId => {
+                  const work = works[workId];
+                  if (work.completed) return;
+                  if (work.assignee !== currentUser) return;
+                  let shouldShow = false;
+                  if (work.work === '시험' || work.parentWorkId) {
+                    shouldShow = work.date === searchDate;
+                  } else {
+                    shouldShow = work.date <= searchDate;
+                  }
+                  if (shouldShow) {
+                    myActiveWorks.push(work);
+                  }
+                });
+                // 정렬 (새 순서로!)
+                myActiveWorks.sort((a, b) => {
+                  const orderA = typeof a.order === 'number' ? a.order : 999;
+                  const orderB = typeof b.order === 'number' ? b.order : 999;
+                  if (orderA === orderB) {
+                    return a.id.localeCompare(b.id);
+                  }
+                  return orderA - orderB;
+                });
+                if (myActiveWorks.length > 0) {
+                  drawRouteFromCurrentLocation(currentPosition, myActiveWorks);
+                }
+              }
+            });
+          
+            // 햅틱 피드백
+            if (navigator.vibrate) {
+              navigator.vibrate(50);
             }
           }
+          
           // 정리
           card.classList.remove('dragging');
           document.querySelectorAll('.task-card').forEach(c => c.classList.remove('drag-over'));
