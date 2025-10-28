@@ -2146,7 +2146,10 @@
 
               window.dbUpdate(window.dbRef(window.db), updates).then(() => {
                 console.log('✅ 모바일 드래그 - 순서 저장 완료');
-
+                
+                // 🆕 화면 갱신으로 순서 번호 재정렬
+                renderWorks();
+                
                 // 🆕 경로가 표시 중이면 자동으로 업데이트
                 if (isRouteDisplayed && currentPosition) {
                   console.log('🔄 모바일: 경로 자동 업데이트');
@@ -2363,10 +2366,14 @@
           }
         });
         // Firebase 업데이트 후 드래그 상태 해제
+        // Firebase 업데이트 후 드래그 상태 해제
         window.dbUpdate(window.dbRef(window.db), updates).then(() => {
           console.log('✅ 순서 저장 완료!');
           isDraggingNow = false;
-
+          
+          // 🆕 화면 갱신으로 순서 번호 재정렬
+          renderWorks();
+          
           // 🆕 경로가 표시 중이면 자동으로 업데이트
           if (isRouteDisplayed && currentPosition) {
             console.log('🔄 경로 자동 업데이트');
