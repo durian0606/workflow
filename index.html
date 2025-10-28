@@ -2133,7 +2133,7 @@
               // 현재 DOM 순서대로 저장
               const cards = Array.from(grid.querySelectorAll('.task-card'));
               const updates = {};
-              
+
               cards.forEach((c, index) => {
                 const workId = c.dataset.workId;
                 if (workId) {
@@ -2143,10 +2143,44 @@
                   }
                 }
               });
-              
-              window.dbUpdate(window.dbRef(window.db), updates);
-              console.log('✅ 모바일 드래그 - 순서 저장');
-              
+
+              window.dbUpdate(window.dbRef(window.db), updates).then(() => {
+                console.log('✅ 모바일 드래그 - 순서 저장 완료');
+
+                // 🆕 경로가 표시 중이면 자동으로 업데이트
+                if (isRouteDisplayed && currentPosition) {
+                  console.log('🔄 모바일: 경로 자동 업데이트');
+                  const searchDate = currentDate.toISOString().split('T')[0];
+                  const myActiveWorks = [];
+                  Object.keys(works).forEach(workId => {
+                    const work = works[workId];
+                    if (work.completed) return;
+                    if (work.assignee !== currentUser) return;
+                    let shouldShow = false;
+                    if (work.work === '시험' || work.parentWorkId) {
+                      shouldShow = work.date === searchDate;
+                    } else {
+                      shouldShow = work.date <= searchDate;
+                    }
+                    if (shouldShow) {
+                      myActiveWorks.push(work);
+                    }
+                  });
+                  // 정렬 (새 순서로!)
+                  myActiveWorks.sort((a, b) => {
+                    const orderA = typeof a.order === 'number' ? a.order : 999;
+                    const orderB = typeof b.order === 'number' ? b.order : 999;
+                    if (orderA === orderB) {
+                      return a.id.localeCompare(b.id);
+                    }
+                    return orderA - orderB;
+                  });
+                  if (myActiveWorks.length > 0) {
+                    drawRouteFromCurrentLocation(currentPosition, myActiveWorks);
+                  }
+                }
+              });
+
               // 햅틱 피드백
               if (navigator.vibrate) {
                 navigator.vibrate(50);
