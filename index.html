@@ -1282,6 +1282,7 @@
     let routeMarkers = []; // 경로 마커들
     let routeLine = null; // 경로 선
     let currentPosition = null; // 현재 위치 저장
+    let isRouteDisplayed = false; // 🆕 경로 표시 중인지 여부
     let draggedElement = null;
     let draggedWorkId = null;
     let originalOrder = []; // 드래그 시작 시 원래 순서 저장
@@ -1359,6 +1360,15 @@
         if (shouldShow) {
           myActiveWorks.push(work);
         }
+      });
+      // 🆕 순서대로 정렬 (리스트와 동일한 순서로!)
+      myActiveWorks.sort((a, b) => {
+        const orderA = typeof a.order === 'number' ? a.order : 999;
+        const orderB = typeof b.order === 'number' ? b.order : 999;
+        if (orderA === orderB) {
+          return a.id.localeCompare(b.id);
+        }
+        return orderA - orderB;
       });
       console.log('📋 내 작업 진행 중:', myActiveWorks.length, '개');
       if (myActiveWorks.length === 0) {
@@ -1598,17 +1608,20 @@
           arrow.setMap(map);
           routeMarkers.push(arrow);
         }
+        
         // 모든 마커가 보이도록 지도 범위 조정
         const bounds = new kakao.maps.LatLngBounds();
         positions.forEach(pos => bounds.extend(pos.coords));
         map.setBounds(bounds);
         document.getElementById('loadingOverlay').classList.remove('active');
         document.getElementById('routeBtn').disabled = false;
+        isRouteDisplayed = true; // 🆕 경로 표시 완료 플래그
         console.log(`✅ ${positions.length - 1}개 현장 경로 표시 완료`);
       }).catch(error => {
         console.error('❌ 경로 표시 중 에러:', error);
         document.getElementById('loadingOverlay').classList.remove('active');
         document.getElementById('routeBtn').disabled = false;
+        isRouteDisplayed = false; // 🆕 에러 발생 시 플래그 false
         alert('경로를 표시하는 중 오류가 발생했습니다.');
       });
     }
@@ -2319,6 +2332,39 @@
         window.dbUpdate(window.dbRef(window.db), updates).then(() => {
           console.log('✅ 순서 저장 완료!');
           isDraggingNow = false;
+
+          // 🆕 경로가 표시 중이면 자동으로 업데이트
+          if (isRouteDisplayed && currentPosition) {
+            console.log('🔄 경로 자동 업데이트');
+            const searchDate = currentDate.toISOString().split('T')[0];
+            const myActiveWorks = [];
+            Object.keys(works).forEach(workId => {
+              const work = works[workId];
+              if (work.completed) return;
+              if (work.assignee !== currentUser) return;
+              let shouldShow = false;
+              if (work.work === '시험' || work.parentWorkId) {
+                shouldShow = work.date === searchDate;
+              } else {
+                shouldShow = work.date <= searchDate;
+              }
+              if (shouldShow) {
+                myActiveWorks.push(work);
+              }
+            });
+            // 정렬 (새 순서로!)
+            myActiveWorks.sort((a, b) => {
+              const orderA = typeof a.order === 'number' ? a.order : 999;
+              const orderB = typeof b.order === 'number' ? b.order : 999;
+              if (orderA === orderB) {
+                return a.id.localeCompare(b.id);
+              }
+              return orderA - orderB;
+            });
+            if (myActiveWorks.length > 0) {
+              drawRouteFromCurrentLocation(currentPosition, myActiveWorks);
+            }
+          }
         }).catch(() => {
           isDraggingNow = false;
         });
