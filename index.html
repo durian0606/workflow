@@ -438,23 +438,33 @@
       transform: scale(0.98);
     }
 
+    /* 번호와 체크박스를 감싸는 컨테이너 추가 */
+    .number-check-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+    
     .order-number {
       background: #0d7377;
       color: white;
       border-radius: 50%;
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      font-size: 13px;
+      font-size: 12px;
       flex-shrink: 0;
     }
-
+    
     .task-checkbox {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       border: 2px solid #0d7377;
       border-radius: 50%;
       cursor: pointer;
@@ -1052,6 +1062,15 @@
     }
 
     @media (max-width: 768px) {
+      .number-check-container {
+        gap: 8px; /* 모바일에서는 간격 늘리기 */
+      }
+      
+      .task-checkbox {
+        width: 24px;  /* 터치 영역 확대 */
+        height: 24px;
+      }
+          
       .task-container {
         max-height: 400px;
       }
@@ -2417,21 +2436,30 @@
           isDragging = false;
         });
         card.appendChild(dragHandle);
+        
+        // 번호와 체크박스를 묶는 컨테이너
+        const numberCheckContainer = document.createElement('div');
+        numberCheckContainer.className = 'number-check-container';
+        
         // 순서 번호 추가
         if (work.orderNumber) {
           const orderNum = document.createElement('div');
           orderNum.className = 'order-number';
           orderNum.textContent = work.orderNumber;
-          card.appendChild(orderNum);
+          numberCheckContainer.appendChild(orderNum);
         }
-      }
-      const checkbox = document.createElement('div');
-      checkbox.className = 'task-checkbox';
-      checkbox.onclick = (e) => {
-        e.stopPropagation();
-        toggleComplete(work.id);
-      };
-      card.appendChild(checkbox);
+        
+        // 체크박스
+        const checkbox = document.createElement('div');
+        checkbox.className = 'task-checkbox';
+        checkbox.onclick = (e) => {
+          e.stopPropagation();
+          toggleComplete(work.id);
+        };
+        numberCheckContainer.appendChild(checkbox);
+        
+        // 컨테이너를 카드에 추가
+        card.appendChild(numberCheckContainer);
       const cardBody = document.createElement('div');
       cardBody.className = 'task-card-body';
       const title = document.createElement('div');
