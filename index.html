@@ -17,7 +17,7 @@
       min-height: 100vh;
       overflow-x: hidden;
       overflow-y: auto;
-      background: linear-gradient(135deg, #2a459c 100%);
+      background: linear-gradient(135deg, #2a459c 0%, #5b7fd6 100%);
       touch-action: pan-y;
     }
 
@@ -74,7 +74,7 @@
       color: white;
       border-color: #2a459c;
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(13, 115, 119, 0.3);
+      box-shadow: 0 4px 12px rgba(42, 69, 156, 0.3);
     }
 
     .user-card-avatar {
@@ -343,20 +343,25 @@
     .task-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 12px;
+      gap: 8px;
       margin-bottom: 20px;
     }
 
     .task-card {
       background: white;
       border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      padding: 16px;
+      border-radius: 8px;
+      padding: 10px 12px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       transition: all 0.2s;
       position: relative;
+      cursor: grab;
+    }
+
+    .task-card:active {
+      cursor: grabbing;
     }
 
     .task-card:hover {
@@ -373,77 +378,19 @@
       background: #f0f9f9;
     }
 
-    .drag-handle {
-      position: absolute;
-      left: -8px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 24px;
-      height: 40px;
-      background: #2a459c;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 6px 0 0 6px;
-      cursor: grab;
-      opacity: 0.6;
-      transition: all 0.2s;
-      font-size: 16px;
-      user-select: none;
-      touch-action: none;
-      /* 🆕 이미 있지만 확인 */
-    }
-
-    /* 🆕 드래그 중일 때만 스크롤 방지 */
+    /* 드래그 중일 때만 스크롤 방지 */
     body.dragging-active {
       overflow: hidden;
       position: fixed;
       width: 100%;
     }
 
-    /* 드래그 핸들에 툴팁 추가 */
-    .drag-handle::after {
-      content: '드래그';
-      position: absolute;
-      top: -25px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #2a459c;
-      color: white;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 600;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s;
-      white-space: nowrap;
-    }
-
-    .drag-handle:hover::after {
-      opacity: 1;
-    }
-
-    .drag-handle:hover {
-      background: rgba(42, 69, 156, 0.15);
-      border-color: rgba(42, 69, 156, 0.4);
-      transform: scale(1.05);
-      box-shadow: 0 2px 8px rgba(42, 69, 156, 0.2);
-    }
-
-    .drag-handle:active {
-      cursor: grabbing;
-      background: rgba(42, 69, 156, 0.25);
-      transform: scale(0.98);
-    }
-
-    /* 번호와 체크박스를 감싸는 컨테이너 추가 */
+    /* 번호와 체크박스를 감싸는 컨테이너 */
     .number-check-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       margin-right: 8px;
       flex-shrink: 0;
     }
@@ -452,19 +399,19 @@
       background: #2a459c;
       color: white;
       border-radius: 50%;
-      width: 26px;
-      height: 26px;
+      width: 24px;
+      height: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      font-size: 12px;
+      font-size: 11px;
       flex-shrink: 0;
     }
     
     .task-checkbox {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       border: 2px solid #2a459c;
       border-radius: 50%;
       cursor: pointer;
@@ -487,7 +434,7 @@
       position: absolute;
       color: white;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 12px;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -497,13 +444,14 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
     }
 
     .task-title {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 500;
       color: #333;
+      line-height: 1.3;
     }
 
     .task-card.completed .task-title {
@@ -518,27 +466,27 @@
 
     .person-select-container {
       display: flex;
-      gap: 12px;
+      gap: 8px;
       align-items: center;
     }
 
     .select-wrapper {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 2px;
     }
 
     .select-label {
-      font-size: 11px;
+      font-size: 10px;
       color: #999;
       font-weight: 500;
     }
 
     .assignee-select {
-      padding: 6px 10px;
+      padding: 4px 8px;
       border: 1.5px solid #e0e0e0;
       border-radius: 6px;
-      font-size: 13px;
+      font-size: 12px;
       background: white;
       cursor: pointer;
       transition: border 0.2s;
@@ -556,13 +504,18 @@
     .action-btn {
       background: #ffe0e0;
       border: none;
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 14px;
       transition: all 0.2s;
       flex-shrink: 0;
+      display: none;
+    }
+
+    .task-card.selected .action-btn {
+      display: block;
     }
 
     .action-btn:hover {
@@ -590,6 +543,18 @@
       font-size: 16px;
       font-weight: 600;
       color: #333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .route-info {
+      font-size: 12px;
+      color: #2a459c;
+      font-weight: 600;
+      background: rgba(42, 69, 156, 0.1);
+      padding: 4px 10px;
+      border-radius: 4px;
     }
 
     .section-header {
@@ -914,23 +879,23 @@
     .deadline-label-container {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-top: 8px;
+      gap: 6px;
+      margin-top: 4px;
       cursor: pointer;
     }
 
     .deadline-label-text {
-      font-size: 12px;
+      font-size: 11px;
       color: #666;
     }
 
     .deadline-date-tag {
       display: inline-block;
-      padding: 4px 10px;
+      padding: 2px 8px;
       background: #e3f2fd;
       color: #1976d2;
       border-radius: 4px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 500;
     }
 
@@ -972,12 +937,9 @@
     }
 
     @keyframes pulse {
-
-      0%,
-      100% {
+      0%, 100% {
         opacity: 1;
       }
-
       50% {
         opacity: 0.7;
       }
@@ -985,29 +947,29 @@
 
     .overdue-warning {
       display: inline-block;
-      margin-left: 8px;
-      padding: 2px 8px;
+      margin-left: 6px;
+      padding: 2px 6px;
       background: #f44336;
       color: white;
-      border-radius: 4px;
-      font-size: 11px;
+      border-radius: 3px;
+      font-size: 10px;
       font-weight: 600;
       animation: pulse 1.5s infinite;
     }
 
     .date-label {
-      font-size: 12px;
+      font-size: 11px;
       color: #666;
-      margin-right: 6px;
+      margin-right: 4px;
     }
 
     .test-date-label {
       display: inline-block;
-      padding: 4px 10px;
+      padding: 2px 8px;
       background: #fff3e0;
       color: #f57c00;
-      border-radius: 4px;
-      font-size: 12px;
+      border-radius: 3px;
+      font-size: 11px;
       font-weight: 500;
     }
 
@@ -1050,7 +1012,6 @@
       0% {
         transform: rotate(0deg);
       }
-
       100% {
         transform: rotate(360deg);
       }
@@ -1063,12 +1024,12 @@
 
     @media (max-width: 768px) {
       .number-check-container {
-        gap: 8px; /* 모바일에서는 간격 늘리기 */
+        gap: 4px;
       }
       
       .task-checkbox {
-        width: 24px;  /* 터치 영역 확대 */
-        height: 24px;
+        width: 20px;
+        height: 20px;
       }
           
       .task-container {
@@ -1184,10 +1145,12 @@
         <!-- 지도 섹션 -->
         <div class="map-section">
           <div class="map-section-header">
-            <h3 class="map-section-title">🚗 이동 경로</h3>
+            <h3 class="map-section-title">
+              🚗 이동 경로
+              <span class="route-info" id="routeInfo" style="display: none;"></span>
+            </h3>
             <div class="map-controls">
               <button class="map-btn" id="routeBtn" onclick="showRouteFromCurrentLocation()">경로 표시</button>
-              <button class="map-btn" onclick="showCurrentLocation()">내 위치</button>
             </div>
           </div>
           <div id="map"></div>
@@ -1299,7 +1262,6 @@
     window.dbOnValue = onValue;
     window.dbUpdate = update;
     window.dbRemove = remove;
-    // Firebase 초기화 완료 알림
     window.firebaseReady = true;
     console.log('✅ Firebase initialized');
   </script>
@@ -1312,22 +1274,23 @@
     let currentUser = null;
     let map = null;
     let currentMarker = null;
-    let currentLocationMarker = null; // 현재 위치 마커
-    let routeMarkers = []; // 경로 마커들
-    let routeLine = null; // 경로 선
-    let currentPosition = null; // 현재 위치 저장
-    let isRouteDisplayed = false; // 🆕 경로 표시 중인지 여부
+    let currentLocationMarker = null;
+    let routeMarkers = [];
+    let routeLine = null;
+    let currentPosition = null;
+    let isRouteDisplayed = false;
     let draggedElement = null;
     let draggedWorkId = null;
-    let originalOrder = []; // 드래그 시작 시 원래 순서 저장
-    let isDraggingNow = false; // 현재 드래그 중인지 여부
-    // 섹션 접기/펼치기 상태
+    let originalOrder = [];
+    let isDraggingNow = false;
+    let selectedCard = null; // 선택된 카드 추적
+    
     let sectionStates = {
       myActive: true,
       teamActive: true,
       completed: true
     };
-    // Firebase 준비 대기
+    
     function waitForFirebase() {
       if (window.firebaseReady) {
         initApp();
@@ -1339,7 +1302,7 @@
     function initApp() {
       loadAssignees();
     }
-    // 카카오맵 초기화
+    
     function initMap() {
       if (typeof kakao === 'undefined' || !kakao.maps) {
         console.error('카카오맵 API가 로드되지 않았습니다.');
@@ -1371,14 +1334,14 @@
         document.getElementById('map').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;text-align:center;padding:20px;">지도를 불러올 수 없습니다.<br>페이지를 새로고침 해주세요.</div>';
       }
     }
-    // 🆕 현재 위치부터 시작하는 경로 표시
+    
     window.showRouteFromCurrentLocation = function() {
       console.log('🚀 경로 표시 시작');
       if (!map) {
         alert('지도가 초기화되지 않았습니다.');
         return;
       }
-      // 내 작업 진행 중 리스트 가져오기
+      
       const searchDate = currentDate.toISOString().split('T')[0];
       const myActiveWorks = [];
       Object.keys(works).forEach(workId => {
@@ -1395,7 +1358,7 @@
           myActiveWorks.push(work);
         }
       });
-      // 🆕 순서대로 정렬 (리스트와 동일한 순서로!)
+      
       myActiveWorks.sort((a, b) => {
         const orderA = typeof a.order === 'number' ? a.order : 999;
         const orderB = typeof b.order === 'number' ? b.order : 999;
@@ -1404,23 +1367,25 @@
         }
         return orderA - orderB;
       });
+      
       console.log('📋 내 작업 진행 중:', myActiveWorks.length, '개');
       if (myActiveWorks.length === 0) {
         alert('표시할 작업이 없습니다.');
         return;
       }
-      // 현재 위치 가져오기
+      
       if (navigator.geolocation) {
         document.getElementById('loadingOverlay').classList.add('active');
         document.getElementById('routeBtn').disabled = true;
         console.log('📍 현재 위치 요청 중...');
-        // 타임아웃 설정 (10초)
+        
         const timeout = setTimeout(() => {
           document.getElementById('loadingOverlay').classList.remove('active');
           document.getElementById('routeBtn').disabled = false;
           alert('위치 정보를 가져오는데 시간이 너무 오래 걸립니다. 다시 시도해주세요.');
           console.error('❌ 위치 요청 타임아웃');
         }, 10000);
+        
         navigator.geolocation.getCurrentPosition(
           function(position) {
             clearTimeout(timeout);
@@ -1428,7 +1393,6 @@
             const lng = position.coords.longitude;
             console.log('✅ 현재 위치:', lat, lng);
             currentPosition = new kakao.maps.LatLng(lat, lng);
-            // 경로 그리기
             drawRouteFromCurrentLocation(currentPosition, myActiveWorks);
           },
           function(error) {
@@ -1462,17 +1426,15 @@
       }
     };
     
-    // 🆕 현재 위치부터 현장들을 순서대로 연결하는 경로 그리기 (실제 도로 경로)
     function drawRouteFromCurrentLocation(currentPos, myActiveWorks) {
       console.log('🗺️ 경로 그리기 시작');
-      // 기존 마커와 선 제거
+      
       if (currentLocationMarker) {
         currentLocationMarker.setMap(null);
       }
       routeMarkers.forEach(marker => marker.setMap(null));
       routeMarkers = [];
       if (routeLine) {
-        // 배열인 경우 모든 구간 제거
         if (Array.isArray(routeLine)) {
           routeLine.forEach(line => line.setMap(null));
         } else {
@@ -1480,7 +1442,7 @@
         }
         routeLine = null;
       }
-      // 현장 목록에서 중복 제거하고 순서 유지
+      
       const uniqueSites = [];
       const siteNames = new Set();
       myActiveWorks.forEach(work => {
@@ -1490,7 +1452,7 @@
         }
       });
       console.log('🏗️ 고유 현장:', uniqueSites);
-      // 주소를 좌표로 변환
+      
       const geocoder = new kakao.maps.services.Geocoder();
       const promises = [];
       const positions = [{
@@ -1498,6 +1460,7 @@
         siteName: '현재 위치',
         index: 0
       }];
+      
       uniqueSites.forEach((siteName, index) => {
         const site = Object.values(sites).find(s => s.name === siteName);
         if (!site || !site.address) {
@@ -1524,7 +1487,7 @@
         });
         promises.push(promise);
       });
-      // 모든 주소 검색이 완료된 후 마커와 경로 표시
+      
       Promise.all(promises).then(() => {
         console.log('📊 변환된 위치:', positions.length, '개');
         positions.sort((a, b) => a.index - b.index);
@@ -1537,11 +1500,9 @@
           return;
         }
 
-        // 🆕 실제 도로 경로 가져오기
         getRealRoutes(positions).then(routeData => {
           console.log('🎨 마커 그리기 시작');
 
-          // 현재 위치 마커 (시작점)
           const startMarkerContent = `
             <div style="position: relative;">
               <div style="
@@ -1581,7 +1542,6 @@
           });
           currentLocationMarker.setMap(map);
 
-          // 현장 마커들 (1, 2, 3...)
           for (let i = 1; i < positions.length; i++) {
             const pos = positions[i];
             const markerContent = `
@@ -1626,34 +1586,30 @@
 
           console.log('✏️ 구간별 색상 경로선 그리기');
             
-            // 🎨 구간별 색상 정의
-            const routeColors = [
-              '#FF5722', // 빨간색 - 현재위치에서 1번
-              '#2196F3', // 파란색 - 1번에서 2번
-              '#4CAF50', // 초록색 - 2번에서 3번
-              '#9C27B0', // 보라색 - 3번에서 4번
-              '#FF9800', // 주황색 - 4번에서 5번
-              '#00BCD4', // 청록색 - 5번 이후
-            ];
+          const routeColors = [
+            '#FF5722',
+            '#2196F3',
+            '#4CAF50',
+            '#9C27B0',
+            '#FF9800',
+            '#00BCD4',
+          ];
             
-            // 🆕 routeLine을 배열로 변경
-            routeLine = [];
+          routeLine = [];
             
-            // 각 구간별로 다른 색상의 경로선 그리기
-            routeData.segments.forEach((segment, index) => {
-              const color = routeColors[index % routeColors.length];
-              const segmentLine = new kakao.maps.Polyline({
-                path: segment.points,
-                strokeWeight: 6,
-                strokeColor: color,
-                strokeOpacity: 0.8,
-                strokeStyle: 'solid'
-              });
-              segmentLine.setMap(map);
-              routeLine.push(segmentLine);
+          routeData.segments.forEach((segment, index) => {
+            const color = routeColors[index % routeColors.length];
+            const segmentLine = new kakao.maps.Polyline({
+              path: segment.points,
+              strokeWeight: 6,
+              strokeColor: color,
+              strokeOpacity: 0.8,
+              strokeStyle: 'solid'
             });
+            segmentLine.setMap(map);
+            routeLine.push(segmentLine);
+          });
 
-          // 모든 마커가 보이도록 지도 범위 조정
           const bounds = new kakao.maps.LatLngBounds();
           routeData.allPoints.forEach(point => bounds.extend(point));
           map.setBounds(bounds);
@@ -1665,10 +1621,15 @@
           const totalDistance = (routeData.totalDistance / 1000).toFixed(1);
           const totalTime = Math.round(routeData.totalTime / 60);
           console.log(`✅ 경로 표시 완료 - 총 ${totalDistance}km, 약 ${totalTime}분`);
+          
+          // 거리와 시간을 레이블 옆에 표시
+          const routeInfo = document.getElementById('routeInfo');
+          routeInfo.textContent = `${totalDistance}km · ${totalTime}분`;
+          routeInfo.style.display = 'inline-block';
+          
           alert(`경로 표시 완료!\n총 거리: ${totalDistance}km\n예상 시간: 약 ${totalTime}분`);
         }).catch(error => {
           console.error('❌ 경로 계산 실패:', error);
-          // 실패 시 직선으로 표시
           drawStraightRoute(positions);
         });
       }).catch(error => {
@@ -1680,19 +1641,16 @@
       });
     }
 
-    // 🆕 Kakao Mobility API로 실제 도로 경로 가져오기
-    // getRealRoutes - 프록시(/api/directions) 사용
-    // positions: [{ coords: kakao.maps.LatLng, siteName, index }, ...]
     async function getRealRoutes(positions) {
       const PROXY_BASE = 'https://workflow-blush-five.vercel.app';
       
       const allPoints = [];
-      const segments = []; // 🆕 구간별 경로 저장
+      const segments = [];
       let totalDistance = 0;
       let totalTime = 0;
     
       for (let i = 0; i < positions.length - 1; i++) {
-        const segmentPoints = []; // 🆕 이 구간의 포인트들
+        const segmentPoints = [];
         
         const origin = positions[i].coords;
         const destination = positions[i + 1].coords;
@@ -1743,7 +1701,6 @@
           allPoints.push(positions[i + 1].coords);
         }
         
-        // 🆕 구간 정보 저장
         segments.push({
           from: positions[i].siteName,
           to: positions[i + 1].siteName,
@@ -1753,18 +1710,15 @@
     
       return {
         allPoints: allPoints,
-        segments: segments, // 🆕 구간별 데이터 반환
+        segments: segments,
         totalDistance,
         totalTime
       };
     }
 
-
-    // 🆕 실패 시 직선으로 표시하는 백업 함수
     function drawStraightRoute(positions) {
       console.log('⚠️ 백업: 직선 경로로 표시');
 
-      // 현재 위치 마커
       const startMarkerContent = `
         <div style="position: relative;">
           <div style="
@@ -1804,7 +1758,6 @@
       });
       currentLocationMarker.setMap(map);
 
-      // 현장 마커들
       for (let i = 1; i < positions.length; i++) {
         const pos = positions[i];
         const markerContent = `
@@ -1847,7 +1800,6 @@
         routeMarkers.push(marker);
       }
 
-      // 직선 경로
       const linePath = positions.map(pos => pos.coords);
       routeLine = new kakao.maps.Polyline({
         path: linePath,
@@ -1869,7 +1821,6 @@
       console.log(`✅ 직선 경로 표시 완료`);
     }
     
-    // 사용자 목록 로드
     function loadAssignees() {
       const assigneesRef = window.dbRef(window.db, 'assignees');
       window.dbOnValue(assigneesRef, (snapshot) => {
@@ -1886,7 +1837,7 @@
         renderUserGrid();
       });
     }
-    // 사용자 그리드 렌더링
+    
     function renderUserGrid() {
       const grid = document.getElementById('userGrid');
       grid.innerHTML = '';
@@ -1905,7 +1856,7 @@
         grid.appendChild(card);
       });
     }
-    // 새 사용자 추가
+    
     window.addNewUser = function() {
       const input = document.getElementById('newUserInput');
       const name = input.value.trim();
@@ -1924,7 +1875,7 @@
       });
       input.value = '';
     };
-    // 로그인
+    
     window.login = function(userName) {
       currentUser = userName;
       document.getElementById('loginContainer').style.display = 'none';
@@ -1937,25 +1888,21 @@
       setTimeout(() => {
         console.log('🗺️ 지도 초기화 시작...');
         initMap();
-        setTimeout(() => {
-          if (map) {
-            showCurrentLocation();
-          }
-        }, 800);
       }, 500);
     };
-    // 로그아웃
+    
     window.logout = function() {
       currentUser = null;
       document.getElementById('loginContainer').style.display = 'flex';
       document.getElementById('appContainer').classList.remove('active');
     };
-    // 오늘 날짜로 이동
+    
     window.goToToday = function() {
       currentDate = new Date();
       updateDateDisplay();
       renderWorks();
     };
+    
     window.changeDate = function(days) {
       currentDate.setDate(currentDate.getDate() + days);
       updateDateDisplay();
@@ -1971,6 +1918,7 @@
       };
       document.getElementById('dateDisplay').textContent = currentDate.toLocaleDateString('ko-KR', options);
     }
+    
     window.addWork = function() {
       const site = document.getElementById('siteInput').value.trim();
       const work = document.getElementById('workInput').value.trim();
@@ -2051,7 +1999,7 @@
       document.getElementById('siteInput').value = '';
       document.getElementById('workInput').value = '';
     };
-    // 작업 로드
+    
     function loadWorks() {
       const worksRef = window.dbRef(window.db, 'works');
       window.dbOnValue(worksRef, (snapshot) => {
@@ -2059,7 +2007,7 @@
         renderWorks();
       });
     }
-    // 현장 로드
+    
     function loadSites() {
       const sitesRef = window.dbRef(window.db, 'sites');
       window.dbOnValue(sitesRef, (snapshot) => {
@@ -2069,7 +2017,6 @@
     }
 
     function renderWorks() {
-      // ✅ 드래그 중에는 렌더링하지 않음!
       if (isDraggingNow) {
         console.log('⚠️ 드래그 중 - 렌더링 건너뜀');
         return;
@@ -2121,16 +2068,16 @@
       const container = document.getElementById('taskContainer');
       container.innerHTML = '';
       const myActiveWorks = myWorks.filter(w => !w.completed);
-      // 🆕 순서대로 정렬 - 안정적인 정렬을 위해 두 번째 기준(id) 추가
+      
       myActiveWorks.sort((a, b) => {
         const orderA = typeof a.order === 'number' ? a.order : 999;
         const orderB = typeof b.order === 'number' ? b.order : 999;
         if (orderA === orderB) {
-          // order가 같으면 id로 2차 정렬 (안정성 보장)
           return a.id.localeCompare(b.id);
         }
         return orderA - orderB;
       });
+      
       if (myActiveWorks.length > 0) {
         const header = document.createElement('div');
         header.className = 'section-header my-work' + (sectionStates.myActive ? '' : ' collapsed');
@@ -2140,13 +2087,13 @@
         const grid = document.createElement('div');
         grid.className = 'task-grid' + (sectionStates.myActive ? '' : ' collapsed');
         grid.id = 'myTaskGrid';
-        // 🆕 순서 번호를 포함하여 카드 생성
+        
         myActiveWorks.forEach((work, index) => {
-          work.orderNumber = index + 1; // 순서 번호 추가
+          work.orderNumber = index + 1;
           grid.appendChild(createWorkCard(work, false));
         });
         container.appendChild(grid);
-        // ✅ 그리드에 드래그 이벤트 등록
+        
         grid.addEventListener('dragover', handleDragOver);
         grid.addEventListener('drop', handleDrop);
       }
@@ -2201,247 +2148,57 @@
         container.appendChild(emptyState);
       }
     }
-    // 섹션 접기/펼치기 토글
+    
     function toggleSection(sectionKey) {
       sectionStates[sectionKey] = !sectionStates[sectionKey];
       renderWorks();
     }
-    // 작업 카드 생성
+    
     function createWorkCard(work, isCompleted) {
       const card = document.createElement('div');
       card.className = 'task-card' + (isCompleted ? ' completed' : '');
       if (!isCompleted && work.isOverdue) {
         card.classList.add('overdue');
       }
-      // 내 작업은 항상 draggable = true (하지만 canDrag 플래그로 제어)
+      
       if (work.assignee === currentUser && !isCompleted) {
         card.draggable = true;
       } else {
         card.draggable = false;
       }
+      
       card.dataset.workId = work.id;
       if (work.assignee === currentUser) {
         card.classList.add('my-task');
       }
-      // 드래그 허용 플래그
-      let canDrag = false;
-      if (!isCompleted) {
-        card.addEventListener('dragstart', (e) => {
-          // 드래그 핸들을 통해서만 허용
-          if (!canDrag) {
-            e.preventDefault();
-            return;
-          }
-          handleDragStart.call(card, e);
-        });
-        card.addEventListener('dragend', handleDragEnd);
-        // dragover, drop, dragleave는 그리드에 등록!
-      }
-      if (!isCompleted) {
-        const dragHandle = document.createElement('div');
-        dragHandle.className = 'drag-handle';
-        dragHandle.textContent = '⋮⋮';
-        // PC용 드래그
-        dragHandle.addEventListener('mousedown', (e) => {
-          e.stopPropagation();
-          canDrag = true; // 드래그 허용
-        });
-        dragHandle.addEventListener('mouseup', (e) => {
-          setTimeout(() => {
-            canDrag = false; // 드래그 금지
-          }, 100);
-        });
-        // 🆕 모바일용 터치 드래그 (개선된 버전)
-        let touchStartY = 0;
-        let touchCurrentY = 0;
-        let isDragging = false;
-        let scrollContainer = null;
-        let touchStartOrder = []; // 🆕 터치 시작 시 원래 순서 저장
-        dragHandle.addEventListener('touchstart', (e) => {
-          e.stopPropagation();
-          touchStartY = e.touches[0].clientY;
-          isDragging = false; // 아직 드래그 시작 안함
-          // 스크롤 컨테이너 찾기
-          scrollContainer = card.closest('.task-container');
-          // 🆕 PC와 동일: 드래그 시작 시 원래 순서 저장
-          const grid = card.closest('.task-grid');
-          if (grid) {
-            touchStartOrder = Array.from(grid.querySelectorAll('.task-card')).map(c => c.dataset.workId);
-          }
-          console.log('🟢 터치 시작:', work.site);
-          console.log('🟢 원래 순서:', touchStartOrder);
-        });
-        dragHandle.addEventListener('touchmove', (e) => {
-          touchCurrentY = e.touches[0].clientY;
-          const deltaY = Math.abs(touchCurrentY - touchStartY);
-          // 🆕 5px 이상 움직이면 드래그로 인식 (더 민감하게)
-          if (deltaY > 5) {
-            if (!isDragging) {
-              isDragging = true;
-              card.classList.add('dragging');
-              console.log('🔵 드래그 시작');
-              // 🆕 드래그 중 표시 (CSS로 스크롤 제어)
-              document.body.classList.add('dragging-active');
-            }
-            // 🆕 드래그 중 터치 이벤트 기본 동작 방지
-            e.preventDefault();
-            e.stopPropagation();
-            // 현재 터치 위치의 엘리먼트 찾기
-            const touch = e.touches[0];
-            // 중요: 드래그 중인 카드를 임시로 숨기고 아래 엘리먼트 찾기
-            const originalVisibility = card.style.visibility;
-            card.style.visibility = 'hidden';
-            const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-            card.style.visibility = originalVisibility;
-            const targetCard = elementBelow?.closest('.task-card');
-            // 모든 카드의 drag-over 제거
-            document.querySelectorAll('.task-card').forEach(c => c.classList.remove('drag-over'));
-            // 타겟 카드에 drag-over 추가
-            // ✅ 타겟 카드에 실제로 DOM 순서 변경 (PC와 동일!)
-            if (targetCard && targetCard !== card && !targetCard.classList.contains('completed')) {
-              targetCard.classList.add('drag-over');
-              console.log('🎯 타겟 위에:', works[targetCard.dataset.workId]?.site);
-              // ✅ PC의 handleDragOver와 동일한 로직
-              const container = card.closest('.task-grid');
-              const targetContainer = targetCard.closest('.task-grid');
-              if (container && targetContainer && container === targetContainer && container.id === 'myTaskGrid') {
-                // 터치 위치가 타겟 카드의 위/아래 중 어디?
-                const rect = targetCard.getBoundingClientRect();
-                const touchY = touch.clientY;
-                const middle = rect.top + rect.height / 2;
-                if (touchY < middle) {
-                  // 위쪽 절반 → 타겟 앞에 삽입
-                  container.insertBefore(card, targetCard);
-                } else {
-                  // 아래쪽 절반 → 타겟 뒤에 삽입
-                  const nextCard = targetCard.nextElementSibling;
-                  if (nextCard && nextCard !== card) {
-                    container.insertBefore(card, nextCard);
-                  } else {
-                    container.appendChild(card);
-                  }
-                }
-              }
-            }
-          }
-        }, {
-          passive: false
-        });
-        dragHandle.addEventListener('touchend', (e) => {
-          // 🆕 스크롤 복원은 항상 실행 (드래그 여부 상관없이)
-          document.body.classList.remove('dragging-active');
-          if (!isDragging) {
-            // 드래그가 아니라 그냥 탭이었음
-            console.log('❌ 드래그 없음 (탭)');
-            card.classList.remove('dragging');
-            document.querySelectorAll('.task-card').forEach(c => c.classList.remove('drag-over'));
-            return;
-          }
-          const touch = e.changedTouches[0];
-          // 드래그 중인 카드를 임시로 숨기고 타겟 찾기
-          card.style.visibility = 'hidden';
-          const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-          card.style.visibility = 'visible';
-          const targetCard = elementBelow?.closest('.task-card');
-          console.log('🔴 터치 종료');
-          console.log('   드래그:', work.site);
-          console.log('   타겟:', targetCard ? works[targetCard.dataset.workId]?.site : '없음');
-          // ✅ 드래그 종료 처리 - PC와 동일한 순서 변경 체크!
-          const grid = card.closest('.task-grid');
-          if (grid && grid.id === 'myTaskGrid') {
-            const cards = Array.from(grid.querySelectorAll('.task-card'));
-            const currentOrder = cards.map(c => c.dataset.workId);
-            // 🆕 PC와 동일: 순서가 실제로 변경되었는지 확인
-            const hasChanged = !touchStartOrder.every((id, index) => id === currentOrder[index]);
-            console.log('🔴 모바일 터치 종료');
-            console.log('   원래 순서:', touchStartOrder);
-            console.log('   현재 순서:', currentOrder);
-            console.log('   변경됨?', hasChanged);
-            if (!hasChanged) {
-              console.log('❌ 순서 변경 없음 - 저장 안 함');
-              // 정리
-              card.classList.remove('dragging');
-              document.querySelectorAll('.task-card').forEach(c => c.classList.remove('drag-over'));
-              isDragging = false;
-              // 🆕 스크롤 복원
-              document.body.style.overflow = '';
-              document.body.style.position = '';
-              document.body.style.width = '';
-              return;
-            }
-            // 변경되었을 때만 저장
-            const updates = {};
-            cards.forEach((c, index) => {
-              const workId = c.dataset.workId;
-              if (workId && works[workId]) {
-                updates[`works/${workId}/order`] = index;
-                works[workId].order = index;
-              }
-            });
-            window.dbUpdate(window.dbRef(window.db), updates).then(() => {
-              console.log('✅ 모바일 드래그 - 순서 저장 완료');
-              // 🆕 화면 갱신으로 순서 번호 재정렬
-              renderWorks();
-              // 🆕 경로가 표시 중이면 자동으로 업데이트
-              if (isRouteDisplayed && currentPosition) {
-                console.log('🔄 모바일: 경로 자동 업데이트');
-                const searchDate = currentDate.toISOString().split('T')[0];
-                const myActiveWorks = [];
-                Object.keys(works).forEach(workId => {
-                  const work = works[workId];
-                  if (work.completed) return;
-                  if (work.assignee !== currentUser) return;
-                  let shouldShow = false;
-                  if (work.work === '시험' || work.parentWorkId) {
-                    shouldShow = work.date === searchDate;
-                  } else {
-                    shouldShow = work.date <= searchDate;
-                  }
-                  if (shouldShow) {
-                    myActiveWorks.push(work);
-                  }
-                });
-                // 정렬 (새 순서로!)
-                myActiveWorks.sort((a, b) => {
-                  const orderA = typeof a.order === 'number' ? a.order : 999;
-                  const orderB = typeof b.order === 'number' ? b.order : 999;
-                  if (orderA === orderB) {
-                    return a.id.localeCompare(b.id);
-                  }
-                  return orderA - orderB;
-                });
-                if (myActiveWorks.length > 0) {
-                  drawRouteFromCurrentLocation(currentPosition, myActiveWorks);
-                }
-              }
-            });
-            // 햅틱 피드백
-            if (navigator.vibrate) {
-              navigator.vibrate(50);
-            }
-          }
-          // 정리
-          card.classList.remove('dragging');
-          document.querySelectorAll('.task-card').forEach(c => c.classList.remove('drag-over'));
-          isDragging = false;
-        }, {
-          passive: false
-        });
-        // 🆕 터치가 취소되었을 때도 스크롤 복원 (안전장치)
-        dragHandle.addEventListener('touchcancel', (e) => {
-          console.log('⚠️ 터치 취소됨');
-          document.body.classList.remove('dragging-active');
-          card.classList.remove('dragging');
-          document.querySelectorAll('.task-card').forEach(c => c.classList.remove('drag-over'));
-          isDragging = false;
-        });
-        card.appendChild(dragHandle);
+      
+      // 카드 클릭 시 선택/해제
+      card.addEventListener('click', (e) => {
+        // 체크박스나 담당자 선택 등 다른 요소 클릭 시 무시
+        if (e.target.closest('.task-checkbox') || 
+            e.target.closest('.assignee-select') || 
+            e.target.closest('.action-btn') ||
+            e.target.closest('.deadline-label-container')) {
+          return;
+        }
         
-        // 번호와 체크박스를 묶는 컨테이너
+        // 다른 카드의 선택 해제
+        document.querySelectorAll('.task-card.selected').forEach(c => {
+          if (c !== card) c.classList.remove('selected');
+        });
+        
+        // 현재 카드 토글
+        card.classList.toggle('selected');
+      });
+      
+      if (!isCompleted) {
+        card.addEventListener('dragstart', handleDragStart);
+        card.addEventListener('dragend', handleDragEnd);
+        
+        // 번호와 체크박스 컨테이너
         const numberCheckContainer = document.createElement('div');
         numberCheckContainer.className = 'number-check-container';
         
-        // 순서 번호 추가
         if (work.orderNumber) {
           const orderNum = document.createElement('div');
           orderNum.className = 'order-number';
@@ -2449,7 +2206,6 @@
           numberCheckContainer.appendChild(orderNum);
         }
         
-        // 체크박스
         const checkbox = document.createElement('div');
         checkbox.className = 'task-checkbox';
         checkbox.onclick = (e) => {
@@ -2458,7 +2214,6 @@
         };
         numberCheckContainer.appendChild(checkbox);
         
-        // 컨테이너를 카드에 추가
         card.appendChild(numberCheckContainer);
       }
       
@@ -2482,6 +2237,7 @@
         };
       }
       cardBody.appendChild(title);
+      
       if (work.work !== '시험' && !work.parentWorkId) {
         const deadlineContainer = document.createElement('div');
         deadlineContainer.className = 'deadline-label-container';
@@ -2504,6 +2260,7 @@
         deadlineContainer.appendChild(deadlineDate);
         cardBody.appendChild(deadlineContainer);
       }
+      
       if (work.testDate) {
         const dateLabel = document.createElement('span');
         dateLabel.className = 'date-label';
@@ -2514,9 +2271,10 @@
         testDateTag.textContent = work.testDate;
         cardBody.appendChild(testDateTag);
       }
+      
       if (isCompleted && work.completedDate) {
         const completedInfo = document.createElement('div');
-        completedInfo.style.cssText = 'margin-top: 8px; font-size: 12px; color: #4caf50;';
+        completedInfo.style.cssText = 'margin-top: 6px; font-size: 11px; color: #4caf50;';
         const completedLabel = document.createElement('span');
         completedLabel.textContent = '✓ 완료: ';
         completedLabel.style.fontWeight = '600';
@@ -2531,6 +2289,7 @@
         cardBody.appendChild(completedInfo);
       }
       card.appendChild(cardBody);
+      
       const personContainer = document.createElement('div');
       personContainer.className = 'person-select-container';
       const assigneeWrapper = document.createElement('div');
@@ -2562,6 +2321,7 @@
       assigneeWrapper.appendChild(assigneeSelect);
       personContainer.appendChild(assigneeWrapper);
       card.appendChild(personContainer);
+      
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'action-btn';
       deleteBtn.textContent = '🗑️';
@@ -2570,16 +2330,17 @@
         deleteWork(work.id);
       };
       card.appendChild(deleteBtn);
+      
       return card;
     }
-    // 드래그 관련 함수들
+    
     function handleDragStart(e) {
       draggedElement = this;
       draggedWorkId = this.dataset.workId;
       this.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/html', this.innerHTML);
-      // ✅ 드래그 시작 시 원래 순서 저장
+      
       isDraggingNow = true;
       const grid = this.closest('.task-grid');
       if (grid) {
@@ -2594,34 +2355,33 @@
       if (grid && grid.id === 'myTaskGrid') {
         const cards = Array.from(grid.querySelectorAll('.task-card'));
         const currentOrder = cards.map(card => card.dataset.workId);
-        // ✅ 순서가 실제로 변경되었는지 확인
+        
         const hasChanged = !originalOrder.every((id, index) => id === currentOrder[index]);
         console.log('🔴 드래그 종료');
         console.log('   원래 순서:', originalOrder);
         console.log('   현재 순서:', currentOrder);
         console.log('   변경됨?', hasChanged);
+        
         if (!hasChanged) {
           console.log('❌ 순서 변경 없음 - 저장 안 함');
           isDraggingNow = false;
           return;
         }
-        // ✅ 변경되었을 때만 저장 - 먼저 로컬에서 업데이트
+        
         const updates = {};
         cards.forEach((card, index) => {
           const workId = card.dataset.workId;
           if (workId && works[workId]) {
             updates[`works/${workId}/order`] = index;
-            works[workId].order = index; // 즉시 로컬 업데이트
+            works[workId].order = index;
           }
         });
-        // Firebase 업데이트 후 드래그 상태 해제
-        // Firebase 업데이트 후 드래그 상태 해제
+        
         window.dbUpdate(window.dbRef(window.db), updates).then(() => {
           console.log('✅ 순서 저장 완료!');
           isDraggingNow = false;
-          // 🆕 화면 갱신으로 순서 번호 재정렬
           renderWorks();
-          // 🆕 경로가 표시 중이면 자동으로 업데이트
+          
           if (isRouteDisplayed && currentPosition) {
             console.log('🔄 경로 자동 업데이트');
             const searchDate = currentDate.toISOString().split('T')[0];
@@ -2640,7 +2400,7 @@
                 myActiveWorks.push(work);
               }
             });
-            // 정렬 (새 순서로!)
+            
             myActiveWorks.sort((a, b) => {
               const orderA = typeof a.order === 'number' ? a.order : 999;
               const orderB = typeof b.order === 'number' ? b.order : 999;
@@ -2649,6 +2409,7 @@
               }
               return orderA - orderB;
             });
+            
             if (myActiveWorks.length > 0) {
               drawRouteFromCurrentLocation(currentPosition, myActiveWorks);
             }
@@ -2665,25 +2426,23 @@
       e.preventDefault();
       const draggedCard = document.querySelector('.dragging');
       if (!draggedCard) return;
-      // ✅ 마우스가 올라간 카드 찾기
+      
       const targetCard = e.target.closest('.task-card');
       if (!targetCard || targetCard === draggedCard) return;
       if (targetCard.classList.contains('completed')) return;
-      // ✅ 같은 그리드 내에서만
+      
       const container = draggedCard.closest('.task-grid');
       const targetContainer = targetCard.closest('.task-grid');
       if (!container || !targetContainer || container !== targetContainer) return;
       if (container.id !== 'myTaskGrid') return;
-      // ✅ 마우스가 타겟 카드의 위쪽/아래쪽 중 어디에?
+      
       const rect = targetCard.getBoundingClientRect();
       const mouseY = e.clientY;
       const middle = rect.top + rect.height / 2;
-      // ✅ 간단하고 정확한 삽입!
+      
       if (mouseY < middle) {
-        // 위쪽 절반 → 타겟 앞에 삽입
         container.insertBefore(draggedCard, targetCard);
       } else {
-        // 아래쪽 절반 → 타겟 뒤에 삽입
         const nextCard = targetCard.nextElementSibling;
         if (nextCard && nextCard !== draggedCard) {
           container.insertBefore(draggedCard, nextCard);
@@ -2696,10 +2455,9 @@
     function handleDrop(e) {
       e.preventDefault();
       e.stopPropagation();
-      // handleDragEnd에서 저장할 것이므로 여기서는 아무것도 안 함
       return false;
     }
-    // 시험 작업 타임라인 표시
+    
     function showTimeline(work) {
       const modal = document.getElementById('timelineModal');
       const title = document.getElementById('timelineTitle');
@@ -2748,10 +2506,11 @@
       });
       modal.classList.add('active');
     }
+    
     window.closeTimelineModal = function() {
       document.getElementById('timelineModal').classList.remove('active');
     };
-    // 작업 완료 토글
+    
     function toggleComplete(workId) {
       const work = works[workId];
       if (!work) return;
@@ -2767,14 +2526,14 @@
       }
       window.dbUpdate(workRef, updateData);
     }
-    // 담당자 저장
+    
     function saveAssignee(workId, assignee) {
       const workRef = window.dbRef(window.db, `works/${workId}`);
       window.dbUpdate(workRef, {
         assignee: assignee
       });
     }
-    // 작업 삭제
+    
     function deleteWork(workId) {
       const work = works[workId];
       if (!work) return;
@@ -2792,7 +2551,7 @@
       const workRef = window.dbRef(window.db, `works/${workId}`);
       window.dbRemove(workRef);
     }
-    // 현장 관리
+    
     window.toggleSiteModal = function() {
       const modal = document.getElementById('siteModal');
       modal.classList.toggle('active');
@@ -2800,6 +2559,7 @@
         renderSiteList();
       }
     };
+    
     window.toggleSiteSelectModal = function() {
       const modal = document.getElementById('siteSelectModal');
       modal.classList.toggle('active');
@@ -2855,6 +2615,7 @@
       document.getElementById('siteInput').value = siteName;
       toggleSiteSelectModal();
     }
+    
     window.addSite = function() {
       const nameInput = document.getElementById('newSiteName');
       const addressInput = document.getElementById('newSiteAddress');
@@ -2921,7 +2682,7 @@
       date.setDate(date.getDate() + days);
       return date.toISOString().split('T')[0];
     }
-    // 모달 외부 클릭 시 닫기
+    
     document.getElementById('timelineModal').addEventListener('click', (e) => {
       if (e.target === document.getElementById('timelineModal')) {
         closeTimelineModal();
@@ -2937,7 +2698,7 @@
         toggleSiteSelectModal();
       }
     });
-    // Enter 키 이벤트
+    
     document.getElementById('siteInput').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         document.getElementById('workInput').focus();
@@ -2952,7 +2713,7 @@
     document.getElementById('newSiteName').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') addSite();
     });
-    // 완료 기한 관련 변수
+    
     let currentEditingWorkId = null;
 
     function openDeadlineModal(workId, currentDeadline) {
@@ -2971,6 +2732,7 @@
       document.getElementById('customDeadlineInput').value = currentDeadline;
       modal.classList.add('active');
     }
+    
     window.selectDeadline = function(option) {
       if (!currentEditingWorkId) return;
       let selectedDate;
@@ -3006,13 +2768,14 @@
       document.getElementById('deadlineModal').classList.remove('active');
       currentEditingWorkId = null;
     };
+    
     document.getElementById('deadlineModal').addEventListener('click', (e) => {
       if (e.target === document.getElementById('deadlineModal')) {
         document.getElementById('deadlineModal').classList.remove('active');
         currentEditingWorkId = null;
       }
     });
-    // 초기화
+    
     window.onload = function() {
       waitForFirebase();
     };
