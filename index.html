@@ -1453,7 +1453,12 @@
       routeMarkers.forEach(marker => marker.setMap(null));
       routeMarkers = [];
       if (routeLine) {
-        routeLine.setMap(null);
+        // 배열인 경우 모든 구간 제거
+        if (Array.isArray(routeLine)) {
+          routeLine.forEach(line => line.setMap(null));
+        } else {
+          routeLine.setMap(null);
+        }
         routeLine = null;
       }
       // 현장 목록에서 중복 제거하고 순서 유지
@@ -1600,16 +1605,34 @@
             routeMarkers.push(marker);
           }
 
-          console.log('✏️ 실제 도로 경로선 그리기');
-          // 🆕 실제 도로 경로선 그리기
-          routeLine = new kakao.maps.Polyline({
-            path: routeData.allPoints,
-            strokeWeight: 5,
-            strokeColor: '#3396ff',
-            strokeOpacity: 0.9,
-            strokeStyle: 'solid'
-          });
-          routeLine.setMap(map);
+          console.log('✏️ 구간별 색상 경로선 그리기');
+            
+            // 🎨 구간별 색상 정의
+            const routeColors = [
+              '#FF5722', // 빨간색 - 현재위치에서 1번
+              '#2196F3', // 파란색 - 1번에서 2번
+              '#4CAF50', // 초록색 - 2번에서 3번
+              '#9C27B0', // 보라색 - 3번에서 4번
+              '#FF9800', // 주황색 - 4번에서 5번
+              '#00BCD4', // 청록색 - 5번 이후
+            ];
+            
+            // 🆕 routeLine을 배열로 변경
+            routeLine = [];
+            
+            // 각 구간별로 다른 색상의 경로선 그리기
+            routeData.segments.forEach((segment, index) => {
+              const color = routeColors[index % routeColors.length];
+              const segmentLine = new kakao.maps.Polyline({
+                path: segment.points,
+                strokeWeight: 6,
+                strokeColor: color,
+                strokeOpacity: 0.8,
+                strokeStyle: 'solid'
+              });
+              segmentLine.setMap(map);
+              routeLine.push(segmentLine);
+            });
 
           // 모든 마커가 보이도록 지도 범위 조정
           const bounds = new kakao.maps.LatLngBounds();
@@ -1642,13 +1665,16 @@
     // getRealRoutes - 프록시(/api/directions) 사용
     // positions: [{ coords: kakao.maps.LatLng, siteName, index }, ...]
     async function getRealRoutes(positions) {
-      const PROXY_BASE = 'https://workflow-blush-five.vercel.app'; // 수정: '/api/directions' 제거
+      const PROXY_BASE = 'https://workflow-blush-five.vercel.app';
       
       const allPoints = [];
+      const segments = []; // 🆕 구간별 경로 저장
       let totalDistance = 0;
       let totalTime = 0;
     
       for (let i = 0; i < positions.length - 1; i++) {
+        const segmentPoints = []; // 🆕 이 구간의 포인트들
+        
         const origin = positions[i].coords;
         const destination = positions[i + 1].coords;
     
@@ -1656,7 +1682,7 @@
         const destStr = `${destination.getLng()},${destination.getLat()}`;
     
         const url = `${PROXY_BASE}/api/directions?origin=${encodeURIComponent(originStr)}&destination=${encodeURIComponent(destStr)}`;
-        // 결과: https://workflow-blush-five.vercel.app/api/directions?... (올바름!)
+    
         try {
           const resp = await fetch(url, { method: 'GET' });
           if (!resp.ok) throw new Error(`proxy ${resp.status}`);
@@ -1664,14 +1690,12 @@
           const data = await resp.json();
     
           if (!data.routes || data.routes.length === 0) {
-            // 카카오가 경로를 못찾으면 직선 연결
-            allPoints.push(origin);
-            allPoints.push(destination);
+            segmentPoints.push(origin);
+            segmentPoints.push(destination);
           } else {
             const route = data.routes[0];
             const sections = route.sections || [];
     
-            // sections -> roads -> vertexes 구조에서 좌표 추출
             sections.forEach(section => {
               (section.roads || []).forEach(road => {
                 const verts = road.vertexes || [];
@@ -1679,13 +1703,14 @@
                   const lng = verts[v];
                   const lat = verts[v + 1];
                   if (typeof lat === 'number' && typeof lng === 'number') {
-                    allPoints.push(new kakao.maps.LatLng(lat, lng));
+                    const point = new kakao.maps.LatLng(lat, lng);
+                    segmentPoints.push(point);
+                    allPoints.push(point);
                   }
                 }
               });
             });
     
-            // 요약거리/시간 합산 (단위: m, sec)
             if (route.summary) {
               totalDistance += route.summary.distance || 0;
               totalTime += route.summary.duration || 0;
@@ -1693,31 +1718,23 @@
           }
         } catch (err) {
           console.error(`구간 ${i}-${i+1} 경로 요청 실패:`, err);
-          // 실패시 안전하게 직선 연결
+          segmentPoints.push(positions[i].coords);
+          segmentPoints.push(positions[i + 1].coords);
           allPoints.push(positions[i].coords);
           allPoints.push(positions[i + 1].coords);
         }
-    
-        // 선택적: 너무 빠른 연속 호출 방지용 짧은 대기 (100~300ms)
-        // await new Promise(r => setTimeout(r, 150));
-      }
-    
-      // allPoints에 중복된 연속 좌표가 들어간 경우가 있을 수 있으므로
-      // 간단히 인접 중복 제거 (같은 좌표 연속 시 중복 제거)
-      const dedupedPoints = [];
-      for (let i = 0; i < allPoints.length; i++) {
-        if (i === 0) dedupedPoints.push(allPoints[i]);
-        else {
-          const a = allPoints[i];
-          const b = dedupedPoints[dedupedPoints.length - 1];
-          if (a.getLat() !== b.getLat() || a.getLng() !== b.getLng()) {
-            dedupedPoints.push(a);
-          }
-        }
+        
+        // 🆕 구간 정보 저장
+        segments.push({
+          from: positions[i].siteName,
+          to: positions[i + 1].siteName,
+          points: segmentPoints
+        });
       }
     
       return {
-        allPoints: dedupedPoints,
+        allPoints: allPoints,
+        segments: segments, // 🆕 구간별 데이터 반환
         totalDistance,
         totalTime
       };
