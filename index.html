@@ -1642,16 +1642,12 @@
     // getRealRoutes - 프록시(/api/directions) 사용
     // positions: [{ coords: kakao.maps.LatLng, siteName, index }, ...]
     async function getRealRoutes(positions) {
-      // 프록시 베이스 URL. 배포하면 상대경로 '/api/directions' 사용 가능.
-      // 로컬에서 index.html을 GitHub Pages로 보는 경우에는 배포된 Vercel URL을 넣어야 함.
-      const PROXY_BASE = 'https://workflow-blush-five.vercel.app/api/directions'; // ''  => 상대경로 '/api/directions'
-      // 예: const PROXY_BASE = 'https://your-site.vercel.app';
-    
+      const PROXY_BASE = 'https://workflow-blush-five.vercel.app'; // 수정: '/api/directions' 제거
+      
       const allPoints = [];
       let totalDistance = 0;
       let totalTime = 0;
     
-      // 순차 요청: 순서 보장, 카카오 과금/제한 위험 줄임
       for (let i = 0; i < positions.length - 1; i++) {
         const origin = positions[i].coords;
         const destination = positions[i + 1].coords;
@@ -1660,7 +1656,7 @@
         const destStr = `${destination.getLng()},${destination.getLat()}`;
     
         const url = `${PROXY_BASE}/api/directions?origin=${encodeURIComponent(originStr)}&destination=${encodeURIComponent(destStr)}`;
-    
+        // 결과: https://workflow-blush-five.vercel.app/api/directions?... (올바름!)
         try {
           const resp = await fetch(url, { method: 'GET' });
           if (!resp.ok) throw new Error(`proxy ${resp.status}`);
