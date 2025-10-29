@@ -1639,74 +1639,94 @@
     }
 
     // 🆕 Kakao Mobility API로 실제 도로 경로 가져오기
+    // getRealRoutes - 프록시(/api/directions) 사용
+    // positions: [{ coords: kakao.maps.LatLng, siteName, index }, ...]
     async function getRealRoutes(positions) {
-      const REST_API_KEY = '00093c797fe596023581271fb7609090'; // 🚨 여기에 REST API 키 입력!
-
+      // 프록시 베이스 URL. 배포하면 상대경로 '/api/directions' 사용 가능.
+      // 로컬에서 index.html을 GitHub Pages로 보는 경우에는 배포된 Vercel URL을 넣어야 함.
+      const PROXY_BASE = 'https://workflow-blush-five.vercel.app/api/directions'; // ''  => 상대경로 '/api/directions'
+      // 예: const PROXY_BASE = 'https://your-site.vercel.app';
+    
       const allPoints = [];
       let totalDistance = 0;
       let totalTime = 0;
-
-      // 각 구간마다 경로 요청
+    
+      // 순차 요청: 순서 보장, 카카오 과금/제한 위험 줄임
       for (let i = 0; i < positions.length - 1; i++) {
         const origin = positions[i].coords;
         const destination = positions[i + 1].coords;
-
-        const url = 'https://apis-navi.kakaomobility.com/v1/directions';
-        const queryParams = new URLSearchParams({
-          origin: `${origin.getLng()},${origin.getLat()}`,
-          destination: `${destination.getLng()},${destination.getLat()}`,
-          priority: 'RECOMMEND' // 추천 경로
-        });
-
+    
+        const originStr = `${origin.getLng()},${origin.getLat()}`;
+        const destStr = `${destination.getLng()},${destination.getLat()}`;
+    
+        const url = `${PROXY_BASE}/api/directions?origin=${encodeURIComponent(originStr)}&destination=${encodeURIComponent(destStr)}`;
+    
         try {
-          const response = await fetch(`${url}?${queryParams}`, {
-            method: 'GET',
-            headers: {
-              'Authorization': `KakaoAK ${REST_API_KEY}`,
-              'Content-Type': 'application/json'
-            }
-          });
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-
-          const data = await response.json();
-
-          if (data.routes && data.routes.length > 0) {
+          const resp = await fetch(url, { method: 'GET' });
+          if (!resp.ok) throw new Error(`proxy ${resp.status}`);
+    
+          const data = await resp.json();
+    
+          if (!data.routes || data.routes.length === 0) {
+            // 카카오가 경로를 못찾으면 직선 연결
+            allPoints.push(origin);
+            allPoints.push(destination);
+          } else {
             const route = data.routes[0];
-            const sections = route.sections;
-
-            // 경로 좌표 추출
+            const sections = route.sections || [];
+    
+            // sections -> roads -> vertexes 구조에서 좌표 추출
             sections.forEach(section => {
-              section.roads.forEach(road => {
-                road.vertexes.forEach((vertex, idx) => {
-                  if (idx % 2 === 0) {
-                    const lng = vertex;
-                    const lat = road.vertexes[idx + 1];
+              (section.roads || []).forEach(road => {
+                const verts = road.vertexes || [];
+                for (let v = 0; v < verts.length; v += 2) {
+                  const lng = verts[v];
+                  const lat = verts[v + 1];
+                  if (typeof lat === 'number' && typeof lng === 'number') {
                     allPoints.push(new kakao.maps.LatLng(lat, lng));
                   }
-                });
+                }
               });
             });
-
-            totalDistance += route.summary.distance;
-            totalTime += route.summary.duration;
+    
+            // 요약거리/시간 합산 (단위: m, sec)
+            if (route.summary) {
+              totalDistance += route.summary.distance || 0;
+              totalTime += route.summary.duration || 0;
+            }
           }
-        } catch (error) {
-          console.error(`구간 ${i}-${i+1} 경로 요청 실패:`, error);
-          // 실패 시 직선으로 연결
-          allPoints.push(origin);
-          allPoints.push(destination);
+        } catch (err) {
+          console.error(`구간 ${i}-${i+1} 경로 요청 실패:`, err);
+          // 실패시 안전하게 직선 연결
+          allPoints.push(positions[i].coords);
+          allPoints.push(positions[i + 1].coords);
+        }
+    
+        // 선택적: 너무 빠른 연속 호출 방지용 짧은 대기 (100~300ms)
+        // await new Promise(r => setTimeout(r, 150));
+      }
+    
+      // allPoints에 중복된 연속 좌표가 들어간 경우가 있을 수 있으므로
+      // 간단히 인접 중복 제거 (같은 좌표 연속 시 중복 제거)
+      const dedupedPoints = [];
+      for (let i = 0; i < allPoints.length; i++) {
+        if (i === 0) dedupedPoints.push(allPoints[i]);
+        else {
+          const a = allPoints[i];
+          const b = dedupedPoints[dedupedPoints.length - 1];
+          if (a.getLat() !== b.getLat() || a.getLng() !== b.getLng()) {
+            dedupedPoints.push(a);
+          }
         }
       }
-
+    
       return {
-        allPoints,
+        allPoints: dedupedPoints,
         totalDistance,
         totalTime
       };
     }
+
 
     // 🆕 실패 시 직선으로 표시하는 백업 함수
     function drawStraightRoute(positions) {
