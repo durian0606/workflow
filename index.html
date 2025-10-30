@@ -30,14 +30,30 @@
     }
     
     .app-container {
-      display: none !important;  /* 🆕 강제 숨김 */
+      display: none !important;
       min-height: 100vh;
       background: #f5f7fa;
+      margin: 0;           /* 🆕 추가 */
+      padding: 0;          /* 🆕 추가 */
     }
     
     .app-container.active {
-      display: flex !important;  /* 🆕 강제 표시 */
+      display: flex !important;
       flex-direction: column;
+      margin: 0;           /* 🆕 추가 */
+      padding: 0;          /* 🆕 추가 */
+    }
+    
+    /* 🆕 추가: 헤더의 상단 여백 제거 */
+    .app-header {
+      background: linear-gradient(135deg, #2a459c 0%, #5b7fd6 100%);
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      margin-top: 0;       /* 🆕 추가 */
     }
 
     .login-box {
@@ -1283,8 +1299,8 @@
     
     /* 메뉴 버튼 */
     .menu-btn {
-      background: rgba(255, 255, 255, 0.25);
-      border: 2px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.2);  /* 🆕 투명도 살짝 낮춤 */
+      border: none;                          /* 🆕 외곽선 완전 제거 */
       color: white;
       width: 48px;
       height: 48px;
@@ -1296,6 +1312,13 @@
       justify-content: center;
       position: relative;
       overflow: hidden;
+    }
+    
+    /* 🆕 호버 효과도 외곽선 없이 */
+    .menu-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      border: none;                          /* 🆕 추가 */
+      transform: scale(1.05);
     }
     
     .menu-btn::before {
@@ -1315,13 +1338,7 @@
       width: 100px;
       height: 100px;
     }
-    
-    .menu-btn:hover {
-      background: rgba(255, 255, 255, 0.35);
-      border-color: rgba(255, 255, 255, 0.5);
-      transform: scale(1.05);
-    }
-    
+        
     .menu-btn:active {
       transform: scale(0.95);
     }
@@ -3256,13 +3273,27 @@
     };
     
     window.logout = function() {
-      currentUser = null;
-      document.getElementById('appContainer').classList.remove('active');
-      document.getElementById('userSelectStep').style.display = 'block';
-      document.getElementById('loginContainer').style.display = 'flex';
+      console.log('🚪 로그아웃 시작');
       
-      // 🆕 자동 로그인되어 있으면 다시 자동 로그인하지 않도록 옵션 추가
-      // (현재는 로그아웃해도 자동 로그인 정보 유지)
+      currentUser = null;
+      
+      // 앱 컨테이너 완전히 숨기기
+      const appContainer = document.getElementById('appContainer');
+      appContainer.classList.remove('active');
+      appContainer.style.display = 'none';
+      
+      // 로그인 컨테이너 표시
+      const loginContainer = document.getElementById('loginContainer');
+      loginContainer.style.display = 'flex';
+      loginContainer.style.visibility = 'visible';
+      loginContainer.style.opacity = '1';
+      
+      // 사용자 선택 화면 표시
+      document.getElementById('companyLoginStep').style.display = 'none';
+      document.getElementById('createCompanyStep').style.display = 'none';
+      document.getElementById('userSelectStep').style.display = 'block';
+      
+      console.log('✅ 로그아웃 완료 - 사용자 선택 화면으로 이동');
     };
     
     window.goToToday = function() {
