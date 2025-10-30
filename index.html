@@ -358,6 +358,7 @@
       transition: all 0.2s;
       position: relative;
       cursor: grab;
+      overflow: hidden;  /* 🆕 추가: 삭제 버튼 완전히 숨김 */
     }
 
     .task-card:active {
@@ -504,40 +505,58 @@
     .action-btn {
       background: #ffe0e0;
       border: none;
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
+      width: 50px;  /* 32px에서 50px로 증가 */
+      height: 100%;  /* 카드 높이에 맞춤 */
+      border-radius: 0;  /* 둥근 모서리 제거 */
+      border-top-right-radius: 8px;  /* 오른쪽만 둥글게 */
+      border-bottom-right-radius: 8px;
       cursor: pointer;
-      font-size: 14px;
-      transition: all 0.2s;
+      font-size: 16px;  /* 14px에서 16px로 증가 */
+      transition: all 0.3s ease;
       flex-shrink: 0;
       position: absolute;
-      right: -40px;  /* 초기에는 카드 밖에 숨김 */
-      transition: right 0.3s ease;
+      right: -50px;  /* 🆕 버튼 너비만큼 숨김 */
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     /* PC에서는 항상 표시 */
     @media (min-width: 769px) {
       .action-btn {
         position: static;  /* PC에서는 절대 위치 해제 */
-        display: block;
+        display: flex;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;  /* PC에서는 원래 스타일 유지 */
+        font-size: 14px;
       }
     }
     
     /* 모바일에서 슬라이드 시 표시 */
     @media (max-width: 768px) {
       .task-card {
-        position: relative;  /* 자식의 absolute 위치 기준 */
-        overflow: visible;  /* 삭제버튼이 보이도록 */
+        position: relative;
+        overflow: hidden;  /* 🆕 변경: visible에서 hidden으로 */
+        transition: transform 0.3s ease;  /* 🆕 부드러운 슬라이드 */
+      }
+      
+      .task-card.swiped-left {
+        transform: translateX(-50px);  /* 🆕 카드를 왼쪽으로 이동 */
       }
       
       .task-card.swiped-left .action-btn {
-        right: 8px;  /* 슬라이드 시 카드 안으로 이동 */
+        right: 0;  /* 🆕 버튼이 오른쪽에 딱 붙음 */
       }
       
       .action-btn {
-        display: block;  /* 모바일에서도 항상 존재 (위치만 변경) */
+        display: flex;
       }
+    }
+    
+    .action-btn:active {
+      background: #ffb3b3;  /* 🆕 터치 시 더 진한 색 */
     }
 
     .action-btn:hover {
@@ -2229,6 +2248,7 @@
         }, { passive: true });
         
         // 🆕 모바일: 터치 이동
+        // 🟢 수정 후
         card.addEventListener('touchmove', (e) => {
           if (e.target.closest('.task-checkbox') || 
               e.target.closest('.assignee-select') || 
@@ -2256,8 +2276,11 @@
           // 슬라이드 처리
           if (isSwiping) {
             e.preventDefault();
-            if (deltaX > 0 && deltaX < 80) {
+            // 🆕 왼쪽으로만 슬라이드 가능, 최대 50px
+            if (deltaX > 0 && deltaX <= 50) {
               card.style.transform = `translateX(-${deltaX}px)`;
+            } else if (deltaX > 50) {
+              card.style.transform = `translateX(-50px)`;  // 최대치 고정
             }
             return;
           }
@@ -2310,12 +2333,19 @@
           if (isSwiping) {
             const deltaX = touchStartX - touchCurrentX;
             
-            if (deltaX > 40) {
+            // 🆕 25px 이상 슬라이드하면 삭제 버튼 표시 (더 민감하게)
+            if (deltaX > 25) {
               card.classList.add('swiped-left');
-              card.style.transform = 'translateX(-50px)';
+              // CSS의 transform이 처리하므로 여기서는 제거
+              card.style.transform = '';
             } else {
               card.classList.remove('swiped-left');
-              card.style.transform = 'translateX(0)';
+              card.style.transform = '';
+            }
+            
+            // 🆕 햅틱 피드백 추가
+            if (deltaX > 25 && navigator.vibrate) {
+              navigator.vibrate(30);
             }
             
             isSwiping = false;
@@ -2414,11 +2444,11 @@
           if (!e.target.closest('.task-card')) {
             document.querySelectorAll('.task-card.swiped-left').forEach(c => {
               c.classList.remove('swiped-left');
-              c.style.transform = 'translateX(0)';
+              c.style.transform = '';  // 🆕 CSS가 처리하도록
             });
           } else if (e.target.closest('.task-card') !== card) {
             card.classList.remove('swiped-left');
-            card.style.transform = 'translateX(0)';
+            card.style.transform = '';  // 🆕 CSS가 처리하도록
           }
         });
         
