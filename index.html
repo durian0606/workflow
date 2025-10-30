@@ -11,22 +11,60 @@
       padding: 0;
       box-sizing: border-box;
     }
-
+    
+    html {
+      margin: 0;           /* 🆕 추가 */
+      padding: 0;          /* 🆕 추가 */
+      height: 100%;        /* 🆕 추가 */
+    }
+    
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       min-height: 100vh;
+      height: 100%;        /* 🆕 추가 */
       overflow-x: hidden;
       overflow-y: auto;
       background: linear-gradient(135deg, #2a459c 0%, #5b7fd6 100%);
       touch-action: pan-y;
+      margin: 0 !important;    /* 🆕 강제로 여백 제거 */
+      padding: 0 !important;   /* 🆕 강제로 여백 제거 */
+      position: relative;      /* 🆕 추가 */
+    }
+    
+    /* 🆕 추가: 앱 컨테이너를 화면 전체에 꽉 차게 */
+    .app-container {
+      display: none !important;
+      min-height: 100vh;
+      height: 100vh;         /* 🆕 추가 */
+      background: #f5f7fa;
+      margin: 0;
+      padding: 0;
+      position: fixed;       /* 🆕 추가: 화면에 고정 */
+      top: 0;                /* 🆕 추가 */
+      left: 0;               /* 🆕 추가 */
+      right: 0;              /* 🆕 추가 */
+      bottom: 0;             /* 🆕 추가 */
+      overflow-y: auto;      /* 🆕 추가: 스크롤 가능하게 */
+    }
+    
+    .app-container.active {
+      display: flex !important;
+      flex-direction: column;
     }
 
     /* 로그인 화면 */
     .login-container {
-      display: flex !important;  /* 🆕 강제 표시 */
+      display: flex !important;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
+      position: fixed;       /* 🆕 추가 */
+      top: 0;                /* 🆕 추가 */
+      left: 0;               /* 🆕 추가 */
+      right: 0;              /* 🆕 추가 */
+      bottom: 0;             /* 🆕 추가 */
+      margin: 0;             /* 🆕 추가 */
+      padding: 0;            /* 🆕 추가 */
     }
     
     .app-container {
