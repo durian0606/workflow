@@ -1902,9 +1902,31 @@
         .guide-step-content p {
           font-size: 13px;
         }
-      }      
-      
-
+        
+        /* 🆕 다른 회사 정보 뱃지 */
+        .other-company-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          background: #fff3e0;
+          border: 1px solid #ffb74d;
+          padding: 3px 8px;
+          border-radius: 4px;
+          font-size: 10px;
+          color: #f57c00;
+          margin-top: 4px;
+          font-weight: 500;
+        }
+        
+        .other-company-icon {
+          font-size: 11px;
+        }
+        
+        .other-company-text {
+          white-space: nowrap;
+        }
+      }
+    
   </style>
 </head>
 
@@ -1955,6 +1977,12 @@
     <div class="login-box" id="createCompanyStep" style="display: none;">
       <h1 class="login-title">🏢 새 회사 만들기</h1>
       <button class="back-btn" onclick="backToCompanyLogin()">← 뒤로</button>
+      
+      <div class="input-group">
+        <label class="input-label">회사명</label>
+        <input type="text" class="admin-input" id="newCompanyNameInput" placeholder="예: (주)건설회사" autocomplete="off">
+        <div class="input-hint">실제 회사 이름을 입력하세요</div>
+      </div>
       
       <div class="input-group">
         <label class="input-label">회사 ID</label>
@@ -2381,6 +2409,7 @@
     let works = {};
     let assignees = [];
     let sites = {};
+    let allCompaniesWorks = {};
     let currentUser = null;
     let currentCompanyId = null;
     let map = null;
@@ -2544,13 +2573,14 @@
           document.getElementById('companyLoginStep').style.display = 'none';
           document.getElementById('createCompanyStep').style.display = 'block';
         };
-    
+
         // 🆕 로그인 화면으로 돌아가기
         window.backToCompanyLogin = function() {
           document.getElementById('createCompanyStep').style.display = 'none';
           document.getElementById('companyLoginStep').style.display = 'block';
           
           // 입력 필드 초기화
+          document.getElementById('newCompanyNameInput').value = '';  // 🆕 추가
           document.getElementById('newCompanyIdInput').value = '';
           document.getElementById('newCompanyPasswordInput').value = '';
           document.getElementById('confirmPasswordInput').value = '';
@@ -2599,14 +2629,20 @@
             });
           }
         });
-    
+
         // 🆕 새 회사 만들기
         window.createCompany = async function() {
+          const companyName = document.getElementById('newCompanyNameInput').value.trim();
           const companyId = document.getElementById('newCompanyIdInput').value.trim();
           const password = document.getElementById('newCompanyPasswordInput').value;
           const confirmPassword = document.getElementById('confirmPasswordInput').value;
           
           // 유효성 검증
+          if (!companyName) {
+            alert('회사명을 입력하세요.');
+            return;
+          }
+          
           if (!companyId) {
             alert('회사 ID를 입력하세요.');
             return;
@@ -2644,6 +2680,7 @@
           const companyRef = window.dbRef(window.db, `companies/${companyId}`);
           window.dbSet(companyRef, {
             info: {
+              name: companyName,  // 🆕 회사명 추가
               password: password,
               createdAt: new Date().toISOString()
             },
@@ -2651,7 +2688,7 @@
             works: {},
             sites: {}
           }).then(() => {
-            alert(`회사가 생성되었습니다!\n\n회사 ID: ${companyId}\n\n팀원들과 공유하세요.`);
+            alert(`회사가 생성되었습니다!\n\n회사명: ${companyName}\n회사 ID: ${companyId}\n\n팀원들과 공유하세요.`);
             
             // 자동 로그인
             currentCompanyId = companyId;
@@ -3191,6 +3228,27 @@
 
       console.log(`✅ 직선 경로 표시 완료`);
     }
+
+// 🆕 모든 회사의 작업 정보 로드 (다른 회사 현장 표시용)
+function loadAllCompaniesWorks() {
+  const companiesRef = window.dbRef(window.db, 'companies');
+  window.dbOnValue(companiesRef, (snapshot) => {
+    const companies = snapshot.val() || {};
+    allCompaniesWorks = {};
+    
+    Object.keys(companies).forEach(companyId => {
+      allCompaniesWorks[companyId] = {
+        name: companies[companyId].info?.name || companyId,
+        works: companies[companyId].works || {}
+      };
+    });
+    
+    // 데이터 로드 후 화면 갱신
+    if (currentUser) {
+      renderWorks();
+    }
+  });
+}
     
     function loadAssignees() {
       const assigneesRef = window.dbRef(window.db, `companies/${currentCompanyId}/assignees`);
@@ -3301,6 +3359,7 @@
       updateDateDisplay();
       loadWorks();
       loadSites();
+      loadAllCompaniesWorks();  // 🆕 추가
       
       setTimeout(() => {
         console.log('🗺️ 지도 초기화 시작...');
@@ -3475,6 +3534,10 @@
       const myWorks = [];
       const teamWorks = [];
       const completedWorks = [];
+      
+      // 🆕 다른 회사의 작업 정보를 먼저 수집
+      const otherCompaniesWorkMap = {};
+      
       Object.keys(works).forEach(workId => {
         const work = works[workId];
         let shouldShow = false;
@@ -3497,11 +3560,44 @@
         if (shouldShow) {
           const deadline = work.deadline || work.date;
           const isOverdue = deadline < searchDate;
+          
+          // 🆕 다른 회사의 같은 현장 작업 찾기
+          const otherCompanyInfo = [];
+          if (work.site) {
+            // allCompaniesWorks에서 같은 날짜, 같은 현장 찾기
+            Object.keys(allCompaniesWorks).forEach(companyId => {
+              if (companyId === currentCompanyId) return; // 자기 회사는 제외
+              
+              const companyWorks = allCompaniesWorks[companyId].works || {};
+              const companyName = allCompaniesWorks[companyId].name || companyId;
+              
+              Object.values(companyWorks).forEach(otherWork => {
+                if (otherWork.completed) return;
+                if (otherWork.site !== work.site) return;
+                
+                let otherShouldShow = false;
+                if (otherWork.work === '시험' || otherWork.parentWorkId) {
+                  otherShouldShow = otherWork.date === searchDate;
+                } else {
+                  otherShouldShow = otherWork.date <= searchDate;
+                }
+                
+                if (otherShouldShow) {
+                  otherCompanyInfo.push({
+                    companyName: companyName,
+                    assignee: otherWork.assignee || '미정'
+                  });
+                }
+              });
+            });
+          }
+          
           const visibleWork = {
             ...work,
             id: workId,
             displayWork: work.displayWork || work.work,
-            isOverdue: isOverdue
+            isOverdue: isOverdue,
+            otherCompanyInfo: otherCompanyInfo  // 🆕 추가
           };
           if (work.assignee === currentUser) {
             myWorks.push(visibleWork);
@@ -3959,8 +4055,25 @@
         title.appendChild(document.createTextNode(' '));
         title.appendChild(warningBadge);
       }
-      // 타임라인 클릭 이벤트는 제목이 아닌 날짜에만 적용
       cardBody.appendChild(title);
+      
+      // 🆕 다른 회사의 같은 현장 작업이 있는지 확인
+      if (work.otherCompanyInfo && work.otherCompanyInfo.length > 0) {
+        const otherCompanyContainer = document.createElement('div');
+        otherCompanyContainer.style.cssText = 'display: flex; flex-direction: column; gap: 4px; margin-top: 4px;';
+        
+        work.otherCompanyInfo.forEach(info => {
+          const badge = document.createElement('div');
+          badge.className = 'other-company-badge';
+          badge.innerHTML = `
+            <span class="other-company-icon">🏢</span>
+            <span class="other-company-text">${info.companyName} - ${info.assignee}</span>
+          `;
+          otherCompanyContainer.appendChild(badge);
+        });
+        
+        cardBody.appendChild(otherCompanyContainer);
+      }
       
       if (work.work !== '시험' && !work.parentWorkId) {
         const deadlineContainer = document.createElement('div');
