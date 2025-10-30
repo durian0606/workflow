@@ -1867,7 +1867,36 @@
   <!-- 로그인 화면 -->
   <div class="login-container" id="loginContainer">
     <!-- Step 1: 회사 로그인 -->
+<!-- Step 1: 회사 로그인 -->
     <div class="login-box" id="companyLoginStep">
+      <h1 class="login-title">🏢 회사 로그인</h1>
+      
+      <div class="input-group">
+        <label class="input-label">회사 ID</label>
+        <input type="text" class="admin-input" id="companyIdInput" placeholder="회사 ID 입력" autocomplete="username">
+        <div class="input-hint">회사 관리자에게 문의하세요</div>
+      </div>
+      
+      <div class="input-group">
+        <label class="input-label">비밀번호</label>
+        <input type="password" class="admin-input" id="companyPasswordInput" placeholder="비밀번호 입력" autocomplete="current-password">
+      </div>
+      
+      <div class="auto-login-container">
+        <label class="checkbox-label">
+          <input type="checkbox" class="auto-login-checkbox" id="autoLoginCheckbox">
+          <span class="checkbox-text">자동 로그인</span>
+        </label>
+      </div>
+      
+      <button class="admin-btn" onclick="loginCompany()">로그인</button>
+      
+      <div class="divider">
+        <span>또는</span>
+      </div>
+      
+      <button class="secondary-btn" onclick="showCreateCompanyStep()">새 회사 만들기</button>
+    </div>
 
     <!-- Step 2: 새 회사 만들기 -->
     <div class="login-box" id="createCompanyStep" style="display: none;">
