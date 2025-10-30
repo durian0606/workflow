@@ -23,12 +23,21 @@
 
     /* 로그인 화면 */
     .login-container {
-      display: flex !important;  /* 강제 표시 */
+      display: flex !important;  /* 🆕 강제 표시 */
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      opacity: 1 !important;
-      visibility: visible !important;
+    }
+    
+    .app-container {
+      display: none !important;  /* 🆕 강제 숨김 */
+      min-height: 100vh;
+      background: #f5f7fa;
+    }
+    
+    .app-container.active {
+      display: flex !important;  /* 🆕 강제 표시 */
+      flex-direction: column;
     }
 
     .login-box {
@@ -269,19 +278,6 @@
       color: #2a459c;
     }
     
-    /* 메인 앱 */
-    .app-container {
-      display: none;
-      min-height: 100vh;
-      background: #f5f7fa;
-    }
-
-    .app-container.active {
-      display: flex;
-      flex-direction: column;
-    }
-
-
     .app-header {
       background: linear-gradient(135deg, #2a459c 0%, #5b7fd6 100%);
       color: white;
@@ -2358,10 +2354,13 @@
         setTimeout(waitForFirebase, 100);
       }
     }
-
+    
     function initApp() {
-          checkSavedCompany();
-        }
+      console.log('✅ 앱 초기화 시작');
+      // 🆕 무조건 로그인 화면 먼저 표시
+      document.getElementById('companyLoginStep').style.display = 'block';
+      checkSavedCompany();
+    }
     
     // 🆕 저장된 회사 정보 확인 (자동 로그인)
     function checkSavedCompany() {
@@ -3157,21 +3156,48 @@
     
     function renderUserGrid() {
       const grid = document.getElementById('userGrid');
+      if (!grid) {
+        console.error('❌ userGrid 요소를 찾을 수 없습니다');
+        return;
+      }
+      
       grid.innerHTML = '';
-      assignees.forEach(user => {
+      
+      console.log('👥 사용자 카드 렌더링:', assignees.length, '명');
+      
+      assignees.forEach((user, index) => {
         const card = document.createElement('div');
         card.className = 'user-card';
-        card.onclick = () => login(user.name);
+        
+        // 🆕 클릭 이벤트 강화
+        card.onclick = (e) => {
+          console.log(`🖱️ ${index + 1}번째 카드 클릭:`, user.name);
+          e.preventDefault();
+          e.stopPropagation();
+          login(user.name);
+        };
+        
+        // 🆕 터치 이벤트도 추가 (모바일 대응)
+        card.ontouchend = (e) => {
+          console.log(`👆 ${index + 1}번째 카드 터치:`, user.name);
+          e.preventDefault();
+          login(user.name);
+        };
+        
         const avatar = document.createElement('div');
         avatar.className = 'user-card-avatar';
         avatar.textContent = user.name.charAt(0);
+        
         const name = document.createElement('div');
         name.className = 'user-card-name';
         name.textContent = user.name;
+        
         card.appendChild(avatar);
         card.appendChild(name);
         grid.appendChild(card);
       });
+      
+      console.log('✅ 사용자 카드 렌더링 완료');
     }
     
     window.addNewUser = function() {
@@ -3194,18 +3220,39 @@
     };
     
     window.login = function(userName) {
+      console.log('🎯 로그인 시도:', userName);
+      
       currentUser = userName;
-      document.getElementById('loginContainer').style.display = 'none';
-      document.getElementById('appContainer').classList.add('active');
+      
+      // 로그인 화면 완전히 숨기기
+      const loginContainer = document.getElementById('loginContainer');
+      loginContainer.style.display = 'none';
+      loginContainer.style.visibility = 'hidden';
+      loginContainer.style.opacity = '0';
+      
+      // 앱 컨테이너 표시
+      const appContainer = document.getElementById('appContainer');
+      appContainer.style.display = 'flex';
+      appContainer.classList.add('active');
+      
+      console.log('✅ 화면 전환 완료');
+      console.log('   - 로그인 컨테이너 display:', loginContainer.style.display);
+      console.log('   - 앱 컨테이너 display:', appContainer.style.display);
+      console.log('   - 앱 컨테이너 클래스:', appContainer.className);
+      
       document.getElementById('userAvatar').textContent = userName.charAt(0);
       document.getElementById('headerUserName').textContent = userName;
+      
       updateDateDisplay();
       loadWorks();
       loadSites();
+      
       setTimeout(() => {
         console.log('🗺️ 지도 초기화 시작...');
         initMap();
       }, 500);
+      
+      console.log('✅ 로그인 완료');
     };
     
     window.logout = function() {
@@ -3322,9 +3369,17 @@
     };
     
     function loadWorks() {
+      console.log('📋 작업 데이터 로드 중...');
+      
+      if (!currentCompanyId) {
+        console.error('❌ currentCompanyId가 설정되지 않음');
+        return;
+      }
+      
       const worksRef = window.dbRef(window.db, `companies/${currentCompanyId}/works`);
       window.dbOnValue(worksRef, (snapshot) => {
         works = snapshot.val() || {};
+        console.log('✅ 작업 데이터 로드 완료:', Object.keys(works).length, '개');
         renderWorks();
       });
     }
