@@ -1875,7 +1875,7 @@
           right: 8px;
           min-width: 160px;
         }
-      
+        
         .guide-modal-content {
           width: 95%;
           max-height: 90vh;
@@ -1904,6 +1904,27 @@
         }
         
         /* 🆕 다른 회사 정보 뱃지 */
+        .other-company-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          background: #fff3e0;
+          border: 1px solid #ffb74d;
+          padding: 3px 8px;
+          border-radius: 4px;
+          font-size: 10px;
+          color: #f57c00;
+          margin-top: 4px;
+          font-weight: 500;
+        }
+        
+        .other-company-icon {
+          font-size: 11px;
+        }
+        
+        .other-company-text {
+          white-space: nowrap;
+        }
         .other-company-badge {
           display: inline-flex;
           align-items: center;
@@ -2100,11 +2121,15 @@
       <span class="menu-item-text">사용 설명서</span>
     </div>
     <div class="menu-divider"></div>
+    <div class="menu-item menu-item-danger" onclick="deleteCompany()">
+      <span class="menu-item-icon">⚠️</span>
+      <span class="menu-item-text">회사 탈퇴</span>
+    </div>
     <div class="menu-item menu-item-danger" onclick="logout()">
       <span class="menu-item-icon">🚪</span>
       <span class="menu-item-text">로그아웃</span>
     </div>
-  </div>  
+  </div>
   <!-- 작업 타임라인 모달 -->
   <div class="modal-overlay" id="timelineModal">
     <div class="modal-content">
@@ -3398,7 +3423,123 @@ function loadAllCompaniesWorks() {
       
       console.log('✅ 로그아웃 완료 - 회사 로그인 화면으로 이동');
     };
-    
+
+    // 🆕 회사 탈퇴 기능
+    window.deleteCompany = async function() {
+      console.log('⚠️ 회사 탈퇴 시도');
+      
+      // 메뉴 닫기
+      toggleMenu();
+      
+      // 1단계: 경고 메시지
+      const confirmMessage = `⚠️ 회사 탈퇴 경고 ⚠️\n\n` +
+        `회사를 탈퇴하면 다음 데이터가 모두 삭제됩니다:\n` +
+        `• 모든 작업 내역\n` +
+        `• 모든 현장 정보\n` +
+        `• 모든 사용자 정보\n` +
+        `• 회사 정보\n\n` +
+        `이 작업은 되돌릴 수 없습니다!\n\n` +
+        `정말로 탈퇴하시겠습니까?`;
+      
+      if (!confirm(confirmMessage)) {
+        console.log('❌ 회사 탈퇴 취소됨');
+        return;
+      }
+      
+      // 2단계: 비밀번호 확인
+      const password = prompt('회사 비밀번호를 입력하여 탈퇴를 확인하세요:');
+      
+      if (!password) {
+        alert('탈퇴가 취소되었습니다.');
+        console.log('❌ 비밀번호 입력 취소됨');
+        return;
+      }
+      
+      try {
+        // Firebase에서 회사 정보 가져오기
+        const companyRef = window.dbRef(window.db, `companies/${currentCompanyId}/info`);
+        
+        window.dbOnValue(companyRef, async (snapshot) => {
+          const companyInfo = snapshot.val();
+          
+          if (!companyInfo) {
+            alert('회사 정보를 찾을 수 없습니다.');
+            return;
+          }
+          
+          // 비밀번호 확인
+          if (companyInfo.password !== password) {
+            alert('비밀번호가 일치하지 않습니다.');
+            console.log('❌ 비밀번호 불일치');
+            return;
+          }
+          
+          // 3단계: 최종 확인
+          const finalConfirm = confirm(
+            '⚠️ 최종 확인 ⚠️\n\n' +
+            '지금 확인을 누르면 회사가 영구적으로 삭제됩니다.\n' +
+            '정말로 진행하시겠습니까?'
+          );
+          
+          if (!finalConfirm) {
+            alert('탈퇴가 취소되었습니다.');
+            console.log('❌ 최종 확인 취소됨');
+            return;
+          }
+          
+          // 회사 데이터 삭제
+          const companyDataRef = window.dbRef(window.db, `companies/${currentCompanyId}`);
+          
+          window.dbRemove(companyDataRef).then(() => {
+            console.log('✅ 회사 데이터 삭제 완료');
+            
+            // 자동 로그인 정보 삭제
+            clearAutoLogin();
+            
+            alert(
+              '회사 탈퇴가 완료되었습니다.\n\n' +
+              '모든 데이터가 삭제되었습니다.\n' +
+              '이용해 주셔서 감사합니다.'
+            );
+            
+            // 로그아웃 처리
+            currentUser = null;
+            currentCompanyId = null;
+            
+            // 앱 컨테이너 숨기기
+            const appContainer = document.getElementById('appContainer');
+            appContainer.classList.remove('active');
+            appContainer.style.display = 'none';
+            
+            // 로그인 화면 표시
+            const loginContainer = document.getElementById('loginContainer');
+            loginContainer.style.display = 'flex';
+            loginContainer.style.visibility = 'visible';
+            loginContainer.style.opacity = '1';
+            
+            // 회사 로그인 화면으로 이동
+            document.getElementById('companyLoginStep').style.display = 'block';
+            document.getElementById('createCompanyStep').style.display = 'none';
+            document.getElementById('userSelectStep').style.display = 'none';
+            
+            // 입력 필드 초기화
+            document.getElementById('companyIdInput').value = '';
+            document.getElementById('companyPasswordInput').value = '';
+            
+            console.log('✅ 회사 탈퇴 완료 - 로그인 화면으로 이동');
+            
+          }).catch((error) => {
+            console.error('❌ 회사 삭제 중 오류:', error);
+            alert('회사 탈퇴 중 오류가 발생했습니다: ' + error.message);
+          });
+          
+        }, { onlyOnce: true });
+        
+      } catch (error) {
+        console.error('❌ 회사 탈퇴 처리 중 오류:', error);
+        alert('회사 탈퇴 처리 중 오류가 발생했습니다: ' + error.message);
+      }
+    };    
     window.goToToday = function() {
       currentDate = new Date();
       updateDateDisplay();
