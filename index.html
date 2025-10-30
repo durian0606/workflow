@@ -425,11 +425,14 @@
       border-width: 3px;
     }
 
+    /* 🟢 수정 후 */
     .task-card.completed .task-checkbox {
       background: #2a459c;
       position: relative;
+      cursor: pointer;  /* 🆕 추가 */
+      transition: all 0.2s;  /* 🆕 추가 */
     }
-
+    
     .task-card.completed .task-checkbox::after {
       content: '✓';
       position: absolute;
@@ -440,7 +443,36 @@
       left: 50%;
       transform: translate(-50%, -50%);
     }
+    
+    /* 🆕 완료된 체크박스 호버 효과 */
+    .task-card.completed .task-checkbox:hover {
+      background: #5b7fd6;  /* 밝은 파란색으로 변경 */
+      border-color: #5b7fd6;
+      transform: scale(1.1);  /* 살짝 커짐 */
+    }
+    
+    /* 🆕 완료된 체크박스 클릭 효과 */
+    .task-card.completed .task-checkbox:active {
+      transform: scale(0.95);  /* 클릭 시 살짝 작아짐 */
+    }
 
+    /* 🆕 모바일에서 터치 영역 확대 */
+    @media (max-width: 768px) {
+      .task-card.completed .task-checkbox {
+        width: 24px;
+        height: 24px;
+        min-width: 44px;  /* iOS 권장 터치 영역 */
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .task-card.completed .task-checkbox::after {
+        font-size: 14px;
+      }
+    }
+    
     .task-card-body {
       flex: 1;
       display: flex;
@@ -2215,7 +2247,7 @@
       if (work.assignee === currentUser) {
         card.classList.add('my-task');
       }
-      // 🟢 수정 후: 아래 코드로 완전 교체
+      
       if (!isCompleted) {
         // 터치/드래그 변수 통합
         let touchStartX = 0;
@@ -2520,6 +2552,24 @@
         numberCheckContainer.appendChild(checkbox);
         
         card.appendChild(numberCheckContainer);
+      } else {
+        // 🆕 완료된 작업에도 체크박스 추가 (완료 취소용)
+        const completedCheckContainer = document.createElement('div');
+        completedCheckContainer.className = 'number-check-container';
+        
+        const checkbox = document.createElement('div');
+        checkbox.className = 'task-checkbox';
+        checkbox.style.cursor = 'pointer';
+        checkbox.onclick = (e) => {
+          e.stopPropagation();
+          // 완료 취소 확인
+          if (confirm('이 작업을 다시 진행중으로 되돌리시겠습니까?')) {
+            toggleComplete(work.id);
+          }
+        };
+        completedCheckContainer.appendChild(checkbox);
+        
+        card.appendChild(completedCheckContainer);
       }
       
       const cardBody = document.createElement('div');
@@ -2823,19 +2873,39 @@
       document.getElementById('timelineModal').classList.remove('active');
     };
     
+    // 🟢 수정 후
     function toggleComplete(workId) {
       const work = works[workId];
       if (!work) return;
+      
       const workRef = window.dbRef(window.db, `works/${workId}`);
       const isCompleting = !work.completed;
+      
       const updateData = {
         completed: isCompleting
       };
+      
       if (isCompleting) {
+        // 완료 처리
         updateData.completedDate = new Date().toISOString().split('T')[0];
+        
+        // 🆕 햅틱 피드백 (완료 시)
+        if (navigator.vibrate) {
+          navigator.vibrate(50);
+        }
       } else {
+        // 완료 취소
         updateData.completedDate = null;
+        
+        // 🆕 햅틱 피드백 (취소 시)
+        if (navigator.vibrate) {
+          navigator.vibrate([30, 50, 30]);  // 패턴 진동
+        }
+        
+        // 🆕 완료 취소 시 order 값 복원 (맨 아래로)
+        updateData.order = Date.now();
       }
+      
       window.dbUpdate(workRef, updateData);
     }
     
