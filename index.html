@@ -1146,7 +1146,291 @@
       .task-grid::-webkit-scrollbar-thumb:hover {
         background: #5b7fd6;
       }
-    }
+
+      /* 🆕 메뉴 버튼 */
+      .menu-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 24px;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .menu-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      
+      .menu-icon {
+        display: block;
+        line-height: 1;
+      }
+      
+      /* 🆕 메뉴 드롭다운 */
+      .menu-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 16px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        min-width: 180px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.2s ease;
+        z-index: 1000;
+        margin-top: 8px;
+        overflow: hidden;
+      }
+      
+      .menu-dropdown.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+      
+      .menu-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        cursor: pointer;
+        transition: background 0.2s;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      
+      .menu-item:last-child {
+        border-bottom: none;
+      }
+      
+      .menu-item:hover {
+        background: #f5f7fa;
+      }
+      
+      .menu-item-icon {
+        font-size: 18px;
+        width: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .menu-item-text {
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+        flex: 1;
+      }
+      
+      .menu-item-danger {
+        color: #d32f2f;
+      }
+      
+      .menu-item-danger .menu-item-text {
+        color: #d32f2f;
+      }
+      
+      .menu-item-danger:hover {
+        background: #ffebee;
+      }
+      
+      /* 🆕 사용설명서 모달 */
+      .guide-modal-content {
+        max-width: 700px;
+        max-height: 85vh;
+      }
+      
+      .guide-content {
+        padding: 8px 0;
+      }
+      
+      .guide-section {
+        margin-bottom: 32px;
+      }
+      
+      .guide-section-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #2a459c;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #e3f2fd;
+      }
+      
+      .guide-step {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 20px;
+        align-items: flex-start;
+      }
+      
+      .guide-step-number {
+        background: #2a459c;
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+      
+      .guide-step-content {
+        flex: 1;
+      }
+      
+      .guide-step-content h4 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+      }
+      
+      .guide-step-content p {
+        font-size: 14px;
+        line-height: 1.6;
+        color: #666;
+        margin-bottom: 8px;
+      }
+      
+      .guide-list {
+        margin: 12px 0;
+        padding-left: 20px;
+      }
+      
+      .guide-list li {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 6px;
+        line-height: 1.5;
+      }
+      
+      .guide-tip {
+        background: #e3f2fd;
+        border-left: 4px solid #2196F3;
+        padding: 10px 12px;
+        margin-top: 12px;
+        font-size: 13px;
+        color: #1565C0;
+        border-radius: 4px;
+      }
+      
+      .guide-warning {
+        background: #fff3e0;
+        border-left: 4px solid #ff9800;
+        padding: 10px 12px;
+        margin-top: 12px;
+        font-size: 13px;
+        color: #e65100;
+        border-radius: 4px;
+      }
+      
+      .guide-tips-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      
+      .guide-tip-item {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        background: #f5f7fa;
+        padding: 12px;
+        border-radius: 8px;
+      }
+      
+      .tip-emoji {
+        font-size: 20px;
+        flex-shrink: 0;
+      }
+      
+      .guide-tip-item span:last-child {
+        font-size: 14px;
+        line-height: 1.6;
+        color: #666;
+      }
+      
+      .guide-contact {
+        background: #f5f7fa;
+        padding: 20px;
+        border-radius: 8px;
+      }
+      
+      .guide-contact p {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 16px;
+        line-height: 1.6;
+      }
+      
+      .contact-info {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      
+      .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        color: #333;
+      }
+      
+      .contact-icon {
+        font-size: 18px;
+        width: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      /* 모바일 최적화 */
+      @media (max-width: 768px) {
+        .menu-dropdown {
+          right: 8px;
+          min-width: 160px;
+        }
+      
+        .guide-modal-content {
+          width: 95%;
+          max-height: 90vh;
+        }
+      
+        .guide-section-title {
+          font-size: 16px;
+        }
+      
+        .guide-step {
+          gap: 12px;
+        }
+      
+        .guide-step-number {
+          width: 28px;
+          height: 28px;
+          font-size: 13px;
+        }
+      
+        .guide-step-content h4 {
+          font-size: 15px;
+        }
+      
+        .guide-step-content p {
+          font-size: 13px;
+        }
+      }      
+      
+
   </style>
 </head>
 
@@ -1186,8 +1470,25 @@
           </div>
         </div>
         <div class="header-right">
-          <button class="header-btn" onclick="toggleSiteModal()">📍 현장추가</button>
-          <button class="header-btn" onclick="logout()">로그아웃</button>
+          <button class="menu-btn" onclick="toggleMenu()">
+            <span class="menu-icon">☰</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- 🆕 메뉴 드롭다운 -->
+      <div class="menu-dropdown" id="menuDropdown">
+        <div class="menu-item" onclick="toggleSiteModal(); toggleMenu();">
+          <span class="menu-item-icon">📍</span>
+          <span class="menu-item-text">현장 추가</span>
+        </div>
+        <div class="menu-item" onclick="toggleGuideModal(); toggleMenu();">
+          <span class="menu-item-icon">📖</span>
+          <span class="menu-item-text">사용 설명서</span>
+        </div>
+        <div class="menu-item menu-item-danger" onclick="logout()">
+          <span class="menu-item-icon">🚪</span>
+          <span class="menu-item-text">로그아웃</span>
         </div>
       </div>
 
@@ -1304,6 +1605,199 @@
     </div>
   </div>
 
+<!-- 🆕 사용 설명서 모달 -->
+<div class="modal-overlay" id="guideModal">
+  <div class="modal-content guide-modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">📖 사용 설명서</h3>
+      <button class="close-btn" onclick="toggleGuideModal()">×</button>
+    </div>
+    
+    <div class="guide-content">
+      <!-- 1. 시작하기 -->
+      <div class="guide-section">
+        <h3 class="guide-section-title">🚀 1. 시작하기</h3>
+        <div class="guide-step">
+          <div class="guide-step-number">1</div>
+          <div class="guide-step-content">
+            <h4>사용자 선택</h4>
+            <p>로그인 화면에서 본인의 이름을 선택하세요. 새 사용자는 하단에서 추가할 수 있습니다.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 현장 관리 -->
+      <div class="guide-section">
+        <h3 class="guide-section-title">🏗️ 2. 현장 관리</h3>
+        <div class="guide-step">
+          <div class="guide-step-number">2</div>
+          <div class="guide-step-content">
+            <h4>현장 추가하기</h4>
+            <p>① 우측 상단 메뉴(☰) → "현장 추가" 클릭<br>
+               ② 현장명과 주소 입력<br>
+               ③ 저장 버튼 클릭</p>
+            <div class="guide-tip">💡 주소는 경로 표시 기능에 사용되므로 정확히 입력하세요.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. 작업 추가 -->
+      <div class="guide-section">
+        <h3 class="guide-section-title">✍️ 3. 작업 추가</h3>
+        <div class="guide-step">
+          <div class="guide-step-number">3</div>
+          <div class="guide-step-content">
+            <h4>일반 작업 추가</h4>
+            <p>① 현장명 입력 (또는 "선택" 버튼으로 등록된 현장 선택)<br>
+               ② 작업 내용 입력 (예: 배근, 거푸집, 콘크리트 타설 등)<br>
+               ③ "추가" 버튼 클릭</p>
+          </div>
+        </div>
+        <div class="guide-step">
+          <div class="guide-step-number">4</div>
+          <div class="guide-step-content">
+            <h4>시험 작업 추가 (자동 일정 생성)</h4>
+            <p>작업 내용에 "시험"을 입력하면 자동으로 관련 일정이 생성됩니다:</p>
+            <ul class="guide-list">
+              <li>시험 당일</li>
+              <li>캡핑 (영업일 +1일)</li>
+              <li>탈형 (영업일 +2일)</li>
+              <li>7일 강도 시험 (+7일)</li>
+              <li>28일 강도 시험 (+28일)</li>
+            </ul>
+            <div class="guide-tip">💡 시험 관련 작업은 작업등록일자를 클릭하면 전체 타임라인을 볼 수 있습니다.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. 작업 관리 -->
+      <div class="guide-section">
+        <h3 class="guide-section-title">📋 4. 작업 관리</h3>
+        <div class="guide-step">
+          <div class="guide-step-number">5</div>
+          <div class="guide-step-content">
+            <h4>작업 순서 변경</h4>
+            <p><strong>PC:</strong> 작업 카드를 드래그하여 위아래로 이동<br>
+               <strong>모바일:</strong> 작업 카드를 길게 누르고 상하로 드래그</p>
+            <div class="guide-tip">💡 "내 작업 진행 중" 섹션에서만 순서 변경 가능</div>
+          </div>
+        </div>
+        <div class="guide-step">
+          <div class="guide-step-number">6</div>
+          <div class="guide-step-content">
+            <h4>작업 완료 체크</h4>
+            <p>작업 카드 왼쪽의 체크박스를 클릭하면 완료 처리됩니다.<br>
+               완료된 작업의 체크박스를 다시 클릭하면 진행중으로 되돌아갑니다.</p>
+          </div>
+        </div>
+        <div class="guide-step">
+          <div class="guide-step-number">7</div>
+          <div class="guide-step-content">
+            <h4>작업 삭제</h4>
+            <p><strong>PC:</strong> 작업 카드 우측의 🗑️ 버튼 클릭<br>
+               <strong>모바일:</strong> 작업 카드를 왼쪽으로 슬라이드하면 삭제 버튼 표시</p>
+            <div class="guide-warning">⚠️ 시험 작업 삭제 시 관련된 모든 작업(캡핑, 탈형 등)이 함께 삭제됩니다.</div>
+          </div>
+        </div>
+        <div class="guide-step">
+          <div class="guide-step-number">8</div>
+          <div class="guide-step-content">
+            <h4>담당자 지정</h4>
+            <p>작업 카드의 담당자 선택 드롭다운에서 담당자를 변경할 수 있습니다.</p>
+          </div>
+        </div>
+        <div class="guide-step">
+          <div class="guide-step-number">9</div>
+          <div class="guide-step-content">
+            <h4>완료 기한 설정</h4>
+            <p>작업 카드의 "완료 기한" 날짜를 클릭하면 기한을 변경할 수 있습니다:<br>
+               • 오늘<br>
+               • 내일<br>
+               • 이번주 중 (금요일)<br>
+               • 직접 날짜 선택</p>
+            <div class="guide-warning">⚠️ 기한이 지난 작업은 빨간색으로 표시되며 "기한초과" 뱃지가 표시됩니다.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. 날짜 네비게이션 -->
+      <div class="guide-section">
+        <h3 class="guide-section-title">📅 5. 날짜 네비게이션</h3>
+        <div class="guide-step">
+          <div class="guide-step-number">10</div>
+          <div class="guide-step-content">
+            <h4>날짜 이동</h4>
+            <p>헤더의 날짜 표시 옆 버튼으로 날짜를 이동할 수 있습니다:<br>
+               • <strong>오늘:</strong> 오늘 날짜로 이동<br>
+               • <strong>◀:</strong> 하루 전으로<br>
+               • <strong>▶:</strong> 하루 후로</p>
+            <div class="guide-tip">💡 선택한 날짜 이전의 미완료 작업도 함께 표시됩니다.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. 경로 표시 -->
+      <div class="guide-section">
+        <h3 class="guide-section-title">🗺️ 6. 이동 경로 표시</h3>
+        <div class="guide-step">
+          <div class="guide-step-number">11</div>
+          <div class="guide-step-content">
+            <h4>경로 확인하기</h4>
+            <p>① 지도 섹션의 "경로 표시" 버튼 클릭<br>
+               ② 위치 권한 허용<br>
+               ③ 현재 위치에서 출발하여 작업 순서대로 현장을 방문하는 최적 경로가 표시됩니다.</p>
+            <div class="guide-tip">💡 경로는 작업 순서에 따라 자동으로 계산되며, 총 거리와 소요 시간이 표시됩니다.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. 팁과 요령 -->
+      <div class="guide-section">
+        <h3 class="guide-section-title">💡 7. 유용한 팁</h3>
+        <div class="guide-tips-list">
+          <div class="guide-tip-item">
+            <span class="tip-emoji">✅</span>
+            <span>아침에 출근하면 작업 순서를 먼저 정리하세요. 이동 경로가 자동으로 최적화됩니다.</span>
+          </div>
+          <div class="guide-tip-item">
+            <span class="tip-emoji">📍</span>
+            <span>자주 방문하는 현장은 미리 등록해두면 빠르게 선택할 수 있습니다.</span>
+          </div>
+          <div class="guide-tip-item">
+            <span class="tip-emoji">📋</span>
+            <span>섹션 헤더를 클릭하면 접거나 펼칠 수 있어 화면을 효율적으로 사용할 수 있습니다.</span>
+          </div>
+          <div class="guide-tip-item">
+            <span class="tip-emoji">🔔</span>
+            <span>시험 작업은 자동으로 일정이 생성되므로 일일이 입력할 필요가 없습니다.</span>
+          </div>
+          <div class="guide-tip-item">
+            <span class="tip-emoji">👥</span>
+            <span>팀 작업도 한눈에 볼 수 있어 업무 분담과 협업이 쉽습니다.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. 문의하기 -->
+      <div class="guide-section">
+        <h3 class="guide-section-title">📞 8. 문의하기</h3>
+        <div class="guide-contact">
+          <p>사용 중 문의사항이나 개선 제안이 있으시면 언제든 연락주세요.</p>
+          <div class="contact-info">
+            <div class="contact-item">
+              <span class="contact-icon">📧</span>
+              <span>이메일: support@example.com</span>
+            </div>
+            <div class="contact-item">
+              <span class="contact-icon">💬</span>
+              <span>카카오톡: @작업관리앱</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>  
   <!-- Kakao Map API -->
   <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=edfe0792f24f219880fc608009d59a0f&libraries=services"></script>
 
@@ -3157,7 +3651,37 @@
         currentEditingWorkId = null;
       }
     });
+
+    // 🆕 메뉴 토글
+    window.toggleMenu = function() {
+      const menu = document.getElementById('menuDropdown');
+      menu.classList.toggle('active');
+    };
     
+    // 🆕 메뉴 외부 클릭 시 닫기
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('menuDropdown');
+      const menuBtn = document.querySelector('.menu-btn');
+      
+      if (menu && menuBtn) {
+        if (!menu.contains(e.target) && !menuBtn.contains(e.target)) {
+          menu.classList.remove('active');
+        }
+      }
+    });
+    
+    // 🆕 사용설명서 모달 토글
+    window.toggleGuideModal = function() {
+      const modal = document.getElementById('guideModal');
+      modal.classList.toggle('active');
+    };
+    
+    // 사용설명서 모달 외부 클릭 시 닫기
+    document.getElementById('guideModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('guideModal')) {
+        toggleGuideModal();
+      }
+    });    
     window.onload = function() {
       waitForFirebase();
     };
