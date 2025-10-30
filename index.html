@@ -216,35 +216,6 @@
       background: #e8eef3;
     }
 
-    .company-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .company-header .login-title {
-      margin-bottom: 0;
-    }
-
-    .company-logout-btn {
-      background: #f5f7fa;
-      border: 1px solid #e0e0e0;
-      color: #666;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-
-    .company-logout-btn:hover {
-      background: #e8eef3;
-      border-color: #2a459c;
-      color: #2a459c;
-    }
-
     .company-info-badge {
       display: flex;
       align-items: center;
@@ -1914,12 +1885,9 @@
       <button class="admin-btn" onclick="createCompany()">회사 만들기</button>
     </div>
 
-    <!-- Step 3: 사용자 선택 (기존과 동일) -->
+    <!-- Step 3: 사용자 선택 -->
     <div class="login-box" id="userSelectStep" style="display: none;">
-      <div class="company-header">
-        <h1 class="login-title">작업 관리</h1>
-        <button class="company-logout-btn" onclick="logoutCompany()">회사 변경</button>
-      </div>
+      <h1 class="login-title">작업 관리</h1>
       <div class="company-info-badge">
         <span class="company-badge-icon">🏢</span>
         <span class="company-badge-name" id="companyIdDisplay"></span>
@@ -2563,14 +2531,6 @@
           loadAssignees();
         }
     
-        // 🆕 회사 로그아웃 (회사 변경)
-        window.logoutCompany = function() {
-          if (!confirm('회사를 변경하시겠습니까?')) return;
-          
-          localStorage.removeItem('currentCompanyId');
-          location.reload();
-        };
-    
     function initMap() {
       if (typeof kakao === 'undefined' || !kakao.maps) {
         console.error('카카오맵 API가 로드되지 않았습니다.');
@@ -3160,8 +3120,9 @@
     
     window.logout = function() {
       currentUser = null;
-      document.getElementById('loginContainer').style.display = 'flex';
       document.getElementById('appContainer').classList.remove('active');
+      document.getElementById('userSelectStep').style.display = 'block';
+      document.getElementById('loginContainer').style.display = 'flex';
     };
     
     window.goToToday = function() {
@@ -4216,7 +4177,7 @@
 
     function deleteSite(id) {
       if (!confirm('이 현장을 삭제하시겠습니까?')) return;
-      const siteRef = window.dbRef(window.db, `sites/${id}`);
+      const siteRef = window.dbRef(window.db, `companies/${currentCompanyId}/sites/${id}`);
       window.dbRemove(siteRef);
     }
 
