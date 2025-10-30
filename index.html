@@ -3313,7 +3313,9 @@
     window.logout = function() {
       console.log('🚪 로그아웃 시작');
       
+      // 현재 사용자와 회사 정보 초기화
       currentUser = null;
+      currentCompanyId = null;  /* 🆕 추가: 회사 정보도 초기화 */
       
       // 앱 컨테이너 완전히 숨기기
       const appContainer = document.getElementById('appContainer');
@@ -3326,12 +3328,15 @@
       loginContainer.style.visibility = 'visible';
       loginContainer.style.opacity = '1';
       
-      // 사용자 선택 화면 표시
-      document.getElementById('companyLoginStep').style.display = 'none';
+      // 🆕 회사 로그인 화면으로 이동 (처음 화면)
+      document.getElementById('companyLoginStep').style.display = 'block';
       document.getElementById('createCompanyStep').style.display = 'none';
-      document.getElementById('userSelectStep').style.display = 'block';
+      document.getElementById('userSelectStep').style.display = 'none';
       
-      console.log('✅ 로그아웃 완료 - 사용자 선택 화면으로 이동');
+      // 🆕 비밀번호 입력란만 초기화 (아이디는 유지)
+      document.getElementById('companyPasswordInput').value = '';
+      
+      console.log('✅ 로그아웃 완료 - 회사 로그인 화면으로 이동');
     };
     
     window.goToToday = function() {
