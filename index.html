@@ -582,7 +582,6 @@
     .other-company-name-line {
       display: flex;
       align-items: center;
-      gap: 3px;
     }
        
     .other-company-name {
@@ -594,8 +593,7 @@
     .other-company-assignee-line {
       display: flex;
       align-items: center;
-      gap: 3px;
-      padding-left: 12px;  /* 🟢 아이콘 너비만큼 들여쓰기 */
+      padding-left: 8px;  /* 🟢 들여쓰기 유지 (아이콘 제거로 12px → 8px) */
     }
     
     .other-company-assignee {
@@ -4327,6 +4325,7 @@ function loadAllCompaniesWorks() {
       card.appendChild(cardBody);
 
       // 🆕 가운데 영역: 다른 회사 정보 (cardBody 밖으로!)
+      // 🆕 가운데 영역: 다른 회사 정보 (cardBody 밖으로!)
       if (work.otherCompanyInfo && work.otherCompanyInfo.length > 0) {
         const otherCompaniesSection = document.createElement('div');
         otherCompaniesSection.className = 'other-companies-section';
@@ -4335,19 +4334,17 @@ function loadAllCompaniesWorks() {
           const badge = document.createElement('div');
           badge.className = 'other-company-badge';
           
-          // 🟢 회사명 라인
+          // 🟢 회사명 라인 (아이콘 제거)
           const nameLine = document.createElement('div');
           nameLine.className = 'other-company-name-line';
           nameLine.innerHTML = `
-            <span class="other-company-icon">🏢</span>
             <span class="other-company-name">${info.companyName}</span>
           `;
           
-          // 🟢 담당자 라인
+          // 🟢 담당자 라인 (아이콘 제거)
           const assigneeLine = document.createElement('div');
           assigneeLine.className = 'other-company-assignee-line';
           assigneeLine.innerHTML = `
-            <span class="other-company-assignee-icon">👤</span>
             <span class="other-company-assignee">${info.assignee}</span>
           `;
           
