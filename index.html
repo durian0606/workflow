@@ -609,7 +609,7 @@
     }
     
     .other-company-assignee {
-      font-size: 8px;
+      font-size: 10px;
       opacity: 0.9;
       white-space: nowrap;
     }
@@ -4901,7 +4901,8 @@ function loadAllCompaniesWorks() {
           }
           break;
       }
-      const workRef = window.dbRef(window.db, `works/${currentEditingWorkId}`);
+      // ✅ 올바른 경로: companies/${currentCompanyId}/works/${workId}
+      const workRef = window.dbRef(window.db, `companies/${currentCompanyId}/works/${currentEditingWorkId}`);
       window.dbUpdate(workRef, {
         deadline: selectedDate
       });
