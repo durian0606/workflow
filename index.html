@@ -552,7 +552,7 @@
       gap: 4px;
       min-width: 0;  /* flex 자식의 텍스트 오버플로우 방지 */
     }
-    
+
     /* 🆕 다른 회사 정보 영역 (가운데) */
     .other-companies-section {
       display: flex;
@@ -563,26 +563,54 @@
       align-self: center;  /* 세로 중앙 정렬 */
     }
     
-    /* 🆕 다른 회사 뱃지 - 더 컴팩트하게 */
+    /* 🆕 다른 회사 뱃지 - 상하 배치로 변경 */
     .other-company-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
+      display: flex;
+      flex-direction: column;  /* 🟢 상하 배치 */
+      align-items: flex-start;  /* 🟢 왼쪽 정렬 */
+      gap: 2px;  /* 🟢 줄 간격 줄임 */
       background: #fff3e0;
       border: 1px solid #ffb74d;
-      padding: 2px 4px;
+      padding: 3px 6px;  /* 🟢 패딩 조정 */
       border-radius: 4px;
       font-size: 9px;
       color: #f57c00;
       font-weight: 500;
-      white-space: nowrap;
+    }
+    
+    /* 🟢 회사명 라인 */
+    .other-company-name-line {
+      display: flex;
+      align-items: center;
+      gap: 3px;
     }
     
     .other-company-icon {
       font-size: 9px;
+      flex-shrink: 0;
     }
     
-    .other-company-text {
+    .other-company-name {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    
+    /* 🟢 담당자 라인 */
+    .other-company-assignee-line {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      padding-left: 12px;  /* 🟢 아이콘 너비만큼 들여쓰기 */
+    }
+    
+    .other-company-assignee-icon {
+      font-size: 8px;
+      flex-shrink: 0;
+    }
+    
+    .other-company-assignee {
+      font-size: 8px;
+      opacity: 0.9;
       white-space: nowrap;
     }
     
@@ -4315,7 +4343,7 @@ function loadAllCompaniesWorks() {
       
       // 왼쪽 영역 추가
       card.appendChild(cardBody);
-      
+
       // 🆕 가운데 영역: 다른 회사 정보 (cardBody 밖으로!)
       if (work.otherCompanyInfo && work.otherCompanyInfo.length > 0) {
         const otherCompaniesSection = document.createElement('div');
@@ -4324,10 +4352,25 @@ function loadAllCompaniesWorks() {
         work.otherCompanyInfo.forEach(info => {
           const badge = document.createElement('div');
           badge.className = 'other-company-badge';
-          badge.innerHTML = `
+          
+          // 🟢 회사명 라인
+          const nameLine = document.createElement('div');
+          nameLine.className = 'other-company-name-line';
+          nameLine.innerHTML = `
             <span class="other-company-icon">🏢</span>
-            <span class="other-company-text">${info.companyName} - ${info.assignee}</span>
+            <span class="other-company-name">${info.companyName}</span>
           `;
+          
+          // 🟢 담당자 라인
+          const assigneeLine = document.createElement('div');
+          assigneeLine.className = 'other-company-assignee-line';
+          assigneeLine.innerHTML = `
+            <span class="other-company-assignee-icon">👤</span>
+            <span class="other-company-assignee">${info.assignee}</span>
+          `;
+          
+          badge.appendChild(nameLine);
+          badge.appendChild(assigneeLine);
           otherCompaniesSection.appendChild(badge);
         });
         
