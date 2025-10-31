@@ -4851,14 +4851,67 @@
         // 🆕 수정 모드
         console.log('✅ 현장 수정:', currentEditingSiteId);
         
+        // 1️⃣ 기존 현장명 가져오기
+        const oldSite = sites[currentEditingSiteId];
+        const oldSiteName = oldSite ? oldSite.name : '';
+        
+        console.log(`🔄 현장명 변경: "${oldSiteName}" → "${name}"`);
+        
+        // 2️⃣ 현장 정보 업데이트
         const siteRef = window.dbRef(window.db, `companies/${currentCompanyId}/sites/${currentEditingSiteId}`);
         window.dbUpdate(siteRef, {
           name: name,
           address: address,
           updatedAt: new Date().toISOString()
         }).then(() => {
-          alert('현장이 수정되었습니다.');
-          cancelEditSite(); // 수정 모드 해제
+          
+          // 3️⃣ 현장명이 변경된 경우에만 작업들도 업데이트
+          if (oldSiteName !== name) {
+            console.log('📋 현장명이 변경되어 관련 작업들을 업데이트합니다...');
+            
+            // 해당 현장을 사용하는 모든 작업 찾기
+            const updates = {};
+            let updatedCount = 0;
+            
+            Object.keys(works).forEach(workId => {
+              const work = works[workId];
+              
+              // 🆕 유사도 비교 (80% 이상 유사하면 같은 현장으로 간주)
+              const oldSiteObj = Object.values(sites).find(s => s.name === oldSiteName);
+              const oldSiteAddress = oldSiteObj ? oldSiteObj.address : '';
+              
+              const workSiteObj = Object.values(sites).find(s => s.name === work.site);
+              const workSiteAddress = workSiteObj ? workSiteObj.address : '';
+              
+              // 현장명과 주소를 함께 비교
+              if (areSitesSimilar(oldSiteName, oldSiteAddress, work.site, workSiteAddress)) {
+                updates[`companies/${currentCompanyId}/works/${workId}/site`] = name;
+                works[workId].site = name; // 로컬 데이터도 업데이트
+                updatedCount++;
+                console.log(`  ✅ 작업 업데이트: ${workId} - "${work.work}"`);
+              }
+            });
+            
+            // Firebase 일괄 업데이트
+            if (updatedCount > 0) {
+              window.dbUpdate(window.dbRef(window.db), updates).then(() => {
+                alert(`현장이 수정되었습니다.\n관련 작업 ${updatedCount}개도 함께 업데이트되었습니다.`);
+                cancelEditSite();
+                renderWorks(); // 작업 목록 새로고침
+              }).catch((error) => {
+                alert('작업 업데이트 중 오류가 발생했습니다: ' + error.message);
+              });
+            } else {
+              alert('현장이 수정되었습니다.');
+              cancelEditSite();
+            }
+            
+          } else {
+            // 현장명은 변경 안 되고 주소만 변경된 경우
+            alert('현장 정보가 수정되었습니다.');
+            cancelEditSite();
+          }
+          
         }).catch((error) => {
           alert('현장 수정 중 오류가 발생했습니다: ' + error.message);
         });
