@@ -2086,11 +2086,18 @@
       <h1 class="login-title">🏢 새 회사 만들기</h1>
       <button class="back-btn" onclick="backToCompanyLogin()">← 뒤로</button>
       
-      <!-- 🆕 회사명 입력란 추가 -->
+      <!-- 회사명 입력란 -->
       <div class="input-group">
         <label class="input-label">회사명</label>
         <input type="text" class="admin-input" id="newCompanyNameInput" placeholder="예: (주)건설회사" autocomplete="off">
         <div class="input-hint">실제 회사 이름을 입력하세요</div>
+      </div>
+      
+      <!-- 🆕 관리자 이름 입력란 추가 -->
+      <div class="input-group">
+        <label class="input-label">관리자 이름</label>
+        <input type="text" class="admin-input" id="newAdminNameInput" placeholder="예: 홍길동" autocomplete="off">
+        <div class="input-hint">회사 관리자의 이름을 입력하세요</div>
       </div>
       
       <div class="input-group">
@@ -2207,6 +2214,32 @@
       <span class="menu-item-icon">📖</span>
       <span class="menu-item-text">사용 설명서</span>
     </div>
+    
+    <!-- 🆕 관리자 전용 섹션 (JavaScript로 동적 표시) -->
+    <div id="adminMenuSection" style="display: none;">
+      <div class="menu-divider"></div>
+      <div class="menu-item" style="background: #fff8e1; pointer-events: none;">
+        <span class="menu-item-icon">👑</span>
+        <span class="menu-item-text" style="font-weight: 600; color: #F57C00;">관리 메뉴</span>
+      </div>
+      <div class="menu-item" onclick="toggleCompanyCodeModal(); toggleMenu();">
+        <span class="menu-item-icon">🔑</span>
+        <span class="menu-item-text">회사 코드 확인</span>
+      </div>
+      <div class="menu-item" onclick="toggleStaffManageModal(); toggleMenu();">
+        <span class="menu-item-icon">👥</span>
+        <span class="menu-item-text">직원 관리</span>
+      </div>
+      <div class="menu-item" onclick="toggleCompanyInfoModal(); toggleMenu();">
+        <span class="menu-item-icon">🏢</span>
+        <span class="menu-item-text">회사 정보 수정</span>
+      </div>
+      <div class="menu-item" onclick="toggleTransferAdminModal(); toggleMenu();">
+        <span class="menu-item-icon">🔄</span>
+        <span class="menu-item-text">관리자 권한 이전</span>
+      </div>
+    </div>
+    
     <div class="menu-divider"></div>
     <div class="menu-item menu-item-danger" onclick="deleteCompany()">
       <span class="menu-item-icon">⚠️</span>
@@ -2582,6 +2615,9 @@
     let allCompaniesWorks = {};
     let currentUser = null;
     let currentCompanyId = null;
+    let currentUserId = null;  // 🆕 현재 사용자 ID
+    let isAdmin = false;  // 🆕 관리자 여부
+    let companyInfo = null;  // 🆕 회사 정보
     let map = null;
     let currentMarker = null;
     let currentLocationMarker = null;
@@ -2750,7 +2786,8 @@
           document.getElementById('companyLoginStep').style.display = 'block';
           
           // 입력 필드 초기화
-          document.getElementById('newCompanyNameInput').value = '';  // 🆕 추가
+          document.getElementById('newCompanyNameInput').value = '';
+          document.getElementById('newAdminNameInput').value = '';  // 🆕 추가
           document.getElementById('newCompanyIdInput').value = '';
           document.getElementById('newCompanyPasswordInput').value = '';
           document.getElementById('confirmPasswordInput').value = '';
@@ -2806,6 +2843,7 @@
           const companyId = document.getElementById('newCompanyIdInput').value.trim();
           const password = document.getElementById('newCompanyPasswordInput').value;
           const confirmPassword = document.getElementById('confirmPasswordInput').value;
+          const adminName = document.getElementById('newAdminNameInput').value.trim();  // 🆕 관리자 이름
           
           // 유효성 검증
           if (!companyName) {
@@ -2839,6 +2877,12 @@
             return;
           }
           
+          // 🆕 관리자 이름 확인
+          if (!adminName) {
+            alert('관리자 이름을 입력하세요.');
+            return;
+          }
+          
           // 중복 확인
           const available = await checkCompanyIdAvailability(companyId);
           if (!available) {
@@ -2848,27 +2892,56 @@
           
           // 회사 생성
           const companyRef = window.dbRef(window.db, `companies/${companyId}`);
+          
+          // 🆕 관리자 사용자 먼저 생성
+          const assigneesRef = window.dbRef(window.db, `companies/${companyId}/assignees`);
+          const newAdminRef = window.dbPush(assigneesRef);
+          const adminId = newAdminRef.key;
+          
           window.dbSet(companyRef, {
             info: {
-              name: companyName,  // 🆕 회사명 추가
+              name: companyName,
               password: password,
-              createdAt: new Date().toISOString()
+              createdAt: new Date().toISOString(),
+              adminId: adminId,  // 🆕 관리자 ID 저장
+              companyCode: generateCompanyCode()  // 🆕 회사 코드 생성
             },
-            assignees: {},
+            assignees: {
+              [adminId]: {
+                name: adminName,
+                isAdmin: true,  // 🆕 관리자 플래그
+                createdAt: new Date().toISOString()
+              }
+            },
             works: {},
             sites: {}
           }).then(() => {
-            alert(`회사가 생성되었습니다!\n\n회사명: ${companyName}\n회사 ID: ${companyId}\n\n팀원들과 공유하세요.`);
+            alert(`회사가 생성되었습니다!\n\n회사명: ${companyName}\n회사 ID: ${companyId}\n관리자: ${adminName}\n\n팀원들과 공유하세요.`);
             
             // 자동 로그인
             currentCompanyId = companyId;
             localStorage.setItem('currentCompanyId', companyId);
             
-            showUserSelectStep();
+            // 🆕 자동으로 관리자로 로그인
+            currentUser = adminName;
+            currentUserId = adminId;  // 🆕 추가
+            isAdmin = true;  // 🆕 추가
+            
+            showMainApp();  // 🆕 직접 메인 앱으로 이동
           }).catch((error) => {
             alert('회사 생성 중 오류가 발생했습니다: ' + error.message);
           });
         };
+        
+        // 🆕 회사 코드 생성 함수 (6자리 랜덤)
+        function generateCompanyCode() {
+          const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+          let code = '';
+          for (let i = 0; i < 6; i++) {
+            code += chars.charAt(Math.floor(Math.random() * chars.length));
+          }
+          return code;
+        }
     
         // 🆕 사용자 선택 화면 표시
         function showUserSelectStep() {
@@ -3430,10 +3503,19 @@
           Object.keys(data).forEach(key => {
             assignees.push({
               id: key,
-              name: data[key].name
+              name: data[key].name,
+              isAdmin: data[key].isAdmin || false  // 🆕 관리자 정보 추가
             });
           });
         }
+        
+        // 🆕 관리자를 맨 앞으로 정렬
+        assignees.sort((a, b) => {
+          if (a.isAdmin && !b.isAdmin) return -1;
+          if (!a.isAdmin && b.isAdmin) return 1;
+          return a.name.localeCompare(b.name);
+        });
+        
         renderUserGrid();
       });
     }
@@ -3453,7 +3535,12 @@
         const card = document.createElement('div');
         card.className = 'user-card';
         
-        // 🆕 클릭 이벤트 강화
+        // 🆕 관리자 카드 스타일 추가
+        if (user.isAdmin) {
+          card.style.background = 'linear-gradient(135deg, #fff8e1 0%, #ffe082 100%)';
+          card.style.borderColor = '#FFD700';
+        }
+        
         card.onclick = (e) => {
           console.log(`🖱️ ${index + 1}번째 카드 클릭:`, user.name);
           e.preventDefault();
@@ -3461,7 +3548,6 @@
           login(user.name);
         };
         
-        // 🆕 터치 이벤트도 추가 (모바일 대응)
         card.ontouchend = (e) => {
           console.log(`👆 ${index + 1}번째 카드 터치:`, user.name);
           e.preventDefault();
@@ -3472,9 +3558,23 @@
         avatar.className = 'user-card-avatar';
         avatar.textContent = user.name.charAt(0);
         
+        // 🆕 관리자 아바타 스타일
+        if (user.isAdmin) {
+          avatar.style.background = '#FFD700';
+          avatar.style.color = 'white';
+        }
+        
         const name = document.createElement('div');
         name.className = 'user-card-name';
         name.textContent = user.name;
+        
+        // 🆕 관리자 배지 추가
+        if (user.isAdmin) {
+          const adminBadge = document.createElement('span');
+          adminBadge.style.cssText = 'font-size: 11px; color: #F57C00; margin-left: 4px;';
+          adminBadge.textContent = '👑';
+          name.appendChild(adminBadge);
+        }
         
         card.appendChild(avatar);
         card.appendChild(name);
@@ -3508,6 +3608,21 @@
       
       currentUser = userName;
       
+      // 🆕 사용자 ID와 관리자 여부 확인
+      const userEntry = assignees.find(a => a.name === userName);
+      if (userEntry) {
+        currentUserId = userEntry.id;
+        isAdmin = userEntry.isAdmin || false;
+        console.log('👤 사용자 정보:', { 
+          name: userName, 
+          id: currentUserId, 
+          isAdmin: isAdmin 
+        });
+      }
+      
+      // 🆕 회사 정보 로드
+      loadCompanyInfo();
+      
       // 로그인 화면 완전히 숨기기
       const loginContainer = document.getElementById('loginContainer');
       loginContainer.style.display = 'none';
@@ -3520,17 +3635,23 @@
       appContainer.classList.add('active');
       
       console.log('✅ 화면 전환 완료');
-      console.log('   - 로그인 컨테이너 display:', loginContainer.style.display);
-      console.log('   - 앱 컨테이너 display:', appContainer.style.display);
-      console.log('   - 앱 컨테이너 클래스:', appContainer.className);
       
       document.getElementById('userAvatar').textContent = userName.charAt(0);
       document.getElementById('headerUserName').textContent = userName;
       
+      // 🆕 관리자 표시 추가
+      if (isAdmin) {
+        document.getElementById('headerUserName').innerHTML = 
+          `${userName} <span style="color: #FFD700; font-size: 11px;">👑 관리자</span>`;
+      }
+      
       updateDateDisplay();
       loadWorks();
       loadSites();
-      loadAllCompaniesWorks();  // 🆕 추가
+      loadAllCompaniesWorks();
+      
+      // 🆕 메뉴 렌더링 (관리자 메뉴 표시 여부 결정)
+      renderMenu();
       
       setTimeout(() => {
         console.log('🗺️ 지도 초기화 시작...');
@@ -3539,6 +3660,15 @@
       
       console.log('✅ 로그인 완료');
     };
+    
+    // 🆕 회사 정보 로드 함수
+    function loadCompanyInfo() {
+      const companyRef = window.dbRef(window.db, `companies/${currentCompanyId}/info`);
+      window.dbOnValue(companyRef, (snapshot) => {
+        companyInfo = snapshot.val();
+        console.log('🏢 회사 정보 로드:', companyInfo);
+      });
+    }
     
     window.logout = function() {
       console.log('🚪 로그아웃 시작');
@@ -3573,12 +3703,24 @@
     window.deleteCompany = async function() {
       console.log('⚠️ 회사 탈퇴 시도');
       
+      // 🆕 관리자 권한 확인
+      if (!isAdmin) {
+        alert('회사 탈퇴는 관리자만 할 수 있습니다.');
+        return;
+      }
+      
       // 메뉴 닫기
       toggleMenu();
       
       // 1단계: 경고 메시지
       const confirmMessage = `⚠️ 회사 탈퇴 경고 ⚠️\n\n` +
         `회사를 탈퇴하면 다음 데이터가 모두 삭제됩니다:\n` +
+        `• 모든 작업 내역\n` +
+        `• 모든 현장 정보\n` +
+        `• 모든 사용자 정보 (${assignees.length}명)\n` +  // 🆕 직원 수 표시
+        `• 회사 정보\n\n` +
+        `이 작업은 되돌릴 수 없습니다!\n\n` +
+        `정말로 탈퇴하시겠습니까?`;
         `• 모든 작업 내역\n` +
         `• 모든 현장 정보\n` +
         `• 모든 사용자 정보\n` +
@@ -5148,6 +5290,21 @@
       }
     });
 
+    // 🆕 메뉴 렌더링 (관리자 여부에 따라)
+    function renderMenu() {
+      const adminSection = document.getElementById('adminMenuSection');
+      
+      if (adminSection) {
+        if (isAdmin) {
+          adminSection.style.display = 'block';
+          console.log('✅ 관리자 메뉴 표시');
+        } else {
+          adminSection.style.display = 'none';
+          console.log('ℹ️ 일반 사용자 - 관리자 메뉴 숨김');
+        }
+      }
+    }
+    
 // 🆕 메뉴 토글 (햄버거 애니메이션 포함)
     window.toggleMenu = function() {
       const menu = document.getElementById('menuDropdown');
@@ -5189,6 +5346,595 @@
       const modal = document.getElementById('guideModal');
       modal.classList.toggle('active');
     };
+
+    // 🆕 회사 코드 모달 토글
+    window.toggleCompanyCodeModal = function() {
+      const modal = document.getElementById('companyCodeModal');
+      
+      if (!modal.classList.contains('active')) {
+        // 모달 열 때 회사 코드 표시
+        if (companyInfo && companyInfo.companyCode) {
+          document.getElementById('displayCompanyCode').textContent = companyInfo.companyCode;
+        }
+      }
+      
+      modal.classList.toggle('active');
+    };
+
+    // 🆕 회사 코드 복사
+    window.copyCompanyCode = function() {
+      if (!companyInfo || !companyInfo.companyCode) {
+        alert('회사 코드를 불러올 수 없습니다.');
+        return;
+      }
+      
+      const code = companyInfo.companyCode;
+      
+      // 클립보드 복사
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(code).then(() => {
+          alert(`회사 코드가 복사되었습니다!\n\n코드: ${code}\n\n이 코드를 직원들에게 공유하세요.`);
+          
+          // 햅틱 피드백
+          if (navigator.vibrate) {
+            navigator.vibrate(50);
+          }
+        }).catch(err => {
+          // 폴백: 텍스트 영역 사용
+          fallbackCopy(code);
+        });
+      } else {
+        fallbackCopy(code);
+      }
+    };
+
+    // 🆕 직원 목록 렌더링
+    function renderStaffList() {
+      const list = document.getElementById('staffList');
+      const countSpan = document.getElementById('staffCount');
+      
+      if (!list) return;
+      
+      list.innerHTML = '';
+      
+      // 관리자를 제외한 직원 수
+      const staffCount = assignees.filter(a => !a.isAdmin).length;
+      countSpan.textContent = assignees.length;
+      
+      assignees.forEach(user => {
+        const li = document.createElement('li');
+        li.className = 'site-item';
+        
+        // 관리자 배경색
+        if (user.isAdmin) {
+          li.style.background = 'linear-gradient(135deg, #fff8e1 0%, #ffe082 100%)';
+          li.style.borderLeft = '4px solid #FFD700';
+        }
+        
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'site-item-info';
+        
+        const name = document.createElement('div');
+        name.className = 'site-item-name';
+        name.textContent = user.name;
+        
+        // 관리자 배지
+        if (user.isAdmin) {
+          const badge = document.createElement('span');
+          badge.style.cssText = 'margin-left: 8px; font-size: 12px; color: #F57C00; font-weight: 600;';
+          badge.textContent = '👑 관리자';
+          name.appendChild(badge);
+        }
+        
+        const role = document.createElement('div');
+        role.className = 'site-item-address';
+        role.textContent = user.isAdmin ? '모든 권한 보유' : '일반 직원';
+        
+        infoDiv.appendChild(name);
+        infoDiv.appendChild(role);
+        
+        // 삭제 버튼 (관리자는 삭제 불가)
+        if (!user.isAdmin) {
+          const actionsDiv = document.createElement('div');
+          actionsDiv.className = 'site-item-actions';
+          
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'site-item-delete';
+          deleteBtn.textContent = '퇴출';
+          deleteBtn.onclick = () => removeStaff(user.id, user.name);
+          
+          actionsDiv.appendChild(deleteBtn);
+          li.appendChild(infoDiv);
+          li.appendChild(actionsDiv);
+        } else {
+          li.appendChild(infoDiv);
+        }
+        
+        list.appendChild(li);
+      });
+      
+      if (assignees.length === 0) {
+        list.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">등록된 직원이 없습니다.</p>';
+      }
+    }
+    
+    // 🆕 직원 강제 퇴출
+    window.removeStaff = function(userId, userName) {
+      if (!isAdmin) {
+        alert('관리자만 사용할 수 있습니다.');
+        return;
+      }
+      
+      const confirmMsg = 
+        `⚠️ 직원 퇴출 확인 ⚠️\n\n` +
+        `직원: ${userName}\n\n` +
+        `이 직원을 퇴출하면:\n` +
+        `• 더 이상 로그인할 수 없습니다\n` +
+        `• 담당했던 작업은 유지됩니다\n\n` +
+        `정말로 퇴출하시겠습니까?`;
+      
+      if (!confirm(confirmMsg)) {
+        return;
+      }
+      
+      // Firebase에서 삭제
+      const assigneeRef = window.dbRef(window.db, `companies/${currentCompanyId}/assignees/${userId}`);
+      window.dbRemove(assigneeRef).then(() => {
+        alert(`${userName}님이 퇴출되었습니다.`);
+        console.log('✅ 직원 퇴출 완료:', userName);
+        
+        // 목록 새로고침은 Firebase 리스너가 자동으로 처리
+      }).catch((error) => {
+        alert('직원 퇴출 중 오류가 발생했습니다: ' + error.message);
+        console.error('❌ 직원 퇴출 실패:', error);
+      });
+    };
+
+    // 🆕 회사 정보 저장
+    window.saveCompanyInfo = function() {
+      if (!isAdmin) {
+        alert('관리자만 사용할 수 있습니다.');
+        return;
+      }
+      
+      const newCompanyName = document.getElementById('editCompanyName').value.trim();
+      const currentPassword = document.getElementById('currentPasswordForEdit').value;
+      const newPassword = document.getElementById('newPasswordForEdit').value;
+      const confirmPassword = document.getElementById('confirmNewPassword').value;
+      
+      // 회사명 확인
+      if (!newCompanyName) {
+        alert('회사명을 입력하세요.');
+        return;
+      }
+      
+      // 현재 비밀번호 확인
+      if (!currentPassword) {
+        alert('현재 비밀번호를 입력하세요.');
+        return;
+      }
+      
+      if (!companyInfo || companyInfo.password !== currentPassword) {
+        alert('현재 비밀번호가 일치하지 않습니다.');
+        return;
+      }
+      
+      // 새 비밀번호 검증 (입력한 경우에만)
+      if (newPassword) {
+        if (newPassword.length < 4) {
+          alert('새 비밀번호는 최소 4자 이상이어야 합니다.');
+          return;
+        }
+        
+        if (newPassword !== confirmPassword) {
+          alert('새 비밀번호가 일치하지 않습니다.');
+          return;
+        }
+      }
+      
+      // 업데이트할 데이터
+      const updates = {
+        name: newCompanyName,
+        updatedAt: new Date().toISOString()
+      };
+      
+      // 비밀번호 변경 시
+      if (newPassword) {
+        updates.password = newPassword;
+      }
+      
+      const companyInfoRef = window.dbRef(window.db, `companies/${currentCompanyId}/info`);
+      window.dbUpdate(companyInfoRef, updates).then(() => {
+        let message = '회사 정보가 수정되었습니다.';
+        
+        if (newPassword) {
+          message += '\n\n비밀번호도 변경되었습니다.';
+          
+          // 🆕 자동 로그인 정보 업데이트
+          if (localStorage.getItem('autoLogin') === 'true') {
+            localStorage.setItem('savedPassword', newPassword);
+          }
+        }
+        
+        alert(message);
+        
+        // 모달 닫기
+        toggleCompanyInfoModal();
+        
+        console.log('✅ 회사 정보 수정 완료');
+      }).catch((error) => {
+        alert('회사 정보 수정 중 오류가 발생했습니다: ' + error.message);
+        console.error('❌ 회사 정보 수정 실패:', error);
+      });
+    };
+
+    // 🆕 권한 이전 대상 목록 렌더링
+    function renderTransferAdminList() {
+      const select = document.getElementById('newAdminSelect');
+      
+      if (!select) return;
+      
+      // 초기화
+      select.innerHTML = '<option value="">선택하세요</option>';
+      
+      // 본인을 제외한 다른 직원들만 표시
+      assignees.forEach(user => {
+        if (user.id !== currentUserId && !user.isAdmin) {
+          const option = document.createElement('option');
+          option.value = user.id;
+          option.textContent = user.name;
+          select.appendChild(option);
+        }
+      });
+      
+      if (assignees.length <= 1) {
+        select.innerHTML = '<option value="">권한을 이전할 직원이 없습니다</option>';
+        select.disabled = true;
+      } else {
+        select.disabled = false;
+      }
+    }
+    
+    // 🆕 관리자 권한 이전
+    window.transferAdmin = function() {
+      if (!isAdmin) {
+        alert('관리자만 사용할 수 있습니다.');
+        return;
+      }
+      
+      const newAdminId = document.getElementById('newAdminSelect').value;
+      const password = document.getElementById('passwordForTransfer').value;
+      
+      if (!newAdminId) {
+        alert('새 관리자를 선택하세요.');
+        return;
+      }
+      
+      if (!password) {
+        alert('비밀번호를 입력하세요.');
+        return;
+      }
+      
+      if (!companyInfo || companyInfo.password !== password) {
+        alert('비밀번호가 일치하지 않습니다.');
+        return;
+      }
+      
+      const newAdmin = assignees.find(a => a.id === newAdminId);
+      
+      if (!newAdmin) {
+        alert('선택한 직원을 찾을 수 없습니다.');
+        return;
+      }
+      
+      const finalConfirm = confirm(
+        `⚠️ 최종 확인 ⚠️\n\n` +
+        `새 관리자: ${newAdmin.name}\n\n` +
+        `권한을 이전하면:\n` +
+        `• ${newAdmin.name}님이 새 관리자가 됩니다\n` +
+        `• 본인(${currentUser})은 일반 직원이 됩니다\n` +
+        `• 이 작업은 되돌릴 수 없습니다\n\n` +
+        `정말로 진행하시겠습니까?`
+      );
+      
+      if (!finalConfirm) {
+        return;
+      }
+      
+      // Firebase 업데이트
+      const updates = {};
+      
+      // 1. 회사 정보에 새 관리자 ID 저장
+      updates[`companies/${currentCompanyId}/info/adminId`] = newAdminId;
+      
+      // 2. 새 관리자에게 isAdmin 플래그 추가
+      updates[`companies/${currentCompanyId}/assignees/${newAdminId}/isAdmin`] = true;
+      
+      // 3. 기존 관리자(본인)의 isAdmin 플래그 제거
+      updates[`companies/${currentCompanyId}/assignees/${currentUserId}/isAdmin`] = false;
+      
+      window.dbUpdate(window.dbRef(window.db), updates).then(() => {
+        alert(
+          `권한 이전이 완료되었습니다!\n\n` +
+          `새 관리자: ${newAdmin.name}\n\n` +
+          `앱을 다시 시작합니다.`
+        );
+        
+        // 로그아웃 처리
+        logout();
+        
+        console.log('✅ 관리자 권한 이전 완료:', newAdmin.name);
+      }).catch((error) => {
+        alert('권한 이전 중 오류가 발생했습니다: ' + error.message);
+        console.error('❌ 권한 이전 실패:', error);
+      });
+    };
+
+    
+    // 폴백 복사 방법
+    function fallbackCopy(text) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+      
+      try {
+        document.execCommand('copy');
+        alert(`회사 코드가 복사되었습니다!\n\n코드: ${text}\n\n이 코드를 직원들에게 공유하세요.`);
+      } catch (err) {
+        alert(`코드를 복사할 수 없습니다.\n\n수동으로 복사하세요: ${text}`);
+      }
+      
+      document.body.removeChild(textArea);
+    }
+    
+    // 🆕 회사 코드 재발급
+    window.regenerateCompanyCode = function() {
+      if (!isAdmin) {
+        alert('관리자만 사용할 수 있습니다.');
+        return;
+      }
+      
+      const confirmMsg = 
+        '⚠️ 회사 코드 재발급 경고 ⚠️\n\n' +
+        '코드를 재발급하면:\n' +
+        '• 기존 코드는 사용할 수 없습니다\n' +
+        '• 새로운 직원은 새 코드로만 가입 가능합니다\n' +
+        '• 기존 직원에게는 영향이 없습니다\n\n' +
+        '정말로 재발급하시겠습니까?';
+      
+      if (!confirm(confirmMsg)) {
+        return;
+      }
+      
+      const password = prompt('비밀번호를 입력하여 확인하세요:');
+      
+      if (!password) {
+        alert('재발급이 취소되었습니다.');
+        return;
+      }
+      
+      if (!companyInfo || companyInfo.password !== password) {
+        alert('비밀번호가 일치하지 않습니다.');
+        return;
+      }
+      
+      // 새 코드 생성
+      const newCode = generateCompanyCode();
+      
+      const companyInfoRef = window.dbRef(window.db, `companies/${currentCompanyId}/info`);
+      window.dbUpdate(companyInfoRef, {
+        companyCode: newCode,
+        codeUpdatedAt: new Date().toISOString()
+      }).then(() => {
+        alert(`회사 코드가 재발급되었습니다!\n\n새 코드: ${newCode}\n\n새로운 코드를 직원들에게 공유하세요.`);
+        
+        // 화면 업데이트
+        document.getElementById('displayCompanyCode').textContent = newCode;
+        
+        console.log('✅ 회사 코드 재발급 완료:', newCode);
+      }).catch((error) => {
+        alert('코드 재발급 중 오류가 발생했습니다: ' + error.message);
+        console.error('❌ 코드 재발급 실패:', error);
+      });
+    };
+    
+    // 🆕 직원 관리 모달 토글
+    window.toggleStaffManageModal = function() {
+      const modal = document.getElementById('staffManageModal');
+      
+      if (!modal.classList.contains('active')) {
+        // 모달 열 때 직원 목록 렌더링
+        renderStaffList();
+      }
+      
+      modal.classList.toggle('active');
+    };
+    
+    // 🆕 회사 정보 수정 모달 토글
+    window.toggleCompanyInfoModal = function() {
+      const modal = document.getElementById('companyInfoModal');
+      
+      if (!modal.classList.contains('active')) {
+        // 모달 열 때 현재 정보 채우기
+        if (companyInfo) {
+          document.getElementById('editCompanyName').value = companyInfo.name || '';
+        }
+        // 비밀번호 필드 초기화
+        document.getElementById('currentPasswordForEdit').value = '';
+        document.getElementById('newPasswordForEdit').value = '';
+        document.getElementById('confirmNewPassword').value = '';
+      }
+      
+      modal.classList.toggle('active');
+    };
+    
+    // 🆕 관리자 권한 이전 모달 토글
+    window.toggleTransferAdminModal = function() {
+      const modal = document.getElementById('transferAdminModal');
+      
+      if (!modal.classList.contains('active')) {
+        // 모달 열 때 직원 목록 채우기
+        renderTransferAdminList();
+        document.getElementById('passwordForTransfer').value = '';
+      }
+      
+      modal.classList.toggle('active');
+    };
+    
+    // 모달 외부 클릭 시 닫기
+    document.addEventListener('DOMContentLoaded', function() {
+      const modals = [
+        'companyCodeModal',
+        'staffManageModal', 
+        'companyInfoModal',
+        'transferAdminModal'
+      ];
+      
+      modals.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+              modal.classList.remove('active');
+            }
+          });
+        }
+      });
+    });
+    
+    //회사코드 확인 모달
+    <div class="modal-overlay" id="companyCodeModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">🔑 회사 코드</h3>
+          <button class="close-btn" onclick="toggleCompanyCodeModal()">×</button>
+        </div>
+        
+        <div style="text-align: center; padding: 30px 20px;">
+          <p style="font-size: 14px; color: #666; margin-bottom: 20px;">
+            직원 초대 시 이 코드를 공유하세요
+          </p>
+          
+          <div style="
+            background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%);
+            border: 3px dashed #2a459c;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+          ">
+            <div style="font-size: 36px; font-weight: 700; color: #2a459c; letter-spacing: 4px; font-family: 'Courier New', monospace;" id="displayCompanyCode">
+              ------
+            </div>
+          </div>
+          
+          <div style="display: flex; gap: 10px; justify-content: center;">
+            <button class="admin-btn" onclick="copyCompanyCode()" style="flex: 1; max-width: 200px;">
+              📋 복사하기
+            </button>
+            <button class="admin-btn" onclick="regenerateCompanyCode()" style="flex: 1; max-width: 200px; background: #ff9800;">
+              🔄 코드 재발급
+            </button>
+          </div>
+          
+          <p style="font-size: 12px; color: #999; margin-top: 20px;">
+            💡 코드를 재발급하면 기존 코드는 사용할 수 없습니다
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 🆕 직원 관리 모달 -->
+    <div class="modal-overlay" id="staffManageModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">👥 직원 관리</h3>
+          <button class="close-btn" onclick="toggleStaffManageModal()">×</button>
+        </div>
+        
+        <div style="padding: 10px 0;">
+          <div style="margin-bottom: 20px;">
+            <h4 style="font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 600;">
+              현재 직원 목록 (<span id="staffCount">0</span>명)
+            </h4>
+            <ul class="site-list" id="staffList"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 🆕 회사 정보 수정 모달 -->
+    <div class="modal-overlay" id="companyInfoModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">🏢 회사 정보 수정</h3>
+          <button class="close-btn" onclick="toggleCompanyInfoModal()">×</button>
+        </div>
+        
+        <div style="padding: 10px 0;">
+          <div class="input-group">
+            <label class="input-label">회사명</label>
+            <input type="text" class="admin-input" id="editCompanyName" placeholder="회사명">
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">현재 비밀번호</label>
+            <input type="password" class="admin-input" id="currentPasswordForEdit" placeholder="현재 비밀번호">
+            <div class="input-hint">변경하려면 현재 비밀번호를 입력하세요</div>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">새 비밀번호 (선택)</label>
+            <input type="password" class="admin-input" id="newPasswordForEdit" placeholder="변경할 비밀번호">
+            <div class="input-hint">변경하지 않으려면 비워두세요</div>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">새 비밀번호 확인</label>
+            <input type="password" class="admin-input" id="confirmNewPassword" placeholder="비밀번호 재입력">
+          </div>
+          
+          <button class="admin-btn" onclick="saveCompanyInfo()">💾 저장</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 🆕 관리자 권한 이전 모달 -->
+    <div class="modal-overlay" id="transferAdminModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">🔄 관리자 권한 이전</h3>
+          <button class="close-btn" onclick="toggleTransferAdminModal()">×</button>
+        </div>
+        
+        <div style="padding: 10px 0;">
+          <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 12px; margin-bottom: 20px; border-radius: 4px;">
+            <p style="font-size: 13px; color: #e65100; line-height: 1.6;">
+              ⚠️ <strong>주의:</strong> 관리자 권한을 이전하면 본인은 일반 직원이 됩니다. 이 작업은 되돌릴 수 없습니다.
+            </p>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">새 관리자 선택</label>
+            <select class="admin-input" id="newAdminSelect">
+              <option value="">선택하세요</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label class="input-label">비밀번호 확인</label>
+            <input type="password" class="admin-input" id="passwordForTransfer" placeholder="현재 비밀번호">
+            <div class="input-hint">권한 이전을 확인하기 위해 비밀번호를 입력하세요</div>
+          </div>
+          
+          <button class="admin-btn" onclick="transferAdmin()" style="background: #ff9800;">
+            🔄 권한 이전
+          </button>
+        </div>
+      </div>
+    </div>
     
     // 사용설명서 모달 외부 클릭 시 닫기
     document.getElementById('guideModal').addEventListener('click', (e) => {
