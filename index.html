@@ -3707,6 +3707,7 @@
       }
 
       // login 함수 다음에 추가
+      // ✅ 1단계: login 함수 "밖에" showMainApp 함수를 먼저 정의하세요!
       function showMainApp() {
         console.log('📱 메인 앱 표시');
         
@@ -3745,47 +3746,33 @@
         
         console.log('✅ 메인 앱 로드 완료');
       }
-      
-      // 🆕 회사 정보 로드
-      loadCompanyInfo();
-      
-      // 로그인 화면 완전히 숨기기
-      const loginContainer = document.getElementById('loginContainer');
-      loginContainer.style.display = 'none';
-      loginContainer.style.visibility = 'hidden';
-      loginContainer.style.opacity = '0';
-      
-      // 앱 컨테이너 표시
-      const appContainer = document.getElementById('appContainer');
-      appContainer.style.display = 'flex';
-      appContainer.classList.add('active');
-      
-      console.log('✅ 화면 전환 완료');
-      
-      document.getElementById('userAvatar').textContent = userName.charAt(0);
-      document.getElementById('headerUserName').textContent = userName;
-      
-      // 🆕 관리자 표시 추가
-      if (isAdmin) {
-        document.getElementById('headerUserName').innerHTML = 
-          `${userName} <span style="color: #FFD700; font-size: 11px;">👑 관리자</span>`;
-      }
-      
-      updateDateDisplay();
-      loadWorks();
-      loadSites();
-      loadAllCompaniesWorks();
-      
-      // 🆕 메뉴 렌더링 (관리자 메뉴 표시 여부 결정)
-      renderMenu();
-      
-      setTimeout(() => {
-        console.log('🗺️ 지도 초기화 시작...');
-        initMap();
-      }, 500);
-      
-      console.log('✅ 로그인 완료');
-    };
+  
+      // ✅ 2단계: login 함수를 간단하게 만드세요!
+      window.login = function(userName) {
+        console.log('🎯 로그인 시도:', userName);
+        
+        currentUser = userName;
+        
+        // 사용자 ID와 관리자 여부 확인
+        const userEntry = assignees.find(a => a.name === userName);
+        if (userEntry) {
+          currentUserId = userEntry.id;
+          isAdmin = userEntry.isAdmin || false;
+          console.log('👤 사용자 정보:', { 
+            name: userName, 
+            id: currentUserId, 
+            isAdmin: isAdmin 
+          });
+        }
+        
+        // 회사 정보 로드
+        loadCompanyInfo();
+        
+        // ✅ showMainApp() 호출 (이제 위에서 정의했으므로 사용 가능!)
+        showMainApp();
+        
+        console.log('✅ 로그인 완료');
+      };
     
     // 🆕 회사 정보 로드 함수
     function loadCompanyInfo() {
