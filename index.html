@@ -2503,7 +2503,7 @@
       checkSavedCompany();
     }
     
-    function checkSavedCompany() {
+    async function checkSavedCompany() {
       const autoLogin = localStorage.getItem('autoLogin') === 'true';
       const savedCompanyId = localStorage.getItem('savedCompanyId');
       const savedPassword = localStorage.getItem('savedPassword');
@@ -2511,11 +2511,23 @@
       if (autoLogin && savedCompanyId && savedPassword) {
         console.log('🔐 자동 로그인 시도...');
         
-        const companyRef = window.dbRef(window.db, `companies/${savedCompanyId}/info`);
-        window.dbOnValue(companyRef, (snapshot) => {
-          const companyInfo = snapshot.val();
+        try {
+          const companyRef = window.dbRef(window.db, `companies/${savedCompanyId}/info`);
           
-          if (companyInfo && companyInfo.password === savedPassword) {
+          const companyData = await new Promise((resolve, reject) => {
+            const timeoutId = setTimeout(() => {
+              reject(new Error('Timeout'));
+            }, 5000);
+            
+            window.dbOnValue(companyRef, (snapshot) => {
+              clearTimeout(timeoutId);
+              resolve(snapshot.val());
+            }, {
+              onlyOnce: true
+            });
+          });
+          
+          if (companyData && companyData.password === savedPassword) {
             console.log('✅ 자동 로그인 성공!');
             currentCompanyId = savedCompanyId;
             showUserSelectStep();
@@ -2524,7 +2536,11 @@
             clearAutoLogin();
             showLoginScreen();
           }
-        }, { onlyOnce: true });
+        } catch (error) {
+          console.error('❌ 자동 로그인 오류:', error);
+          clearAutoLogin();
+          showLoginScreen();
+        }
       } else {
         showLoginScreen();
       }
@@ -2577,16 +2593,26 @@
         return;
       }
       
-      const companyRef = window.dbRef(window.db, `companies/${companyId}/info`);
-      window.dbOnValue(companyRef, (snapshot) => {
-        const companyInfo = snapshot.val();
+      try {
+        const companyRef = window.dbRef(window.db, `companies/${companyId}/info`);
         
-        if (!companyInfo) {
+        // Promise로 래핑하여 에러 핸들링 개선
+        const companyData = await new Promise((resolve, reject) => {
+          window.dbOnValue(companyRef, (snapshot) => {
+            resolve(snapshot.val());
+          }, {
+            onlyOnce: true
+          }, (error) => {
+            reject(error);
+          });
+        });
+        
+        if (!companyData) {
           alert('존재하지 않는 회사 ID입니다.');
           return;
         }
         
-        if (companyInfo.password !== password) {
+        if (companyData.password !== password) {
           alert('비밀번호가 일치하지 않습니다.');
           return;
         }
@@ -2606,7 +2632,11 @@
         }
         
         showUserSelectStep();
-      }, { onlyOnce: true });
+        
+      } catch (error) {
+        console.error('❌ 로그인 오류:', error);
+        alert('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
     };
     
     window.showCreateCompanyStep = function() {
@@ -2716,20 +2746,26 @@
       }
       
       try {
+        console.log('🏢 회사 생성 시작...');
+        
         // 1. 관리자 사용자 생성
         const assigneesRef = window.dbRef(window.db, `companies/${companyId}/assignees`);
         const newAdminRef = window.dbPush(assigneesRef);
         const adminId = newAdminRef.key;
         
+        console.log('👤 관리자 생성 중...', adminId);
         await window.dbSet(newAdminRef, {
           name: adminName,
           isAdmin: true,
           createdAt: new Date().toISOString()
         });
+        console.log('✅ 관리자 생성 완료');
         
         // 2. 회사 정보 생성
         const newCompanyCode = generateCompanyCode();
         const companyInfoRef = window.dbRef(window.db, `companies/${companyId}/info`);
+        
+        console.log('🏢 회사 정보 저장 중...');
         await window.dbSet(companyInfoRef, {
           name: companyName,
           password: password,
@@ -2737,8 +2773,15 @@
           adminId: adminId,
           companyCode: newCompanyCode
         });
+        console.log('✅ 회사 정보 저장 완료');
         
-        // ✅ companyInfo 즉시 설정
+        // 3. 전역 변수 설정
+        currentCompanyId = companyId;
+        currentUser = adminName;
+        currentUserId = adminId;
+        isAdmin = true;
+        
+        // 4. companyInfo 설정
         companyInfo = {
           name: companyName,
           password: password,
@@ -2747,21 +2790,28 @@
           companyCode: newCompanyCode
         };
         
-        alert(`회사가 생성되었습니다!\n\n회사명: ${companyName}\n회사 ID: ${companyId}\n관리자: ${adminName}\n회사 코드: ${newCompanyCode}\n\n팀원들과 공유하세요.`);
+        console.log('✅ 전역 변수 설정 완료');
         
-        currentCompanyId = companyId;
-        currentUser = adminName;
-        currentUserId = adminId;
-        isAdmin = true;
-        
+        // 5. 로컬 스토리지 저장
         localStorage.setItem('currentCompanyId', companyId);
         
-        // ✅ companyInfo가 설정된 후 메인 앱 표시
+        alert(
+          `회사가 생성되었습니다!\n\n` +
+          `회사명: ${companyName}\n` +
+          `회사 ID: ${companyId}\n` +
+          `관리자: ${adminName}\n` +
+          `회사 코드: ${newCompanyCode}\n\n` +
+          `팀원들과 공유하세요.`
+        );
+        
+        console.log('🎉 회사 생성 완료! 메인 앱으로 이동...');
+        
+        // 6. 메인 앱 표시
         showMainApp();
         
       } catch (error) {
         console.error('❌ 회사 생성 중 오류:', error);
-        alert('회사 생성 중 오류가 발생했습니다: ' + error.message);
+        alert('회사 생성 중 오류가 발생했습니다.\n\n오류: ' + error.message);
       }
     };
     
@@ -3321,10 +3371,21 @@
     }
     
     function loadAssignees() {
+      console.log('👥 사용자 목록 로드 중...');
+      
+      if (!currentCompanyId) {
+        console.error('❌ currentCompanyId가 없습니다!');
+        return;
+      }
+      
       const assigneesRef = window.dbRef(window.db, `companies/${currentCompanyId}/assignees`);
+      
       window.dbOnValue(assigneesRef, (snapshot) => {
         assignees = [];
         const data = snapshot.val();
+        
+        console.log('📊 사용자 데이터:', data);
+        
         if (data) {
           Object.keys(data).forEach(key => {
             assignees.push({
@@ -3341,10 +3402,14 @@
           return a.name.localeCompare(b.name);
         });
         
+        console.log('✅ 사용자 목록 로드 완료:', assignees.length, '명');
+        
         renderUserGrid();
+      }, (error) => {
+        console.error('❌ 사용자 목록 로드 실패:', error);
+        alert('사용자 목록을 불러오는데 실패했습니다.');
       });
     }
-    
     function renderUserGrid() {
       const grid = document.getElementById('userGrid');
       if (!grid) {
