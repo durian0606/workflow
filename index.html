@@ -3726,65 +3726,7 @@
       document.getElementById('siteInput').value = '';
       document.getElementById('workInput').value = '';
     };
-      if (work === '시험') {
-        const testDateStr = todayStr;
-        const cappingDate = addBusinessDays(testDateStr, 1);
-        const cappingRef = window.dbPush(worksRef);
-        window.dbSet(cappingRef, {
-          date: cappingDate,
-          site: site,
-          work: '캡핑',
-          displayWork: '캡핑',
-          assignee: currentUser,
-          completed: false,
-          createdAt: new Date().toISOString(),
-          parentWorkId: parentWorkId,
-          testDate: testDateStr
-        });
-        const demoldingDate = addBusinessDays(testDateStr, 2);
-        const demoldingRef = window.dbPush(worksRef);
-        window.dbSet(demoldingRef, {
-          date: demoldingDate,
-          site: site,
-          work: '탈형',
-          displayWork: '탈형',
-          assignee: currentUser,
-          completed: false,
-          createdAt: new Date().toISOString(),
-          parentWorkId: parentWorkId,
-          testDate: testDateStr
-        });
-        const day7Date = addCalendarDays(testDateStr, 7);
-        const day7Ref = window.dbPush(worksRef);
-        window.dbSet(day7Ref, {
-          date: day7Date,
-          site: site,
-          work: '7일 강도 시험',
-          displayWork: '7일 강도 시험',
-          assignee: currentUser,
-          completed: false,
-          createdAt: new Date().toISOString(),
-          parentWorkId: parentWorkId,
-          testDate: testDateStr
-        });
-        const day28Date = addCalendarDays(testDateStr, 28);
-        const day28Ref = window.dbPush(worksRef);
-        window.dbSet(day28Ref, {
-          date: day28Date,
-          site: site,
-          work: '28일 강도 시험',
-          displayWork: '28일 강도 시험',
-          assignee: currentUser,
-          completed: false,
-          createdAt: new Date().toISOString(),
-          parentWorkId: parentWorkId,
-          testDate: testDateStr
-        });
-      }
-      document.getElementById('siteInput').value = '';
-      document.getElementById('workInput').value = '';
-    };
-    
+     
     function loadWorks() {
       console.log('📋 작업 데이터 로드 중...');
       
