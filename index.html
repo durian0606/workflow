@@ -3441,14 +3441,19 @@
       }
       
       updateDateDisplay();
+      
+      // ✅ 핵심: loadAssignees() 먼저 호출!
+      loadAssignees();
+      
       loadWorks();
       loadSites();
       loadAllCompaniesWorks();
       renderMenu();
       
-      // ✅ 메뉴 이벤트 리스너 초기화 추가
+      // ✅ 메뉴 이벤트 리스너 초기화
       setTimeout(() => {
         initMenuEventListeners();
+        console.log('🎯 메뉴 이벤트 리스너 초기화 완료');
       }, 100);
       
       setTimeout(() => {
@@ -5514,6 +5519,29 @@
       if (e.target === document.getElementById('guideModal')) {
         toggleGuideModal();
       }
+    });
+
+    // ✅ 모달 외부 클릭 이벤트 설정
+    document.addEventListener('DOMContentLoaded', function() {
+      const modals = [
+        'companyCodeModal',
+        'staffManageModal', 
+        'companyInfoModal',
+        'transferAdminModal'
+      ];
+      
+      modals.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+              modal.classList.remove('active');
+            }
+          });
+        }
+      });
+      
+      console.log('✅ 모달 외부 클릭 이벤트 설정 완료');
     });
     
     window.onload = function() {
