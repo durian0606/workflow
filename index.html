@@ -1801,7 +1801,7 @@
           </div>
         </div>
         <div class="header-right">
-          <button class="menu-btn" type="button" onclick="toggleMenu(event)">
+          <button class="menu-btn" type="button" id="mainMenuBtn">
             <span class="menu-hamburger">
               <span class="menu-line"></span>
               <span class="menu-line"></span>
@@ -2332,54 +2332,6 @@
   </script>
   
   <script>
-
-window.toggleMenu = function(event) {
-      if (event) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-      
-      console.log('🎯 toggleMenu 호출됨');
-      
-      const menu = document.getElementById('menuDropdown');
-      const menuBtn = document.querySelector('.menu-btn');
-      const overlay = document.getElementById('menuOverlay');
-      
-      console.log('📍 메뉴 요소 체크:', {
-        menu: !!menu,
-        menuBtn: !!menuBtn,
-        overlay: !!overlay
-      });
-      
-      if (!menu) {
-        console.error('❌ menuDropdown 요소를 찾을 수 없습니다');
-        return;
-      }
-      
-      if (!menuBtn) {
-        console.error('❌ menu-btn 요소를 찾을 수 없습니다');
-        return;
-      }
-      
-      const isActive = menu.classList.contains('active');
-      console.log('📊 현재 메뉴 상태:', isActive ? '열림' : '닫힘');
-      
-      if (isActive) {
-        // 메뉴 닫기
-        menu.classList.remove('active');
-        menuBtn.classList.remove('active');
-        if (overlay) overlay.classList.remove('active');
-        console.log('✅ 메뉴 닫힘');
-      } else {
-        // 메뉴 열기
-        menu.classList.add('active');
-        menuBtn.classList.add('active');
-        if (overlay) overlay.classList.add('active');
-        console.log('✅ 메뉴 열림');
-      }
-    };
-    
-    console.log('✅ toggleMenu 함수 정의 완료');
     
     // 문자열 유사도 계산 함수
     function calculateSimilarity(str1, str2) {
