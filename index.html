@@ -95,61 +95,6 @@
       text-align: center;
     }
 
-    .user-list-title {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-
-    .user-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-
-    .user-card {
-      padding: 20px;
-      background: #f5f7fa;
-      border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .user-card:hover {
-      background: #2a459c;
-      color: white;
-      border-color: #2a459c;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(42, 69, 156, 0.3);
-    }
-
-    .user-card-avatar {
-      width: 50px;
-      height: 50px;
-      background: rgba(42, 69, 156, 0.1);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      font-size: 20px;
-      margin: 0 auto 10px;
-      color: #2a459c;
-    }
-
-    .user-card:hover .user-card-avatar {
-      background: rgba(255, 255, 255, 0.3);
-      color: white;
-    }
-
-    .user-card-name {
-      font-weight: 500;
-      font-size: 15px;
-    }
-
     .admin-section {
       margin-top: 24px;
       padding-top: 24px;
@@ -1850,22 +1795,6 @@
       
       <button class="admin-btn" onclick="createCompany()">회사 만들기</button>
     </div>
-
-    <!-- Step 3: 사용자 선택 -->
-    <div class="login-box" id="userSelectStep" style="display: none;">
-      <h1 class="login-title">작업 관리</h1>
-      <div class="company-info-badge">
-        <span class="company-badge-icon">🏢</span>
-        <span class="company-badge-name" id="companyIdDisplay"></span>
-      </div>
-      <p class="user-list-title">사용자를 선택하세요</p>
-      <div class="user-grid" id="userGrid"></div>
-
-      <div class="admin-section">
-        <input type="text" class="admin-input" id="newUserInput" placeholder="새 사용자 추가">
-        <button class="admin-btn" onclick="addNewUser()">추가</button>
-      </div>
-    </div>
   </div>
 
   <!-- 메인 앱 -->
@@ -2512,30 +2441,69 @@
         console.log('🔐 자동 로그인 시도...');
         
         try {
+          // 1. 회사 정보 확인
           const companyRef = window.dbRef(window.db, `companies/${savedCompanyId}/info`);
-          
           const companyData = await new Promise((resolve, reject) => {
-            const timeoutId = setTimeout(() => {
-              reject(new Error('Timeout'));
-            }, 5000);
-            
+            const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
             window.dbOnValue(companyRef, (snapshot) => {
               clearTimeout(timeoutId);
               resolve(snapshot.val());
-            }, {
-              onlyOnce: true
-            });
+            }, { onlyOnce: true });
           });
           
-          if (companyData && companyData.password === savedPassword) {
-            console.log('✅ 자동 로그인 성공!');
-            currentCompanyId = savedCompanyId;
-            showUserSelectStep();
-          } else {
+          if (!companyData || companyData.password !== savedPassword) {
             console.log('❌ 자동 로그인 실패 - 로그인 화면 표시');
             clearAutoLogin();
             showLoginScreen();
+            return;
           }
+          
+          // 2. 관리자 정보 로드
+          const assigneesRef = window.dbRef(window.db, `companies/${savedCompanyId}/assignees`);
+          const assigneesData = await new Promise((resolve, reject) => {
+            const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+            window.dbOnValue(assigneesRef, (snapshot) => {
+              clearTimeout(timeoutId);
+              resolve(snapshot.val());
+            }, { onlyOnce: true });
+          });
+          
+          if (!assigneesData) {
+            clearAutoLogin();
+            showLoginScreen();
+            return;
+          }
+          
+          // 3. 관리자 찾기
+          let adminUser = null;
+          Object.keys(assigneesData).forEach(key => {
+            if (assigneesData[key].isAdmin) {
+              adminUser = {
+                id: key,
+                name: assigneesData[key].name,
+                isAdmin: true
+              };
+            }
+          });
+          
+          if (!adminUser) {
+            clearAutoLogin();
+            showLoginScreen();
+            return;
+          }
+          
+          // 4. 전역 변수 설정
+          currentCompanyId = savedCompanyId;
+          currentUser = adminUser.name;
+          currentUserId = adminUser.id;
+          isAdmin = true;
+          companyInfo = companyData;
+          
+          console.log('✅ 자동 로그인 성공!');
+          
+          // 5. 바로 메인 앱 표시
+          showMainApp();
+          
         } catch (error) {
           console.error('❌ 자동 로그인 오류:', error);
           clearAutoLogin();
@@ -2594,17 +2562,16 @@
       }
       
       try {
-        const companyRef = window.dbRef(window.db, `companies/${companyId}/info`);
+        console.log('🔐 로그인 시도:', companyId);
         
-        // Promise로 래핑하여 에러 핸들링 개선
+        // 1. 회사 정보 확인
+        const companyRef = window.dbRef(window.db, `companies/${companyId}/info`);
         const companyData = await new Promise((resolve, reject) => {
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
           window.dbOnValue(companyRef, (snapshot) => {
+            clearTimeout(timeoutId);
             resolve(snapshot.val());
-          }, {
-            onlyOnce: true
-          }, (error) => {
-            reject(error);
-          });
+          }, { onlyOnce: true });
         });
         
         if (!companyData) {
@@ -2617,8 +2584,50 @@
           return;
         }
         
-        currentCompanyId = companyId;
+        console.log('✅ 비밀번호 확인 완료');
         
+        // 2. 관리자 정보 로드
+        const assigneesRef = window.dbRef(window.db, `companies/${companyId}/assignees`);
+        const assigneesData = await new Promise((resolve, reject) => {
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          window.dbOnValue(assigneesRef, (snapshot) => {
+            clearTimeout(timeoutId);
+            resolve(snapshot.val());
+          }, { onlyOnce: true });
+        });
+        
+        if (!assigneesData) {
+          alert('사용자 정보를 찾을 수 없습니다.');
+          return;
+        }
+        
+        // 3. 관리자 찾기
+        let adminUser = null;
+        Object.keys(assigneesData).forEach(key => {
+          if (assigneesData[key].isAdmin) {
+            adminUser = {
+              id: key,
+              name: assigneesData[key].name,
+              isAdmin: true
+            };
+          }
+        });
+        
+        if (!adminUser) {
+          alert('관리자 정보를 찾을 수 없습니다.');
+          return;
+        }
+        
+        console.log('✅ 관리자 찾음:', adminUser.name);
+        
+        // 4. 전역 변수 설정
+        currentCompanyId = companyId;
+        currentUser = adminUser.name;
+        currentUserId = adminUser.id;
+        isAdmin = true;
+        companyInfo = companyData;
+        
+        // 5. 자동 로그인 저장
         if (autoLogin) {
           localStorage.setItem('autoLogin', 'true');
           localStorage.setItem('savedCompanyId', companyId);
@@ -2631,7 +2640,10 @@
           console.log('ℹ️ 회사 ID만 저장됨');
         }
         
-        showUserSelectStep();
+        console.log('🎉 로그인 성공! 메인 앱으로 이동...');
+        
+        // 6. 바로 메인 앱 표시
+        showMainApp();
         
       } catch (error) {
         console.error('❌ 로그인 오류:', error);
@@ -2746,26 +2758,21 @@
       }
       
       try {
-        console.log('🏢 회사 생성 시작...');
-        
-        // 1. 관리자 사용자 생성
+        // 1. 관리자 생성
         const assigneesRef = window.dbRef(window.db, `companies/${companyId}/assignees`);
         const newAdminRef = window.dbPush(assigneesRef);
         const adminId = newAdminRef.key;
         
-        console.log('👤 관리자 생성 중...', adminId);
         await window.dbSet(newAdminRef, {
           name: adminName,
           isAdmin: true,
           createdAt: new Date().toISOString()
         });
-        console.log('✅ 관리자 생성 완료');
         
         // 2. 회사 정보 생성
         const newCompanyCode = generateCompanyCode();
         const companyInfoRef = window.dbRef(window.db, `companies/${companyId}/info`);
         
-        console.log('🏢 회사 정보 저장 중...');
         await window.dbSet(companyInfoRef, {
           name: companyName,
           password: password,
@@ -2773,7 +2780,6 @@
           adminId: adminId,
           companyCode: newCompanyCode
         });
-        console.log('✅ 회사 정보 저장 완료');
         
         // 3. 전역 변수 설정
         currentCompanyId = companyId;
@@ -2781,7 +2787,6 @@
         currentUserId = adminId;
         isAdmin = true;
         
-        // 4. companyInfo 설정
         companyInfo = {
           name: companyName,
           password: password,
@@ -2790,9 +2795,6 @@
           companyCode: newCompanyCode
         };
         
-        console.log('✅ 전역 변수 설정 완료');
-        
-        // 5. 로컬 스토리지 저장
         localStorage.setItem('currentCompanyId', companyId);
         
         alert(
@@ -2800,13 +2802,12 @@
           `회사명: ${companyName}\n` +
           `회사 ID: ${companyId}\n` +
           `관리자: ${adminName}\n` +
-          `회사 코드: ${newCompanyCode}\n\n` +
-          `팀원들과 공유하세요.`
+          `회사 코드: ${newCompanyCode}`
         );
         
         console.log('🎉 회사 생성 완료! 메인 앱으로 이동...');
         
-        // 6. 메인 앱 표시
+        // 4. 바로 메인 앱 표시
         showMainApp();
         
       } catch (error) {
@@ -2822,16 +2823,6 @@
         code += chars.charAt(Math.floor(Math.random() * chars.length));
       }
       return code;
-    }
-    
-    function showUserSelectStep() {
-      document.getElementById('companyLoginStep').style.display = 'none';
-      document.getElementById('createCompanyStep').style.display = 'none';
-      document.getElementById('userSelectStep').style.display = 'block';
-      
-      document.getElementById('companyIdDisplay').textContent = currentCompanyId;
-      
-      loadAssignees();
     }
     
     function initMap() {
@@ -3410,66 +3401,7 @@
         alert('사용자 목록을 불러오는데 실패했습니다.');
       });
     }
-    function renderUserGrid() {
-      const grid = document.getElementById('userGrid');
-      if (!grid) {
-        console.error('❌ userGrid 요소를 찾을 수 없습니다');
-        return;
-      }
-      
-      grid.innerHTML = '';
-      
-      console.log('👥 사용자 카드 렌더링:', assignees.length, '명');
-      
-      assignees.forEach((user, index) => {
-        const card = document.createElement('div');
-        card.className = 'user-card';
-        
-        if (user.isAdmin) {
-          card.style.background = 'linear-gradient(135deg, #fff8e1 0%, #ffe082 100%)';
-          card.style.borderColor = '#FFD700';
-        }
-        
-        card.onclick = (e) => {
-          console.log(`🖱️ ${index + 1}번째 카드 클릭:`, user.name);
-          e.preventDefault();
-          e.stopPropagation();
-          login(user.name);
-        };
-        
-        card.ontouchend = (e) => {
-          console.log(`👆 ${index + 1}번째 카드 터치:`, user.name);
-          e.preventDefault();
-          login(user.name);
-        };
-        
-        const avatar = document.createElement('div');
-        avatar.className = 'user-card-avatar';
-        avatar.textContent = user.name.charAt(0);
-        
-        if (user.isAdmin) {
-          avatar.style.background = '#FFD700';
-          avatar.style.color = 'white';
-        }
-        
-        const name = document.createElement('div');
-        name.className = 'user-card-name';
-        name.textContent = user.name;
-        
-        if (user.isAdmin) {
-          const adminBadge = document.createElement('span');
-          adminBadge.style.cssText = 'font-size: 11px; color: #F57C00; margin-left: 4px;';
-          adminBadge.textContent = '👑';
-          name.appendChild(adminBadge);
-        }
-        
-        card.appendChild(avatar);
-        card.appendChild(name);
-        grid.appendChild(card);
-      });
-      
-      console.log('✅ 사용자 카드 렌더링 완료');
-    }
+    
     
     window.addNewUser = function() {
       const input = document.getElementById('newUserInput');
