@@ -13,25 +13,25 @@
     }
     
     html {
-      margin: 0;           /* 🆕 추가 */
-      padding: 0;          /* 🆕 추가 */
-      height: 100%;        /* 🆕 추가 */
+      margin: 0;
+      padding: 0;
+      height: 100%;
     }
     
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       min-height: 100vh;
-      height: 100%;        /* 🆕 추가 */
+      height: 100%;
       overflow-x: hidden;
       overflow-y: auto;
       background: linear-gradient(135deg, #2a459c 0%, #5b7fd6 100%);
       touch-action: pan-y;
-      margin: 0 !important;    /* 🆕 강제로 여백 제거 */
-      padding: 0 !important;   /* 🆕 강제로 여백 제거 */
-      position: relative;      /* 🆕 추가 */
+      margin: 0 !important;
+      padding: 0 !important;
+      position: relative;
     }
     
-    /* 🆕 추가: 앱 컨테이너를 화면 전체에 꽉 차게 */
+    /* 앱 컨테이너 */
     .app-container {
       display: none !important;
       min-height: 100vh;
@@ -58,16 +58,15 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      position: fixed;       /* 🆕 추가 */
-      top: 0;                /* 🆕 추가 */
-      left: 0;               /* 🆕 추가 */
-      right: 0;              /* 🆕 추가 */
-      bottom: 0;             /* 🆕 추가 */
-      margin: 0;             /* 🆕 추가 */
-      padding: 0;            /* 🆕 추가 */
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: 0;
+      padding: 0;
     }
     
-    /* 🆕 추가: 헤더의 상단 여백 제거 */
     .app-header {
       background: linear-gradient(135deg, #2a459c 0%, #5b7fd6 100%);
       color: white;
@@ -76,7 +75,7 @@
       flex-direction: column;
       gap: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-      margin-top: 0;       /* 🆕 추가 */
+      margin-top: 0;
     }
 
     .login-box {
@@ -187,7 +186,7 @@
       background: #5b7fd6;
     }
 
-/* 🆕 로그인 화면 추가 스타일 */
+    /* 로그인 화면 추가 스타일 */
     .input-group {
       margin-bottom: 20px;
     }
@@ -287,7 +286,7 @@
       color: #2a459c;
     }
 
-/* 🆕 자동 로그인 체크박스 */
+    /* 자동 로그인 체크박스 */
     .auto-login-container {
       margin: 16px 0 20px 0;
     }
@@ -315,16 +314,6 @@
 
     .checkbox-label:hover .checkbox-text {
       color: #2a459c;
-    }
-    
-    .app-header {
-      background: linear-gradient(135deg, #2a459c 0%, #5b7fd6 100%);
-      color: white;
-      padding: 12px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
 
     .header-row-1 {
@@ -521,7 +510,7 @@
       border-radius: 8px;
       padding: 10px 12px;
       display: flex;
-      align-items: center;  /* 세로 중앙 정렬 */
+      align-items: center;
       gap: 10px;
       transition: all 0.2s;
       position: relative;
@@ -529,41 +518,37 @@
       overflow: hidden;
     }
     
-    /* 🆕 카드 본문 영역 (왼쪽) */
     .task-card-body {
       flex: 1;
       display: flex;
       flex-direction: column;
       gap: 4px;
-      min-width: 0;  /* flex 자식의 텍스트 오버플로우 방지 */
+      min-width: 0;
     }
 
-    /* 🆕 다른 회사 정보 영역 (가운데) */
     .other-companies-section {
       display: flex;
       flex-direction: column;
       gap: 3px;
       flex-shrink: 0;
       margin: 0 4px;
-      align-self: center;  /* 세로 중앙 정렬 */
+      align-self: center;
     }
     
-    /* 🆕 다른 회사 뱃지 - 상하 배치로 변경 */
     .other-company-badge {
       display: flex;
-      flex-direction: column;  /* 🟢 상하 배치 */
-      align-items: flex-start;  /* 🟢 왼쪽 정렬 */
-      gap: 2px;  /* 🟢 줄 간격 줄임 */
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
       background: #fff3e0;
       border: 1px solid #ffb74d;
-      padding: 3px 6px;  /* 🟢 패딩 조정 */
+      padding: 3px 6px;
       border-radius: 4px;
       font-size: 9px;
       color: #f57c00;
       font-weight: 500;
     }
     
-    /* 🟢 회사명 라인 */
     .other-company-name-line {
       display: flex;
       align-items: center;
@@ -574,11 +559,10 @@
       white-space: nowrap;
     }
     
-    /* 🟢 담당자 라인 */
     .other-company-assignee-line {
       display: flex;
       align-items: center;
-      padding-left: 8px;  /* 🟢 들여쓰기 유지 (아이콘 제거로 12px → 8px) */
+      padding-left: 8px;
     }
     
     .other-company-assignee {
@@ -587,13 +571,12 @@
       white-space: nowrap;
     }
     
-    /* 담당자 선택 영역 (오른쪽) */
     .person-select-container {
       display: flex;
       gap: 8px;
       align-items: center;
       flex-shrink: 0;
-      align-self: center;  /* 세로 중앙 정렬 */
+      align-self: center;
     }
 
     .task-card:active {
@@ -614,14 +597,12 @@
       background: #f0f9f9;
     }
 
-    /* 드래그 중일 때만 스크롤 방지 */
     body.dragging-active {
       overflow: hidden;
       position: fixed;
       width: 100%;
     }
 
-    /* 번호와 체크박스를 감싸는 컨테이너 */
     .number-check-container {
       display: flex;
       flex-direction: column;
@@ -660,12 +641,11 @@
       border-width: 3px;
     }
 
-    /* 🟢 수정 후 */
     .task-card.completed .task-checkbox {
       background: #2a459c;
       position: relative;
-      cursor: pointer;  /* 🆕 추가 */
-      transition: all 0.2s;  /* 🆕 추가 */
+      cursor: pointer;
+      transition: all 0.2s;
     }
     
     .task-card.completed .task-checkbox::after {
@@ -679,40 +659,14 @@
       transform: translate(-50%, -50%);
     }
     
-    /* 🆕 완료된 체크박스 호버 효과 */
     .task-card.completed .task-checkbox:hover {
-      background: #5b7fd6;  /* 밝은 파란색으로 변경 */
+      background: #5b7fd6;
       border-color: #5b7fd6;
-      transform: scale(1.1);  /* 살짝 커짐 */
+      transform: scale(1.1);
     }
     
-    /* 🆕 완료된 체크박스 클릭 효과 */
     .task-card.completed .task-checkbox:active {
-      transform: scale(0.95);  /* 클릭 시 살짝 작아짐 */
-    }
-
-    /* 🆕 모바일에서 터치 영역 확대 */
-    @media (max-width: 768px) {
-      .task-card.completed .task-checkbox {
-        width: 24px;
-        height: 24px;
-        min-width: 44px;  /* iOS 권장 터치 영역 */
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      
-      .task-card.completed .task-checkbox::after {
-        font-size: 14px;
-      }
-    }
-    
-    .task-card-body {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+      transform: scale(0.95);
     }
 
     .task-title {
@@ -730,12 +684,6 @@
     .task-card.my-task {
       border-left: 4px solid #2a459c;
       background: linear-gradient(to right, rgba(42, 69, 156, 0.03), white);
-    }
-
-    .person-select-container {
-      display: flex;
-      gap: 8px;
-      align-items: center;
     }
 
     .select-wrapper {
@@ -772,58 +720,25 @@
     .action-btn {
       background: #ffe0e0;
       border: none;
-      width: 50px;  /* 32px에서 50px로 증가 */
-      height: 100%;  /* 카드 높이에 맞춤 */
-      border-radius: 0;  /* 둥근 모서리 제거 */
-      border-top-right-radius: 8px;  /* 오른쪽만 둥글게 */
+      width: 50px;
+      height: 100%;
+      border-radius: 0;
+      border-top-right-radius: 8px;
       border-bottom-right-radius: 8px;
       cursor: pointer;
-      font-size: 16px;  /* 14px에서 16px로 증가 */
+      font-size: 16px;
       transition: all 0.3s ease;
       flex-shrink: 0;
       position: absolute;
-      right: -50px;  /* 🆕 버튼 너비만큼 숨김 */
+      right: -50px;
       top: 0;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     
-    /* PC에서는 항상 표시 */
-    @media (min-width: 769px) {
-      .action-btn {
-        position: static;  /* PC에서는 절대 위치 해제 */
-        display: flex;
-        width: 32px;
-        height: 32px;
-        border-radius: 6px;  /* PC에서는 원래 스타일 유지 */
-        font-size: 14px;
-      }
-    }
-    
-    /* 모바일에서 슬라이드 시 표시 */
-    @media (max-width: 768px) {
-      .task-card {
-        position: relative;
-        overflow: hidden;  /* 🆕 변경: visible에서 hidden으로 */
-        transition: transform 0.3s ease;  /* 🆕 부드러운 슬라이드 */
-      }
-      
-      .task-card.swiped-left {
-        transform: translateX(-50px);  /* 🆕 카드를 왼쪽으로 이동 */
-      }
-      
-      .task-card.swiped-left .action-btn {
-        right: 0;  /* 🆕 버튼이 오른쪽에 딱 붙음 */
-      }
-      
-      .action-btn {
-        display: flex;
-      }
-    }
-    
     .action-btn:active {
-      background: #ffb3b3;  /* 🆕 터치 시 더 진한 색 */
+      background: #ffb3b3;
     }
 
     .action-btn:hover {
@@ -919,7 +834,6 @@
       opacity: 0.5;
     }
 
-    /* 지도 */
     #map {
       width: 100%;
       height: 450px;
@@ -952,7 +866,6 @@
       cursor: not-allowed;
     }
 
-    /* 모달 */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -1005,7 +918,6 @@
       height: 30px;
     }
 
-    /* 작업 타임라인 모달 */
     .timeline-item {
       padding: 16px;
       background: #f5f7fa;
@@ -1032,7 +944,6 @@
       color: #666;
     }
 
-    /* 현장 선택 모달 */
     .site-list {
       list-style: none;
       margin-bottom: 20px;
@@ -1072,13 +983,11 @@
       color: #666;
     }
 
-    /* 🆕 현장 아이템 버튼 컨테이너 */
     .site-item-actions {
       display: flex;
       gap: 6px;
     }
     
-    /* 🆕 현장 수정 버튼 */
     .site-item-edit {
       background: #e3f2fd;
       border: none;
@@ -1094,7 +1003,6 @@
       background: #bbdefb;
     }
     
-    /* 현장 삭제 버튼 */
     .site-item-delete {
       background: #ffe0e0;
       border: none;
@@ -1110,7 +1018,6 @@
       background: #ffcdd2;
     }
 
-    /* 완료 기한 선택 모달 */
     .deadline-modal {
       display: none;
       position: fixed;
@@ -1213,29 +1120,29 @@
     }
 
     .deadline-label-container {
-      display: inline-flex;  /* flex에서 inline-flex로 변경 */
+      display: inline-flex;
       align-items: center;
-      gap: 4px;  /* 6px에서 4px로 축소 */
+      gap: 4px;
       margin-top: 4px;
       cursor: pointer;
-      width: fit-content;  /* 추가: 컨텐츠 크기만큼만 */
+      width: fit-content;
     }
     
     .deadline-label-text {
-      font-size: 10px;  /* 11px에서 10px로 축소 */
+      font-size: 10px;
       color: #666;
-      white-space: nowrap;  /* 추가: 줄바꿈 방지 */
+      white-space: nowrap;
     }
     
     .deadline-date-tag {
       display: inline-block;
-      padding: 2px 6px;  /* 8px에서 6px로 축소 */
+      padding: 2px 6px;
       background: #e3f2fd;
       color: #1976d2;
-      border-radius: 3px;  /* 4px에서 3px로 축소 */
-      font-size: 10px;  /* 11px에서 10px로 축소 */
+      border-radius: 3px;
+      font-size: 10px;
       font-weight: 500;
-      white-space: nowrap;  /* 추가: 줄바꿈 방지 */
+      white-space: nowrap;
     }
 
     .add-site-form {
@@ -1258,7 +1165,6 @@
       font-weight: 600;
     }
 
-    /* 기한 초과 작업 스타일 */
     .task-card.overdue {
       border-left: 4px solid #f44336;
       background: #ffebee;
@@ -1304,16 +1210,15 @@
 
     .test-date-label {
       display: inline-block;
-      padding: 2px 6px;  /* 8px에서 6px로 축소 */
+      padding: 2px 6px;
       background: #fff3e0;
       color: #f57c00;
       border-radius: 3px;
-      font-size: 10px;  /* 11px에서 10px로 축소 */
+      font-size: 10px;
       font-weight: 500;
-      white-space: nowrap;  /* 추가: 줄바꿈 방지 */
+      white-space: nowrap;
     }
 
-    /* 로딩 오버레이 */
     .loading-overlay {
       display: none;
       position: fixed;
@@ -1362,63 +1267,10 @@
       color: #666;
     }
 
-    @media (max-width: 768px) {
-      .number-check-container {
-        gap: 4px;
-      }
-      
-      .task-checkbox {
-        width: 20px;
-        height: 20px;
-      }
-          
-      .task-container {
-        max-height: 400px;
-      }
-
-      .map-section {
-        min-height: 350px;
-        margin: 10px;
-        padding: 15px;
-      }
-
-      #map {
-        height: 300px;
-      }
-
-      /* 완료 섹션 스크롤바 스타일 */
-      .task-grid {
-        scrollbar-width: thin;
-        scrollbar-color: #2a459c #f5f7fa;
-      }
-
-      .task-grid::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      .task-grid::-webkit-scrollbar-track {
-        background: #f5f7fa;
-        border-radius: 4px;
-      }
-
-      .task-grid::-webkit-scrollbar-thumb {
-        background: #2a459c;
-        border-radius: 4px;
-      }
-
-      .task-grid::-webkit-scrollbar-thumb:hover {
-        background: #5b7fd6;
-      }
-    }
-
-    /* ========================================
-       🆕 메뉴 시스템 (헤더 밖으로 분리)
-       ======================================== */
-    
-    /* 메뉴 버튼 */
+    /* 메뉴 시스템 */
     .menu-btn {
-      background: rgba(255, 255, 255, 0.2);  /* 🆕 투명도 살짝 낮춤 */
-      border: none;                          /* 🆕 외곽선 완전 제거 */
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
       color: white;
       width: 48px;
       height: 48px;
@@ -1432,10 +1284,9 @@
       overflow: hidden;
     }
     
-    /* 🆕 호버 효과도 외곽선 없이 */
     .menu-btn:hover {
       background: rgba(255, 255, 255, 0.3);
-      border: none;                          /* 🆕 추가 */
+      border: none;
       transform: scale(1.05);
     }
     
@@ -1501,7 +1352,6 @@
       transform: translateY(-8px) rotate(-45deg);
     }
     
-    /* 메뉴 드롭다운 */
     .menu-dropdown {
       position: fixed;
       top: 80px;
@@ -1603,7 +1453,6 @@
       background: #ffcdd2;
     }
     
-    /* 메뉴 오버레이 (배경 어둡게) */
     .menu-overlay {
       display: none;
       position: fixed;
@@ -1622,42 +1471,7 @@
       opacity: 1;
     }
     
-    /* 모바일 최적화 */
-    @media (max-width: 768px) {
-      .menu-btn {
-        width: 44px;
-        height: 44px;
-      }
-    
-      .menu-line {
-        width: 22px;
-        height: 2.5px;
-      }
-    
-      .menu-dropdown {
-        top: 70px;
-        right: 8px;
-        min-width: 180px;
-      }
-    
-      .menu-item {
-        padding: 14px 16px;
-      }
-    
-      .menu-item-icon {
-        font-size: 20px;
-        width: 26px;
-      }
-    
-      .menu-item-text {
-        font-size: 14px;
-      }
-    }
-    
-    /* ========================================
-       사용 설명서 모달 스타일
-       ======================================== */
-    
+    /* 사용 설명서 모달 */
     .guide-modal-content {
       max-width: 700px;
       max-height: 85vh;
@@ -1814,6 +1628,90 @@
     
     /* 모바일 최적화 */
     @media (max-width: 768px) {
+      .number-check-container {
+        gap: 4px;
+      }
+      
+      .task-checkbox {
+        width: 20px;
+        height: 20px;
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .task-card.completed .task-checkbox::after {
+        font-size: 14px;
+      }
+      
+      .task-container {
+        max-height: 400px;
+      }
+
+      .map-section {
+        min-height: 350px;
+        margin: 10px;
+        padding: 15px;
+      }
+
+      #map {
+        height: 300px;
+      }
+
+      .task-grid {
+        scrollbar-width: thin;
+        scrollbar-color: #2a459c #f5f7fa;
+      }
+
+      .task-grid::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .task-grid::-webkit-scrollbar-track {
+        background: #f5f7fa;
+        border-radius: 4px;
+      }
+
+      .task-grid::-webkit-scrollbar-thumb {
+        background: #2a459c;
+        border-radius: 4px;
+      }
+
+      .task-grid::-webkit-scrollbar-thumb:hover {
+        background: #5b7fd6;
+      }
+
+      .menu-btn {
+        width: 44px;
+        height: 44px;
+      }
+    
+      .menu-line {
+        width: 22px;
+        height: 2.5px;
+      }
+    
+      .menu-dropdown {
+        top: 70px;
+        right: 8px;
+        min-width: 180px;
+      }
+    
+      .menu-item {
+        padding: 14px 16px;
+      }
+    
+      .menu-item-icon {
+        font-size: 20px;
+        width: 26px;
+      }
+    
+      .menu-item-text {
+        font-size: 14px;
+      }
+
       .guide-modal-content {
         width: 95%;
         max-height: 90vh;
@@ -1840,169 +1738,37 @@
       .guide-step-content p {
         font-size: 13px;
       }
+
+      .task-card {
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+      }
+      
+      .task-card.swiped-left {
+        transform: translateX(-50px);
+      }
+      
+      .task-card.swiped-left .action-btn {
+        right: 0;
+      }
+      
+      .action-btn {
+        display: flex;
+      }
     }
-      
-      .guide-step-content h4 {
-        font-size: 16px;
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 8px;
-      }
-      
-      .guide-step-content p {
-        font-size: 14px;
-        line-height: 1.6;
-        color: #666;
-        margin-bottom: 8px;
-      }
-      
-      .guide-list {
-        margin: 12px 0;
-        padding-left: 20px;
-      }
-      
-      .guide-list li {
-        font-size: 14px;
-        color: #666;
-        margin-bottom: 6px;
-        line-height: 1.5;
-      }
-      
-      .guide-tip {
-        background: #e3f2fd;
-        border-left: 4px solid #2196F3;
-        padding: 10px 12px;
-        margin-top: 12px;
-        font-size: 13px;
-        color: #1565C0;
-        border-radius: 4px;
-      }
-      
-      .guide-warning {
-        background: #fff3e0;
-        border-left: 4px solid #ff9800;
-        padding: 10px 12px;
-        margin-top: 12px;
-        font-size: 13px;
-        color: #e65100;
-        border-radius: 4px;
-      }
-      
-      .guide-tips-list {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-      }
-      
-      .guide-tip-item {
-        display: flex;
-        gap: 12px;
-        align-items: flex-start;
-        background: #f5f7fa;
-        padding: 12px;
-        border-radius: 8px;
-      }
-      
-      .tip-emoji {
-        font-size: 20px;
-        flex-shrink: 0;
-      }
-      
-      .guide-tip-item span:last-child {
-        font-size: 14px;
-        line-height: 1.6;
-        color: #666;
-      }
-      
-      .guide-contact {
-        background: #f5f7fa;
-        padding: 20px;
-        border-radius: 8px;
-      }
-      
-      .guide-contact p {
-        font-size: 14px;
-        color: #666;
-        margin-bottom: 16px;
-        line-height: 1.6;
-      }
-      
-      .contact-info {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-      }
-      
-      .contact-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 14px;
-        color: #333;
-      }
-      
-      .contact-icon {
-        font-size: 18px;
-        width: 28px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      
-      /* 모바일 최적화 */
-      @media (max-width: 768px) {
-        .menu-dropdown {
-          right: 8px;
-          min-width: 160px;
-        }
-        
-        .guide-modal-content {
-          width: 95%;
-          max-height: 90vh;
-        }
-      
-        .guide-section-title {
-          font-size: 16px;
-        }
-      
-        .guide-step {
-          gap: 12px;
-        }
-      
-        .guide-step-number {
-          width: 28px;
-          height: 28px;
-          font-size: 13px;
-        }
-      
-        .guide-step-content h4 {
-          font-size: 15px;
-        }
-      
-        .guide-step-content p {
-          font-size: 13px;
-        }
-        
-        /* 🆕 다른 회사 정보 뱃지 */
-        .other-company-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 4px;
-          background: #fff3e0;
-          border: 1px solid #ffb74d;
-          padding: 3px 8px;
-          border-radius: 4px;
-          font-size: 10px;
-          color: #f57c00;
-          margin-top: 4px;
-          font-weight: 500;
-        }
-        
-        .other-company-text {
-          white-space: nowrap;
-        }
-      }
     
+    /* PC에서 삭제 버튼 항상 표시 */
+    @media (min-width: 769px) {
+      .action-btn {
+        position: static;
+        display: flex;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 
@@ -2018,7 +1784,6 @@
   <!-- 로그인 화면 -->
   <div class="login-container" id="loginContainer">
     <!-- Step 1: 회사 로그인 -->
-<!-- Step 1: 회사 로그인 -->
     <div class="login-box" id="companyLoginStep">
       <h1 class="login-title">🏢 회사 로그인</h1>
       
@@ -2054,14 +1819,12 @@
       <h1 class="login-title">🏢 새 회사 만들기</h1>
       <button class="back-btn" onclick="backToCompanyLogin()">← 뒤로</button>
       
-      <!-- 회사명 입력란 -->
       <div class="input-group">
         <label class="input-label">회사명</label>
         <input type="text" class="admin-input" id="newCompanyNameInput" placeholder="예: (주)건설회사" autocomplete="off">
         <div class="input-hint">실제 회사 이름을 입력하세요</div>
       </div>
       
-      <!-- 🆕 관리자 이름 입력란 추가 -->
       <div class="input-group">
         <label class="input-label">관리자 이름</label>
         <input type="text" class="admin-input" id="newAdminNameInput" placeholder="예: 홍길동" autocomplete="off">
@@ -2108,7 +1871,6 @@
   <!-- 메인 앱 -->
   <div class="app-container" id="appContainer">
     <div class="app-header">
-      <!-- 첫 번째 줄: 로고, 사용자 정보, 현장, 로그아웃 -->
       <div class="header-row-1">
         <div class="header-left">
           <div class="user-avatar" id="userAvatar"></div>
@@ -2128,7 +1890,6 @@
         </div>
       </div>
 
-      <!-- 두 번째 줄: 날짜 네비게이션 -->
       <div class="header-row-2">
         <div class="date-display" id="dateDisplay"></div>
         <div class="nav-buttons">
@@ -2156,133 +1917,6 @@
 
         <div class="task-container" id="taskContainer"></div>
 
-      <!-- 회사 코드 확인 모달 -->
-        <div class="modal-overlay" id="companyCodeModal">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h3 class="modal-title">🔑 회사 코드</h3>
-              <button class="close-btn" onclick="toggleCompanyCodeModal()">×</button>
-            </div>
-            
-            <div style="text-align: center; padding: 30px 20px;">
-              <p style="font-size: 14px; color: #666; margin-bottom: 20px;">
-                직원 초대 시 이 코드를 공유하세요
-              </p>
-              
-              <div style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%); border: 3px dashed #2a459c; border-radius: 12px; padding: 30px; margin-bottom: 20px;">
-                <div style="font-size: 36px; font-weight: 700; color: #2a459c; letter-spacing: 4px; font-family: 'Courier New', monospace;" id="displayCompanyCode">
-                  ------
-                </div>
-              </div>
-              
-              <div style="display: flex; gap: 10px; justify-content: center;">
-                <button class="admin-btn" onclick="copyCompanyCode()" style="flex: 1; max-width: 200px;">
-                  📋 복사하기
-                </button>
-                <button class="admin-btn" onclick="regenerateCompanyCode()" style="flex: 1; max-width: 200px; background: #ff9800;">
-                  🔄 코드 재발급
-                </button>
-              </div>
-              
-              <p style="font-size: 12px; color: #999; margin-top: 20px;">
-                💡 코드를 재발급하면 기존 코드는 사용할 수 없습니다
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <!-- 직원 관리 모달 -->
-        <div class="modal-overlay" id="staffManageModal">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h3 class="modal-title">👥 직원 관리</h3>
-              <button class="close-btn" onclick="toggleStaffManageModal()">×</button>
-            </div>
-            
-            <div style="padding: 10px 0;">
-              <div style="margin-bottom: 20px;">
-                <h4 style="font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 600;">
-                  현재 직원 목록 (<span id="staffCount">0</span>명)
-                </h4>
-                <ul class="site-list" id="staffList"></ul>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- 회사 정보 수정 모달 -->
-        <div class="modal-overlay" id="companyInfoModal">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h3 class="modal-title">🏢 회사 정보 수정</h3>
-              <button class="close-btn" onclick="toggleCompanyInfoModal()">×</button>
-            </div>
-            
-            <div style="padding: 10px 0;">
-              <div class="input-group">
-                <label class="input-label">회사명</label>
-                <input type="text" class="admin-input" id="editCompanyName" placeholder="회사명">
-              </div>
-              
-              <div class="input-group">
-                <label class="input-label">현재 비밀번호</label>
-                <input type="password" class="admin-input" id="currentPasswordForEdit" placeholder="현재 비밀번호">
-                <div class="input-hint">변경하려면 현재 비밀번호를 입력하세요</div>
-              </div>
-              
-              <div class="input-group">
-                <label class="input-label">새 비밀번호 (선택)</label>
-                <input type="password" class="admin-input" id="newPasswordForEdit" placeholder="변경할 비밀번호">
-                <div class="input-hint">변경하지 않으려면 비워두세요</div>
-              </div>
-              
-              <div class="input-group">
-                <label class="input-label">새 비밀번호 확인</label>
-                <input type="password" class="admin-input" id="confirmNewPassword" placeholder="비밀번호 재입력">
-              </div>
-              
-              <button class="admin-btn" onclick="saveCompanyInfo()">💾 저장</button>
-            </div>
-          </div>
-        </div>
-        
-        <!-- 관리자 권한 이전 모달 -->
-        <div class="modal-overlay" id="transferAdminModal">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h3 class="modal-title">🔄 관리자 권한 이전</h3>
-              <button class="close-btn" onclick="toggleTransferAdminModal()">×</button>
-            </div>
-            
-            <div style="padding: 10px 0;">
-              <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 12px; margin-bottom: 20px; border-radius: 4px;">
-                <p style="font-size: 13px; color: #e65100; line-height: 1.6;">
-                  ⚠️ <strong>주의:</strong> 관리자 권한을 이전하면 본인은 일반 직원이 됩니다. 이 작업은 되돌릴 수 없습니다.
-                </p>
-              </div>
-              
-              <div class="input-group">
-                <label class="input-label">새 관리자 선택</label>
-                <select class="admin-input" id="newAdminSelect">
-                  <option value="">선택하세요</option>
-                </select>
-              </div>
-              
-              <div class="input-group">
-                <label class="input-label">비밀번호 확인</label>
-                <input type="password" class="admin-input" id="passwordForTransfer" placeholder="현재 비밀번호">
-                <div class="input-hint">권한 이전을 확인하기 위해 비밀번호를 입력하세요</div>
-              </div>
-              
-              <button class="admin-btn" onclick="transferAdmin()" style="background: #ff9800;">
-                🔄 권한 이전
-              </button>
-            </div>
-          </div>
-        </div>
-              
-        
-        <!-- 지도 섹션 -->
         <div class="map-section">
           <div class="map-section-header">
             <h3 class="map-section-title">
@@ -2299,6 +1933,7 @@
     </div>
   </div>
   
+  <!-- 메뉴 오버레이 & 드롭다운 -->
   <div class="menu-overlay" id="menuOverlay"></div>
   
   <div class="menu-dropdown" id="menuDropdown">
@@ -2311,7 +1946,6 @@
       <span class="menu-item-text">사용 설명서</span>
     </div>
     
-    <!-- 🆕 관리자 전용 섹션 (JavaScript로 동적 표시) -->
     <div id="adminMenuSection" style="display: none;">
       <div class="menu-divider"></div>
       <div class="menu-item" style="background: #fff8e1; pointer-events: none;">
@@ -2346,6 +1980,7 @@
       <span class="menu-item-text">로그아웃</span>
     </div>
   </div>
+
   <!-- 작업 타임라인 모달 -->
   <div class="modal-overlay" id="timelineModal">
     <div class="modal-content">
@@ -2369,7 +2004,6 @@
         <input type="text" class="task-input" id="newSiteName" placeholder="현장명 입력">
         <input type="text" class="task-input" id="newSiteAddress" placeholder="주소 입력">
         <button class="add-btn" id="saveSiteBtn" onclick="saveSite()">저장</button>
-        <!-- 🆕 수정 모드 취소 버튼 -->
         <button class="secondary-btn" id="cancelEditBtn" onclick="cancelEditSite()" style="display: none;">취소</button>
       </div>
   
@@ -2415,8 +2049,43 @@
       <ul class="site-list" id="siteSelectList"></ul>
     </div>
   </div>
+
+  <!-- 회사 코드 확인 모달 -->
+  <div class="modal-overlay" id="companyCodeModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">🔑 회사 코드</h3>
+        <button class="close-btn" onclick="toggleCompanyCodeModal()">×</button>
+      </div>
+      
+      <div style="text-align: center; padding: 30px 20px;">
+        <p style="font-size: 14px; color: #666; margin-bottom: 20px;">
+          직원 초대 시 이 코드를 공유하세요
+        </p>
+        
+        <div style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%); border: 3px dashed #2a459c; border-radius: 12px; padding: 30px; margin-bottom: 20px;">
+          <div style="font-size: 36px; font-weight: 700; color: #2a459c; letter-spacing: 4px; font-family: 'Courier New', monospace;" id="displayCompanyCode">
+            ------
+          </div>
+        </div>
+        
+        <div style="display: flex; gap: 10px; justify-content: center;">
+          <button class="admin-btn" onclick="copyCompanyCode()" style="flex: 1; max-width: 200px;">
+            📋 복사하기
+          </button>
+          <button class="admin-btn" onclick="regenerateCompanyCode()" style="flex: 1; max-width: 200px; background: #ff9800;">
+            🔄 코드 재발급
+          </button>
+        </div>
+        
+        <p style="font-size: 12px; color: #999; margin-top: 20px;">
+          💡 코드를 재발급하면 기존 코드는 사용할 수 없습니다
+        </p>
+      </div>
+    </div>
+  </div>
   
-  <!-- 🆕 직원 관리 모달 -->
+  <!-- 직원 관리 모달 -->
   <div class="modal-overlay" id="staffManageModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -2435,7 +2104,7 @@
     </div>
   </div>
   
-  <!-- 🆕 회사 정보 수정 모달 -->
+  <!-- 회사 정보 수정 모달 -->
   <div class="modal-overlay" id="companyInfoModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -2471,7 +2140,7 @@
     </div>
   </div>
   
-  <!-- 🆕 관리자 권한 이전 모달 -->
+  <!-- 관리자 권한 이전 모달 -->
   <div class="modal-overlay" id="transferAdminModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -2506,199 +2175,200 @@
     </div>
   </div>
   
-<!-- 🆕 사용 설명서 모달 -->
-<div class="modal-overlay" id="guideModal">
-  <div class="modal-content guide-modal-content">
-    <div class="modal-header">
-      <h3 class="modal-title">📖 사용 설명서</h3>
-      <button class="close-btn" onclick="toggleGuideModal()">×</button>
-    </div>
-    
-    <div class="guide-content">
-      <!-- 1. 시작하기 -->
-      <div class="guide-section">
-        <h3 class="guide-section-title">🚀 1. 시작하기</h3>
-        <div class="guide-step">
-          <div class="guide-step-number">1</div>
-          <div class="guide-step-content">
-            <h4>사용자 선택</h4>
-            <p>로그인 화면에서 본인의 이름을 선택하세요. 새 사용자는 하단에서 추가할 수 있습니다.</p>
-          </div>
-        </div>
+  <!-- 사용 설명서 모달 -->
+  <div class="modal-overlay" id="guideModal">
+    <div class="modal-content guide-modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">📖 사용 설명서</h3>
+        <button class="close-btn" onclick="toggleGuideModal()">×</button>
       </div>
-
-      <!-- 2. 현장 관리 -->
-      <div class="guide-section">
-        <h3 class="guide-section-title">🏗️ 2. 현장 관리</h3>
-        <div class="guide-step">
-          <div class="guide-step-number">2</div>
-          <div class="guide-step-content">
-            <h4>현장 추가하기</h4>
-            <p>① 우측 상단 메뉴(☰) → "현장 추가" 클릭<br>
-               ② 현장명과 주소 입력<br>
-               ③ 저장 버튼 클릭</p>
-            <div class="guide-tip">💡 주소는 경로 표시 기능에 사용되므로 정확히 입력하세요.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 3. 작업 추가 -->
-      <div class="guide-section">
-        <h3 class="guide-section-title">✍️ 3. 작업 추가</h3>
-        <div class="guide-step">
-          <div class="guide-step-number">3</div>
-          <div class="guide-step-content">
-            <h4>일반 작업 추가</h4>
-            <p>① 현장명 입력 (또는 "선택" 버튼으로 등록된 현장 선택)<br>
-               ② 작업 내용 입력 (예: 배근, 거푸집, 콘크리트 타설 등)<br>
-               ③ "추가" 버튼 클릭</p>
-          </div>
-        </div>
-        <div class="guide-step">
-          <div class="guide-step-number">4</div>
-          <div class="guide-step-content">
-            <h4>시험 작업 추가 (자동 일정 생성)</h4>
-            <p>작업 내용에 "시험"을 입력하면 자동으로 관련 일정이 생성됩니다:</p>
-            <ul class="guide-list">
-              <li>시험 당일</li>
-              <li>캡핑 (영업일 +1일)</li>
-              <li>탈형 (영업일 +2일)</li>
-              <li>7일 강도 시험 (+7일)</li>
-              <li>28일 강도 시험 (+28일)</li>
-            </ul>
-            <div class="guide-tip">💡 시험 관련 작업은 작업등록일자를 클릭하면 전체 타임라인을 볼 수 있습니다.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 4. 작업 관리 -->
-      <div class="guide-section">
-        <h3 class="guide-section-title">📋 4. 작업 관리</h3>
-        <div class="guide-step">
-          <div class="guide-step-number">5</div>
-          <div class="guide-step-content">
-            <h4>작업 순서 변경</h4>
-            <p><strong>PC:</strong> 작업 카드를 드래그하여 위아래로 이동<br>
-               <strong>모바일:</strong> 작업 카드를 길게 누르고 상하로 드래그</p>
-            <div class="guide-tip">💡 "내 작업 진행 중" 섹션에서만 순서 변경 가능</div>
-          </div>
-        </div>
-        <div class="guide-step">
-          <div class="guide-step-number">6</div>
-          <div class="guide-step-content">
-            <h4>작업 완료 체크</h4>
-            <p>작업 카드 왼쪽의 체크박스를 클릭하면 완료 처리됩니다.<br>
-               완료된 작업의 체크박스를 다시 클릭하면 진행중으로 되돌아갑니다.</p>
-          </div>
-        </div>
-        <div class="guide-step">
-          <div class="guide-step-number">7</div>
-          <div class="guide-step-content">
-            <h4>작업 삭제</h4>
-            <p><strong>PC:</strong> 작업 카드 우측의 🗑️ 버튼 클릭<br>
-               <strong>모바일:</strong> 작업 카드를 왼쪽으로 슬라이드하면 삭제 버튼 표시</p>
-            <div class="guide-warning">⚠️ 시험 작업 삭제 시 관련된 모든 작업(캡핑, 탈형 등)이 함께 삭제됩니다.</div>
-          </div>
-        </div>
-        <div class="guide-step">
-          <div class="guide-step-number">8</div>
-          <div class="guide-step-content">
-            <h4>담당자 지정</h4>
-            <p>작업 카드의 담당자 선택 드롭다운에서 담당자를 변경할 수 있습니다.</p>
-          </div>
-        </div>
-        <div class="guide-step">
-          <div class="guide-step-number">9</div>
-          <div class="guide-step-content">
-            <h4>완료 기한 설정</h4>
-            <p>작업 카드의 "완료 기한" 날짜를 클릭하면 기한을 변경할 수 있습니다:<br>
-               • 오늘<br>
-               • 내일<br>
-               • 이번주 중 (금요일)<br>
-               • 직접 날짜 선택</p>
-            <div class="guide-warning">⚠️ 기한이 지난 작업은 빨간색으로 표시되며 "기한초과" 뱃지가 표시됩니다.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 5. 날짜 네비게이션 -->
-      <div class="guide-section">
-        <h3 class="guide-section-title">📅 5. 날짜 네비게이션</h3>
-        <div class="guide-step">
-          <div class="guide-step-number">10</div>
-          <div class="guide-step-content">
-            <h4>날짜 이동</h4>
-            <p>헤더의 날짜 표시 옆 버튼으로 날짜를 이동할 수 있습니다:<br>
-               • <strong>오늘:</strong> 오늘 날짜로 이동<br>
-               • <strong>◀:</strong> 하루 전으로<br>
-               • <strong>▶:</strong> 하루 후로</p>
-            <div class="guide-tip">💡 선택한 날짜 이전의 미완료 작업도 함께 표시됩니다.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 6. 경로 표시 -->
-      <div class="guide-section">
-        <h3 class="guide-section-title">🗺️ 6. 이동 경로 표시</h3>
-        <div class="guide-step">
-          <div class="guide-step-number">11</div>
-          <div class="guide-step-content">
-            <h4>경로 확인하기</h4>
-            <p>① 지도 섹션의 "경로 표시" 버튼 클릭<br>
-               ② 위치 권한 허용<br>
-               ③ 현재 위치에서 출발하여 작업 순서대로 현장을 방문하는 최적 경로가 표시됩니다.</p>
-            <div class="guide-tip">💡 경로는 작업 순서에 따라 자동으로 계산되며, 총 거리와 소요 시간이 표시됩니다.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 7. 팁과 요령 -->
-      <div class="guide-section">
-        <h3 class="guide-section-title">💡 7. 유용한 팁</h3>
-        <div class="guide-tips-list">
-          <div class="guide-tip-item">
-            <span class="tip-emoji">✅</span>
-            <span>아침에 출근하면 작업 순서를 먼저 정리하세요. 이동 경로가 자동으로 최적화됩니다.</span>
-          </div>
-          <div class="guide-tip-item">
-            <span class="tip-emoji">📍</span>
-            <span>자주 방문하는 현장은 미리 등록해두면 빠르게 선택할 수 있습니다.</span>
-          </div>
-          <div class="guide-tip-item">
-            <span class="tip-emoji">📋</span>
-            <span>섹션 헤더를 클릭하면 접거나 펼칠 수 있어 화면을 효율적으로 사용할 수 있습니다.</span>
-          </div>
-          <div class="guide-tip-item">
-            <span class="tip-emoji">🔔</span>
-            <span>시험 작업은 자동으로 일정이 생성되므로 일일이 입력할 필요가 없습니다.</span>
-          </div>
-          <div class="guide-tip-item">
-            <span class="tip-emoji">👥</span>
-            <span>팀 작업도 한눈에 볼 수 있어 업무 분담과 협업이 쉽습니다.</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 8. 문의하기 -->
-      <div class="guide-section">
-        <h3 class="guide-section-title">📞 8. 문의하기</h3>
-        <div class="guide-contact">
-          <p>사용 중 문의사항이나 개선 제안이 있으시면 언제든 연락주세요.</p>
-          <div class="contact-info">
-            <div class="contact-item">
-              <span class="contact-icon">📧</span>
-              <span>이메일: support@example.com</span>
+      
+      <div class="guide-content">
+        <!-- 1. 시작하기 -->
+        <div class="guide-section">
+          <h3 class="guide-section-title">🚀 1. 시작하기</h3>
+          <div class="guide-step">
+            <div class="guide-step-number">1</div>
+            <div class="guide-step-content">
+              <h4>사용자 선택</h4>
+              <p>로그인 화면에서 본인의 이름을 선택하세요. 새 사용자는 하단에서 추가할 수 있습니다.</p>
             </div>
-            <div class="contact-item">
-              <span class="contact-icon">💬</span>
-              <span>카카오톡: @작업관리앱</span>
+          </div>
+        </div>
+
+        <!-- 2. 현장 관리 -->
+        <div class="guide-section">
+          <h3 class="guide-section-title">🏗️ 2. 현장 관리</h3>
+          <div class="guide-step">
+            <div class="guide-step-number">2</div>
+            <div class="guide-step-content">
+              <h4>현장 추가하기</h4>
+              <p>① 우측 상단 메뉴(☰) → "현장 추가" 클릭<br>
+                 ② 현장명과 주소 입력<br>
+                 ③ 저장 버튼 클릭</p>
+              <div class="guide-tip">💡 주소는 경로 표시 기능에 사용되므로 정확히 입력하세요.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. 작업 추가 -->
+        <div class="guide-section">
+          <h3 class="guide-section-title">✍️ 3. 작업 추가</h3>
+          <div class="guide-step">
+            <div class="guide-step-number">3</div>
+            <div class="guide-step-content">
+              <h4>일반 작업 추가</h4>
+              <p>① 현장명 입력 (또는 "선택" 버튼으로 등록된 현장 선택)<br>
+                 ② 작업 내용 입력 (예: 배근, 거푸집, 콘크리트 타설 등)<br>
+                 ③ "추가" 버튼 클릭</p>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-number">4</div>
+            <div class="guide-step-content">
+              <h4>시험 작업 추가 (자동 일정 생성)</h4>
+              <p>작업 내용에 "시험"을 입력하면 자동으로 관련 일정이 생성됩니다:</p>
+              <ul class="guide-list">
+                <li>시험 당일</li>
+                <li>캡핑 (영업일 +1일)</li>
+                <li>탈형 (영업일 +2일)</li>
+                <li>7일 강도 시험 (+7일)</li>
+                <li>28일 강도 시험 (+28일)</li>
+              </ul>
+              <div class="guide-tip">💡 시험 관련 작업은 작업등록일자를 클릭하면 전체 타임라인을 볼 수 있습니다.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. 작업 관리 -->
+        <div class="guide-section">
+          <h3 class="guide-section-title">📋 4. 작업 관리</h3>
+          <div class="guide-step">
+            <div class="guide-step-number">5</div>
+            <div class="guide-step-content">
+              <h4>작업 순서 변경</h4>
+              <p><strong>PC:</strong> 작업 카드를 드래그하여 위아래로 이동<br>
+                 <strong>모바일:</strong> 작업 카드를 길게 누르고 상하로 드래그</p>
+              <div class="guide-tip">💡 "내 작업 진행 중" 섹션에서만 순서 변경 가능</div>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-number">6</div>
+            <div class="guide-step-content">
+              <h4>작업 완료 체크</h4>
+              <p>작업 카드 왼쪽의 체크박스를 클릭하면 완료 처리됩니다.<br>
+                 완료된 작업의 체크박스를 다시 클릭하면 진행중으로 되돌아갑니다.</p>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-number">7</div>
+            <div class="guide-step-content">
+              <h4>작업 삭제</h4>
+              <p><strong>PC:</strong> 작업 카드 우측의 🗑️ 버튼 클릭<br>
+                 <strong>모바일:</strong> 작업 카드를 왼쪽으로 슬라이드하면 삭제 버튼 표시</p>
+              <div class="guide-warning">⚠️ 시험 작업 삭제 시 관련된 모든 작업(캡핑, 탈형 등)이 함께 삭제됩니다.</div>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-number">8</div>
+            <div class="guide-step-content">
+              <h4>담당자 지정</h4>
+              <p>작업 카드의 담당자 선택 드롭다운에서 담당자를 변경할 수 있습니다.</p>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-number">9</div>
+            <div class="guide-step-content">
+              <h4>완료 기한 설정</h4>
+              <p>작업 카드의 "완료 기한" 날짜를 클릭하면 기한을 변경할 수 있습니다:<br>
+                 • 오늘<br>
+                 • 내일<br>
+                 • 이번주 중 (금요일)<br>
+                 • 직접 날짜 선택</p>
+              <div class="guide-warning">⚠️ 기한이 지난 작업은 빨간색으로 표시되며 "기한초과" 뱃지가 표시됩니다.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. 날짜 네비게이션 -->
+        <div class="guide-section">
+          <h3 class="guide-section-title">📅 5. 날짜 네비게이션</h3>
+          <div class="guide-step">
+            <div class="guide-step-number">10</div>
+            <div class="guide-step-content">
+              <h4>날짜 이동</h4>
+              <p>헤더의 날짜 표시 옆 버튼으로 날짜를 이동할 수 있습니다:<br>
+                 • <strong>오늘:</strong> 오늘 날짜로 이동<br>
+                 • <strong>◀:</strong> 하루 전으로<br>
+                 • <strong>▶:</strong> 하루 후로</p>
+              <div class="guide-tip">💡 선택한 날짜 이전의 미완료 작업도 함께 표시됩니다.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. 경로 표시 -->
+        <div class="guide-section">
+          <h3 class="guide-section-title">🗺️ 6. 이동 경로 표시</h3>
+          <div class="guide-step">
+            <div class="guide-step-number">11</div>
+            <div class="guide-step-content">
+              <h4>경로 확인하기</h4>
+              <p>① 지도 섹션의 "경로 표시" 버튼 클릭<br>
+                 ② 위치 권한 허용<br>
+                 ③ 현재 위치에서 출발하여 작업 순서대로 현장을 방문하는 최적 경로가 표시됩니다.</p>
+              <div class="guide-tip">💡 경로는 작업 순서에 따라 자동으로 계산되며, 총 거리와 소요 시간이 표시됩니다.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. 팁과 요령 -->
+        <div class="guide-section">
+          <h3 class="guide-section-title">💡 7. 유용한 팁</h3>
+          <div class="guide-tips-list">
+            <div class="guide-tip-item">
+              <span class="tip-emoji">✅</span>
+              <span>아침에 출근하면 작업 순서를 먼저 정리하세요. 이동 경로가 자동으로 최적화됩니다.</span>
+            </div>
+            <div class="guide-tip-item">
+              <span class="tip-emoji">📍</span>
+              <span>자주 방문하는 현장은 미리 등록해두면 빠르게 선택할 수 있습니다.</span>
+            </div>
+            <div class="guide-tip-item">
+              <span class="tip-emoji">📋</span>
+              <span>섹션 헤더를 클릭하면 접거나 펼칠 수 있어 화면을 효율적으로 사용할 수 있습니다.</span>
+            </div>
+            <div class="guide-tip-item">
+              <span class="tip-emoji">🔔</span>
+              <span>시험 작업은 자동으로 일정이 생성되므로 일일이 입력할 필요가 없습니다.</span>
+            </div>
+            <div class="guide-tip-item">
+              <span class="tip-emoji">👥</span>
+              <span>팀 작업도 한눈에 볼 수 있어 업무 분담과 협업이 쉽습니다.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8. 문의하기 -->
+        <div class="guide-section">
+          <h3 class="guide-section-title">📞 8. 문의하기</h3>
+          <div class="guide-contact">
+            <p>사용 중 문의사항이나 개선 제안이 있으시면 언제든 연락주세요.</p>
+            <div class="contact-info">
+              <div class="contact-item">
+                <span class="contact-icon">📧</span>
+                <span>이메일: support@example.com</span>
+              </div>
+              <div class="contact-item">
+                <span class="contact-icon">💬</span>
+                <span>카카오톡: @작업관리앱</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>  
+
   <!-- Kakao Map API -->
   <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=edfe0792f24f219880fc608009d59a0f&libraries=services"></script>
 
@@ -2739,11 +2409,10 @@
   </script>
   
   <script>
-    // 🆕 문자열 유사도 계산 함수 (Levenshtein distance 기반)
+    // 문자열 유사도 계산 함수
     function calculateSimilarity(str1, str2) {
       if (!str1 || !str2) return 0;
       
-      // 정규화: 소문자 변환, 공백 제거
       str1 = str1.toLowerCase().replace(/\s+/g, '');
       str2 = str2.toLowerCase().replace(/\s+/g, '');
       
@@ -2754,7 +2423,6 @@
       
       if (len1 === 0 || len2 === 0) return 0;
       
-      // Levenshtein distance 계산
       const matrix = [];
       for (let i = 0; i <= len1; i++) {
         matrix[i] = [i];
@@ -2767,9 +2435,9 @@
         for (let j = 1; j <= len2; j++) {
           const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
           matrix[i][j] = Math.min(
-            matrix[i - 1][j] + 1,      // 삭제
-            matrix[i][j - 1] + 1,      // 삽입
-            matrix[i - 1][j - 1] + cost // 대체
+            matrix[i - 1][j] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j - 1] + cost
           );
         }
       }
@@ -2781,9 +2449,7 @@
       return similarity;
     }
     
-    // 🆕 현장 유사도 비교 함수 (현장명 + 주소)
     function areSitesSimilar(site1Name, site1Address, site2Name, site2Address) {
-      // 현장명과 주소를 합쳐서 비교
       const full1 = (site1Name || '') + ' ' + (site1Address || '');
       const full2 = (site2Name || '') + ' ' + (site2Address || '');
       
@@ -2791,7 +2457,7 @@
       
       console.log(`🔍 현장 비교: "${site1Name}" vs "${site2Name}" | 유사도: ${similarity.toFixed(1)}%`);
       
-      return similarity >= 80; // 80% 이상 유사하면 같은 현장
+      return similarity >= 80;
     }
 
     let currentDate = new Date();
@@ -2801,9 +2467,9 @@
     let allCompaniesWorks = {};
     let currentUser = null;
     let currentCompanyId = null;
-    let currentUserId = null;  // 🆕 현재 사용자 ID
-    let isAdmin = false;  // 🆕 관리자 여부
-    let companyInfo = null;  // 🆕 회사 정보
+    let currentUserId = null;
+    let isAdmin = false;
+    let companyInfo = null;
     let map = null;
     let currentMarker = null;
     let currentLocationMarker = null;
@@ -2815,7 +2481,7 @@
     let draggedWorkId = null;
     let originalOrder = [];
     let isDraggingNow = false;
-    let selectedCard = null; // 선택된 카드 추적
+    let selectedCard = null;
     let currentEditingSiteId = null;
     let sectionStates = {
       myActive: true,
@@ -2833,12 +2499,10 @@
     
     function initApp() {
       console.log('✅ 앱 초기화 시작');
-      // 🆕 무조건 로그인 화면 먼저 표시
       document.getElementById('companyLoginStep').style.display = 'block';
       checkSavedCompany();
     }
     
-    // 🆕 저장된 회사 정보 확인 (자동 로그인)
     function checkSavedCompany() {
       const autoLogin = localStorage.getItem('autoLogin') === 'true';
       const savedCompanyId = localStorage.getItem('savedCompanyId');
@@ -2847,7 +2511,6 @@
       if (autoLogin && savedCompanyId && savedPassword) {
         console.log('🔐 자동 로그인 시도...');
         
-        // 자동 로그인 시도
         const companyRef = window.dbRef(window.db, `companies/${savedCompanyId}/info`);
         window.dbOnValue(companyRef, (snapshot) => {
           const companyInfo = snapshot.val();
@@ -2858,56 +2521,47 @@
             showUserSelectStep();
           } else {
             console.log('❌ 자동 로그인 실패 - 로그인 화면 표시');
-            // 저장된 정보가 잘못되었으면 초기화
             clearAutoLogin();
             showLoginScreen();
           }
         }, { onlyOnce: true });
       } else {
-        // 자동 로그인 정보 없음
         showLoginScreen();
       }
     }
 
-    // 🆕 로그인 화면 표시
     function showLoginScreen() {
       document.getElementById('companyLoginStep').style.display = 'block';
       
-      // 저장된 정보가 있으면 입력란에 채우기 (자동 로그인 체크 안 된 경우)
       const savedCompanyId = localStorage.getItem('savedCompanyId');
       if (savedCompanyId) {
         document.getElementById('companyIdInput').value = savedCompanyId;
       }
     }
 
-    // 🆕 자동 로그인 정보 초기화
     function clearAutoLogin() {
       localStorage.removeItem('autoLogin');
       localStorage.removeItem('savedCompanyId');
       localStorage.removeItem('savedPassword');
     }
     
-        // 🆕 회사 ID 중복 확인
-        async function checkCompanyIdAvailability(companyId) {
-          return new Promise((resolve) => {
-            const companiesRef = window.dbRef(window.db, 'companies');
-            window.dbOnValue(companiesRef, (snapshot) => {
-              const companies = snapshot.val();
-              
-              if (!companies) {
-                resolve(true); // 첫 회사면 사용 가능
-                return;
-              }
-              
-              // 회사 ID가 이미 존재하는지 확인
-              const exists = Object.keys(companies).some(id => id === companyId);
-              resolve(!exists);
-            }, { onlyOnce: true });
-          });
-        }
+    async function checkCompanyIdAvailability(companyId) {
+      return new Promise((resolve) => {
+        const companiesRef = window.dbRef(window.db, 'companies');
+        window.dbOnValue(companiesRef, (snapshot) => {
+          const companies = snapshot.val();
+          
+          if (!companies) {
+            resolve(true);
+            return;
+          }
+          
+          const exists = Object.keys(companies).some(id => id === companyId);
+          resolve(!exists);
+        }, { onlyOnce: true });
+      });
+    }
     
-        // 🆕 회사 로그인
-    // 🆕 회사 로그인
     window.loginCompany = async function() {
       const companyId = document.getElementById('companyIdInput').value.trim();
       const password = document.getElementById('companyPasswordInput').value;
@@ -2923,7 +2577,6 @@
         return;
       }
       
-      // Firebase에서 회사 정보 확인
       const companyRef = window.dbRef(window.db, `companies/${companyId}/info`);
       window.dbOnValue(companyRef, (snapshot) => {
         const companyInfo = snapshot.val();
@@ -2938,202 +2591,185 @@
           return;
         }
         
-        // 로그인 성공
         currentCompanyId = companyId;
         
-        // 자동 로그인 체크 여부에 따라 저장
         if (autoLogin) {
           localStorage.setItem('autoLogin', 'true');
           localStorage.setItem('savedCompanyId', companyId);
           localStorage.setItem('savedPassword', password);
           console.log('✅ 자동 로그인 정보 저장됨');
         } else {
-          // 체크 안 했으면 자동 로그인 정보 삭제 (회사 ID만 저장)
           localStorage.removeItem('autoLogin');
           localStorage.setItem('savedCompanyId', companyId);
           localStorage.removeItem('savedPassword');
           console.log('ℹ️ 회사 ID만 저장됨');
         }
         
-        // 사용자 선택 화면으로 이동
         showUserSelectStep();
       }, { onlyOnce: true });
     };
     
-        // 🆕 새 회사 만들기 화면 표시
-        window.showCreateCompanyStep = function() {
-          document.getElementById('companyLoginStep').style.display = 'none';
-          document.getElementById('createCompanyStep').style.display = 'block';
-        };
+    window.showCreateCompanyStep = function() {
+      document.getElementById('companyLoginStep').style.display = 'none';
+      document.getElementById('createCompanyStep').style.display = 'block';
+    };
 
-        // 🆕 로그인 화면으로 돌아가기
-        window.backToCompanyLogin = function() {
-          document.getElementById('createCompanyStep').style.display = 'none';
-          document.getElementById('companyLoginStep').style.display = 'block';
-          
-          // 입력 필드 초기화
-          document.getElementById('newCompanyNameInput').value = '';
-          document.getElementById('newAdminNameInput').value = '';  // 🆕 추가
-          document.getElementById('newCompanyIdInput').value = '';
-          document.getElementById('newCompanyPasswordInput').value = '';
-          document.getElementById('confirmPasswordInput').value = '';
-          document.getElementById('companyIdHint').textContent = '영문, 숫자 조합 (4-20자)';
-          document.getElementById('companyIdHint').className = 'input-hint';
-        };
+    window.backToCompanyLogin = function() {
+      document.getElementById('createCompanyStep').style.display = 'none';
+      document.getElementById('companyLoginStep').style.display = 'block';
+      
+      document.getElementById('newCompanyNameInput').value = '';
+      document.getElementById('newAdminNameInput').value = '';
+      document.getElementById('newCompanyIdInput').value = '';
+      document.getElementById('newCompanyPasswordInput').value = '';
+      document.getElementById('confirmPasswordInput').value = '';
+      document.getElementById('companyIdHint').textContent = '영문, 숫자 조합 (4-20자)';
+      document.getElementById('companyIdHint').className = 'input-hint';
+    };
     
-        // 🆕 회사 ID 실시간 중복 확인
-        let checkTimeout;
-        document.addEventListener('DOMContentLoaded', function() {
-          const companyIdInput = document.getElementById('newCompanyIdInput');
-          if (companyIdInput) {
-            companyIdInput.addEventListener('input', function() {
-              clearTimeout(checkTimeout);
-              const companyId = this.value.trim();
-              const hint = document.getElementById('companyIdHint');
-              
-              if (!companyId) {
-                hint.textContent = '영문, 숫자 조합 (4-20자)';
-                hint.className = 'input-hint';
-                return;
-              }
-              
-              // 형식 검증
-              const regex = /^[a-zA-Z0-9]{4,20}$/;
-              if (!regex.test(companyId)) {
-                hint.textContent = '❌ 영문, 숫자만 사용 가능 (4-20자)';
-                hint.className = 'input-hint error';
-                return;
-              }
-              
-              hint.textContent = '확인 중...';
-              hint.className = 'input-hint';
-              
-              // 중복 확인 (500ms 지연)
-              checkTimeout = setTimeout(async () => {
-                const available = await checkCompanyIdAvailability(companyId);
-                if (available) {
-                  hint.textContent = '✅ 사용 가능한 ID입니다';
-                  hint.className = 'input-hint success';
-                } else {
-                  hint.textContent = '❌ 이미 사용 중인 ID입니다';
-                  hint.className = 'input-hint error';
-                }
-              }, 500);
-            });
-          }
-        });
-
-        // 🆕 새 회사 만들기
-        window.createCompany = async function() {
-          const companyName = document.getElementById('newCompanyNameInput').value.trim();
-          const companyId = document.getElementById('newCompanyIdInput').value.trim();
-          const password = document.getElementById('newCompanyPasswordInput').value;
-          const confirmPassword = document.getElementById('confirmPasswordInput').value;
-          const adminName = document.getElementById('newAdminNameInput').value.trim();
-          
-          if (!companyName) {
-            alert('회사명을 입력하세요.');
-            return;
-          }
+    let checkTimeout;
+    document.addEventListener('DOMContentLoaded', function() {
+      const companyIdInput = document.getElementById('newCompanyIdInput');
+      if (companyIdInput) {
+        companyIdInput.addEventListener('input', function() {
+          clearTimeout(checkTimeout);
+          const companyId = this.value.trim();
+          const hint = document.getElementById('companyIdHint');
           
           if (!companyId) {
-            alert('회사 ID를 입력하세요.');
+            hint.textContent = '영문, 숫자 조합 (4-20자)';
+            hint.className = 'input-hint';
             return;
           }
           
           const regex = /^[a-zA-Z0-9]{4,20}$/;
           if (!regex.test(companyId)) {
-            alert('회사 ID는 영문과 숫자 조합으로 4-20자여야 합니다.');
+            hint.textContent = '❌ 영문, 숫자만 사용 가능 (4-20자)';
+            hint.className = 'input-hint error';
             return;
           }
           
-          if (!password) {
-            alert('비밀번호를 입력하세요.');
-            return;
-          }
+          hint.textContent = '확인 중...';
+          hint.className = 'input-hint';
           
-          if (password.length < 4) {
-            alert('비밀번호는 최소 4자 이상이어야 합니다.');
-            return;
-          }
-          
-          if (password !== confirmPassword) {
-            alert('비밀번호가 일치하지 않습니다.');
-            return;
-          }
-          
-          if (!adminName) {
-            alert('관리자 이름을 입력하세요.');
-            return;
-          }
-          
-          const available = await checkCompanyIdAvailability(companyId);
-          if (!available) {
-            alert('이미 사용 중인 회사 ID입니다.');
-            return;
-          }
-          
-          try {
-            // 1. 관리자 사용자 생성
-            const assigneesRef = window.dbRef(window.db, `companies/${companyId}/assignees`);
-            const newAdminRef = window.dbPush(assigneesRef);
-            const adminId = newAdminRef.key;
-            
-            await window.dbSet(newAdminRef, {
-              name: adminName,
-              isAdmin: true,
-              createdAt: new Date().toISOString()
-            });
-            
-            // 2. 회사 정보 생성
-            const companyInfoRef = window.dbRef(window.db, `companies/${companyId}/info`);
-            await window.dbSet(companyInfoRef, {
-              name: companyName,
-              password: password,
-              createdAt: new Date().toISOString(),
-              adminId: adminId,
-              companyCode: generateCompanyCode()
-            });
-            
-            alert(`회사가 생성되었습니다!\n\n회사명: ${companyName}\n회사 ID: ${companyId}\n관리자: ${adminName}\n\n팀원들과 공유하세요.`);
-            
-            // 자동 로그인
-            currentCompanyId = companyId;
-            currentUser = adminName;
-            currentUserId = adminId;
-            isAdmin = true;
-            
-            localStorage.setItem('currentCompanyId', companyId);
-            
-            showMainApp();
-            
-          } catch (error) {
-            console.error('❌ 회사 생성 중 오류:', error);
-            alert('회사 생성 중 오류가 발생했습니다: ' + error.message);
-          }
-        };
+          checkTimeout = setTimeout(async () => {
+            const available = await checkCompanyIdAvailability(companyId);
+            if (available) {
+              hint.textContent = '✅ 사용 가능한 ID입니다';
+              hint.className = 'input-hint success';
+            } else {
+              hint.textContent = '❌ 이미 사용 중인 ID입니다';
+              hint.className = 'input-hint error';
+            }
+          }, 500);
+        });
+      }
+    });
+
+    window.createCompany = async function() {
+      const companyName = document.getElementById('newCompanyNameInput').value.trim();
+      const companyId = document.getElementById('newCompanyIdInput').value.trim();
+      const password = document.getElementById('newCompanyPasswordInput').value;
+      const confirmPassword = document.getElementById('confirmPasswordInput').value;
+      const adminName = document.getElementById('newAdminNameInput').value.trim();
+      
+      if (!companyName) {
+        alert('회사명을 입력하세요.');
+        return;
+      }
+      
+      if (!companyId) {
+        alert('회사 ID를 입력하세요.');
+        return;
+      }
+      
+      const regex = /^[a-zA-Z0-9]{4,20}$/;
+      if (!regex.test(companyId)) {
+        alert('회사 ID는 영문과 숫자 조합으로 4-20자여야 합니다.');
+        return;
+      }
+      
+      if (!password) {
+        alert('비밀번호를 입력하세요.');
+        return;
+      }
+      
+      if (password.length < 4) {
+        alert('비밀번호는 최소 4자 이상이어야 합니다.');
+        return;
+      }
+      
+      if (password !== confirmPassword) {
+        alert('비밀번호가 일치하지 않습니다.');
+        return;
+      }
+      
+      if (!adminName) {
+        alert('관리자 이름을 입력하세요.');
+        return;
+      }
+      
+      const available = await checkCompanyIdAvailability(companyId);
+      if (!available) {
+        alert('이미 사용 중인 회사 ID입니다.');
+        return;
+      }
+      
+      try {
+        const assigneesRef = window.dbRef(window.db, `companies/${companyId}/assignees`);
+        const newAdminRef = window.dbPush(assigneesRef);
+        const adminId = newAdminRef.key;
         
-        // 🆕 회사 코드 생성 함수 (6자리 랜덤)
-        function generateCompanyCode() {
-          const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-          let code = '';
-          for (let i = 0; i < 6; i++) {
-            code += chars.charAt(Math.floor(Math.random() * chars.length));
-          }
-          return code;
-        }
+        await window.dbSet(newAdminRef, {
+          name: adminName,
+          isAdmin: true,
+          createdAt: new Date().toISOString()
+        });
+        
+        const companyInfoRef = window.dbRef(window.db, `companies/${companyId}/info`);
+        await window.dbSet(companyInfoRef, {
+          name: companyName,
+          password: password,
+          createdAt: new Date().toISOString(),
+          adminId: adminId,
+          companyCode: generateCompanyCode()
+        });
+        
+        alert(`회사가 생성되었습니다!\n\n회사명: ${companyName}\n회사 ID: ${companyId}\n관리자: ${adminName}\n\n팀원들과 공유하세요.`);
+        
+        currentCompanyId = companyId;
+        currentUser = adminName;
+        currentUserId = adminId;
+        isAdmin = true;
+        
+        localStorage.setItem('currentCompanyId', companyId);
+        
+        showMainApp();
+        
+      } catch (error) {
+        console.error('❌ 회사 생성 중 오류:', error);
+        alert('회사 생성 중 오류가 발생했습니다: ' + error.message);
+      }
+    };
     
-        // 🆕 사용자 선택 화면 표시
-        function showUserSelectStep() {
-          document.getElementById('companyLoginStep').style.display = 'none';
-          document.getElementById('createCompanyStep').style.display = 'none';
-          document.getElementById('userSelectStep').style.display = 'block';
-          
-          // 회사 ID 표시
-          document.getElementById('companyIdDisplay').textContent = currentCompanyId;
-          
-          loadAssignees();
-        }
+    function generateCompanyCode() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let code = '';
+      for (let i = 0; i < 6; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
+    }
+    
+    function showUserSelectStep() {
+      document.getElementById('companyLoginStep').style.display = 'none';
+      document.getElementById('createCompanyStep').style.display = 'none';
+      document.getElementById('userSelectStep').style.display = 'block';
+      
+      document.getElementById('companyIdDisplay').textContent = currentCompanyId;
+      
+      loadAssignees();
+    }
     
     function initMap() {
       if (typeof kakao === 'undefined' || !kakao.maps) {
@@ -3454,7 +3090,6 @@
           const totalTime = Math.round(routeData.totalTime / 60);
           console.log(`✅ 경로 표시 완료 - 총 ${totalDistance}km, 약 ${totalTime}분`);
           
-          // 거리와 시간을 레이블 옆에 표시
           const routeInfo = document.getElementById('routeInfo');
           routeInfo.textContent = `${totalDistance}km · ${totalTime}분`;
           routeInfo.style.display = 'inline-block';
@@ -3652,7 +3287,6 @@
       console.log(`✅ 직선 경로 표시 완료`);
     }
 
-// 🆕 모든 회사의 작업 정보 로드 (다른 회사 현장 표시용)
     function loadAllCompaniesWorks() {
       const companiesRef = window.dbRef(window.db, 'companies');
       window.dbOnValue(companiesRef, (snapshot) => {
@@ -3663,11 +3297,10 @@
           allCompaniesWorks[companyId] = {
             name: companies[companyId].info?.name || companyId,
             works: companies[companyId].works || {},
-            sites: companies[companyId].sites || {}  // 🆕 현장 정보도 포함
+            sites: companies[companyId].sites || {}
           };
         });
         
-        // 데이터 로드 후 화면 갱신
         if (currentUser) {
           renderWorks();
         }
@@ -3684,12 +3317,11 @@
             assignees.push({
               id: key,
               name: data[key].name,
-              isAdmin: data[key].isAdmin || false  // 🆕 관리자 정보 추가
+              isAdmin: data[key].isAdmin || false
             });
           });
         }
         
-        // 🆕 관리자를 맨 앞으로 정렬
         assignees.sort((a, b) => {
           if (a.isAdmin && !b.isAdmin) return -1;
           if (!a.isAdmin && b.isAdmin) return 1;
@@ -3715,7 +3347,6 @@
         const card = document.createElement('div');
         card.className = 'user-card';
         
-        // 🆕 관리자 카드 스타일 추가
         if (user.isAdmin) {
           card.style.background = 'linear-gradient(135deg, #fff8e1 0%, #ffe082 100%)';
           card.style.borderColor = '#FFD700';
@@ -3738,7 +3369,6 @@
         avatar.className = 'user-card-avatar';
         avatar.textContent = user.name.charAt(0);
         
-        // 🆕 관리자 아바타 스타일
         if (user.isAdmin) {
           avatar.style.background = '#FFD700';
           avatar.style.color = 'white';
@@ -3748,7 +3378,6 @@
         name.className = 'user-card-name';
         name.textContent = user.name;
         
-        // 🆕 관리자 배지 추가
         if (user.isAdmin) {
           const adminBadge = document.createElement('span');
           adminBadge.style.cssText = 'font-size: 11px; color: #F57C00; margin-left: 4px;';
@@ -3783,74 +3412,65 @@
       input.value = '';
     };
 
-      // ✅ 1단계: showMainApp 함수를 먼저 독립적으로 정의
-      function showMainApp() {
-        console.log('📱 메인 앱 표시');
-        
-        // 로그인 화면 숨기기
-        const loginContainer = document.getElementById('loginContainer');
-        loginContainer.style.display = 'none';
-        loginContainer.style.visibility = 'hidden';
-        loginContainer.style.opacity = '0';
-        
-        // 앱 컨테이너 표시
-        const appContainer = document.getElementById('appContainer');
-        appContainer.style.display = 'flex';
-        appContainer.classList.add('active');
-        
-        console.log('✅ 화면 전환 완료');
-        
-        document.getElementById('userAvatar').textContent = currentUser.charAt(0);
-        document.getElementById('headerUserName').textContent = currentUser;
-        
-        // 관리자 표시
-        if (isAdmin) {
-          document.getElementById('headerUserName').innerHTML = 
-            `${currentUser} <span style="color: #FFD700; font-size: 11px;">👑 관리자</span>`;
-        }
-        
-        updateDateDisplay();
-        loadWorks();
-        loadSites();
-        loadAllCompaniesWorks();
-        renderMenu();
-        
-        setTimeout(() => {
-          console.log('🗺️ 지도 초기화 시작...');
-          initMap();
-        }, 500);
-        
-        console.log('✅ 메인 앱 로드 완료');
+    function showMainApp() {
+      console.log('📱 메인 앱 표시');
+      
+      const loginContainer = document.getElementById('loginContainer');
+      loginContainer.style.display = 'none';
+      loginContainer.style.visibility = 'hidden';
+      loginContainer.style.opacity = '0';
+      
+      const appContainer = document.getElementById('appContainer');
+      appContainer.style.display = 'flex';
+      appContainer.classList.add('active');
+      
+      console.log('✅ 화면 전환 완료');
+      
+      document.getElementById('userAvatar').textContent = currentUser.charAt(0);
+      document.getElementById('headerUserName').textContent = currentUser;
+      
+      if (isAdmin) {
+        document.getElementById('headerUserName').innerHTML = 
+          `${currentUser} <span style="color: #FFD700; font-size: 11px;">👑 관리자</span>`;
       }
       
-      // ✅ 2단계: login 함수를 간단하게 정의 (중복 제거)
-      window.login = function(userName) {
-        console.log('🎯 로그인 시도:', userName);
-        
-        currentUser = userName;
-        
-        // 사용자 ID와 관리자 여부 확인
-        const userEntry = assignees.find(a => a.name === userName);
-        if (userEntry) {
-          currentUserId = userEntry.id;
-          isAdmin = userEntry.isAdmin || false;
-          console.log('👤 사용자 정보:', { 
-            name: userName, 
-            id: currentUserId, 
-            isAdmin: isAdmin 
-          });
-        }
-        
-        // 회사 정보 로드
-        loadCompanyInfo();
-        
-        // ✅ showMainApp() 호출 (이제 위에서 정의했으므로 사용 가능!)
-        showMainApp();
-        
-        console.log('✅ 로그인 완료');
-      };
+      updateDateDisplay();
+      loadWorks();
+      loadSites();
+      loadAllCompaniesWorks();
+      renderMenu();
+      
+      setTimeout(() => {
+        console.log('🗺️ 지도 초기화 시작...');
+        initMap();
+      }, 500);
+      
+      console.log('✅ 메인 앱 로드 완료');
+    }
     
-    // 🆕 회사 정보 로드 함수
+    window.login = function(userName) {
+      console.log('🎯 로그인 시도:', userName);
+      
+      currentUser = userName;
+      
+      const userEntry = assignees.find(a => a.name === userName);
+      if (userEntry) {
+        currentUserId = userEntry.id;
+        isAdmin = userEntry.isAdmin || false;
+        console.log('👤 사용자 정보:', { 
+          name: userName, 
+          id: currentUserId, 
+          isAdmin: isAdmin 
+        });
+      }
+      
+      loadCompanyInfo();
+      
+      showMainApp();
+      
+      console.log('✅ 로그인 완료');
+    };
+    
     function loadCompanyInfo() {
       const companyRef = window.dbRef(window.db, `companies/${currentCompanyId}/info`);
       window.dbOnValue(companyRef, (snapshot) => {
@@ -3862,57 +3482,42 @@
     window.logout = function() {
       console.log('🚪 로그아웃 시작');
       
-      // 현재 사용자와 회사 정보 초기화
       currentUser = null;
-      currentCompanyId = null;  /* 🆕 추가: 회사 정보도 초기화 */
+      currentCompanyId = null;
       
-      // 앱 컨테이너 완전히 숨기기
       const appContainer = document.getElementById('appContainer');
       appContainer.classList.remove('active');
       appContainer.style.display = 'none';
       
-      // 로그인 컨테이너 표시
       const loginContainer = document.getElementById('loginContainer');
       loginContainer.style.display = 'flex';
       loginContainer.style.visibility = 'visible';
       loginContainer.style.opacity = '1';
       
-      // 🆕 회사 로그인 화면으로 이동 (처음 화면)
       document.getElementById('companyLoginStep').style.display = 'block';
       document.getElementById('createCompanyStep').style.display = 'none';
       document.getElementById('userSelectStep').style.display = 'none';
       
-      // 🆕 비밀번호 입력란만 초기화 (아이디는 유지)
       document.getElementById('companyPasswordInput').value = '';
       
       console.log('✅ 로그아웃 완료 - 회사 로그인 화면으로 이동');
     };
 
-    // 🆕 회사 탈퇴 기능
     window.deleteCompany = async function() {
       console.log('⚠️ 회사 탈퇴 시도');
       
-      // 🆕 관리자 권한 확인
       if (!isAdmin) {
         alert('회사 탈퇴는 관리자만 할 수 있습니다.');
         return;
       }
       
-      // 메뉴 닫기
       toggleMenu();
       
-      // 1단계: 경고 메시지
       const confirmMessage = `⚠️ 회사 탈퇴 경고 ⚠️\n\n` +
         `회사를 탈퇴하면 다음 데이터가 모두 삭제됩니다:\n` +
         `• 모든 작업 내역\n` +
         `• 모든 현장 정보\n` +
-        `• 모든 사용자 정보 (${assignees.length}명)\n` +  // 🆕 직원 수 표시
-        `• 회사 정보\n\n` +
-        `이 작업은 되돌릴 수 없습니다!\n\n` +
-        `정말로 탈퇴하시겠습니까?`;
-        `• 모든 작업 내역\n` +
-        `• 모든 현장 정보\n` +
-        `• 모든 사용자 정보\n` +
+        `• 모든 사용자 정보 (${assignees.length}명)\n` +
         `• 회사 정보\n\n` +
         `이 작업은 되돌릴 수 없습니다!\n\n` +
         `정말로 탈퇴하시겠습니까?`;
@@ -3922,7 +3527,6 @@
         return;
       }
       
-      // 2단계: 비밀번호 확인
       const password = prompt('회사 비밀번호를 입력하여 탈퇴를 확인하세요:');
       
       if (!password) {
@@ -3932,7 +3536,6 @@
       }
       
       try {
-        // Firebase에서 회사 정보 가져오기
         const companyRef = window.dbRef(window.db, `companies/${currentCompanyId}/info`);
         
         window.dbOnValue(companyRef, async (snapshot) => {
@@ -3943,14 +3546,12 @@
             return;
           }
           
-          // 비밀번호 확인
           if (companyInfo.password !== password) {
             alert('비밀번호가 일치하지 않습니다.');
             console.log('❌ 비밀번호 불일치');
             return;
           }
           
-          // 3단계: 최종 확인
           const finalConfirm = confirm(
             '⚠️ 최종 확인 ⚠️\n\n' +
             '지금 확인을 누르면 회사가 영구적으로 삭제됩니다.\n' +
@@ -3963,13 +3564,11 @@
             return;
           }
           
-          // 회사 데이터 삭제
           const companyDataRef = window.dbRef(window.db, `companies/${currentCompanyId}`);
           
           window.dbRemove(companyDataRef).then(() => {
             console.log('✅ 회사 데이터 삭제 완료');
             
-            // 자동 로그인 정보 삭제
             clearAutoLogin();
             
             alert(
@@ -3978,27 +3577,22 @@
               '이용해 주셔서 감사합니다.'
             );
             
-            // 로그아웃 처리
             currentUser = null;
             currentCompanyId = null;
             
-            // 앱 컨테이너 숨기기
             const appContainer = document.getElementById('appContainer');
             appContainer.classList.remove('active');
             appContainer.style.display = 'none';
             
-            // 로그인 화면 표시
             const loginContainer = document.getElementById('loginContainer');
             loginContainer.style.display = 'flex';
             loginContainer.style.visibility = 'visible';
             loginContainer.style.opacity = '1';
             
-            // 회사 로그인 화면으로 이동
             document.getElementById('companyLoginStep').style.display = 'block';
             document.getElementById('createCompanyStep').style.display = 'none';
             document.getElementById('userSelectStep').style.display = 'none';
             
-            // 입력 필드 초기화
             document.getElementById('companyIdInput').value = '';
             document.getElementById('companyPasswordInput').value = '';
             
@@ -4015,7 +3609,8 @@
         console.error('❌ 회사 탈퇴 처리 중 오류:', error);
         alert('회사 탈퇴 처리 중 오류가 발생했습니다: ' + error.message);
       }
-    };    
+    };
+
     window.goToToday = function() {
       currentDate = new Date();
       updateDateDisplay();
@@ -4153,7 +3748,6 @@
       const teamWorks = [];
       const completedWorks = [];
       
-      // 🆕 다른 회사의 작업 정보를 먼저 수집
       const otherCompaniesWorkMap = {};
       
       Object.keys(works).forEach(workId => {
@@ -4179,12 +3773,10 @@
           const deadline = work.deadline || work.date;
           const isOverdue = deadline < searchDate;
           
-          // 🆕 다른 회사의 같은 현장 작업 찾기
           const otherCompanyInfo = [];
           if (work.site) {
-            // allCompaniesWorks에서 같은 날짜, 같은 현장 찾기
             Object.keys(allCompaniesWorks).forEach(companyId => {
-              if (companyId === currentCompanyId) return; // 자기 회사는 제외
+              if (companyId === currentCompanyId) return;
               
               const companyWorks = allCompaniesWorks[companyId].works || {};
               const companyName = allCompaniesWorks[companyId].name || companyId;
@@ -4192,17 +3784,13 @@
               Object.values(companyWorks).forEach(otherWork => {
                 if (otherWork.completed) return;
                 
-                // 🆕 현장명과 주소를 함께 비교 (80% 이상 유사도)
-                // 내 회사의 현장 정보 가져오기
                 const mySite = Object.values(sites).find(s => s.name === work.site);
                 const mySiteAddress = mySite ? mySite.address : '';
                 
-                // 다른 회사의 현장 정보 가져오기
                 const otherCompanySites = allCompaniesWorks[companyId].sites || {};
                 const otherSite = Object.values(otherCompanySites).find(s => s.name === otherWork.site);
                 const otherSiteAddress = otherSite ? otherSite.address : '';
                 
-                // 유사도 비교
                 if (!areSitesSimilar(work.site, mySiteAddress, otherWork.site, otherSiteAddress)) {
                   return;
                 }
@@ -4229,7 +3817,7 @@
             id: workId,
             displayWork: work.displayWork || work.work,
             isOverdue: isOverdue,
-            otherCompanyInfo: otherCompanyInfo  // 🆕 추가
+            otherCompanyInfo: otherCompanyInfo
           };
           if (work.assignee === currentUser) {
             myWorks.push(visibleWork);
@@ -4351,7 +3939,6 @@
       }
       
       if (!isCompleted) {
-        // 터치/드래그 변수 통합
         let touchStartX = 0;
         let touchStartY = 0;
         let touchCurrentX = 0;
@@ -4361,7 +3948,6 @@
         let dragStarted = false;
         let touchStartOrder = [];
         
-        // 🆕 모바일: 터치 시작
         card.addEventListener('touchstart', (e) => {
           if (e.target.closest('.task-checkbox') || 
               e.target.closest('.assignee-select') || 
@@ -4381,8 +3967,6 @@
           }
         }, { passive: true });
         
-        // 🆕 모바일: 터치 이동
-        // 🟢 수정 후
         card.addEventListener('touchmove', (e) => {
           if (e.target.closest('.task-checkbox') || 
               e.target.closest('.assignee-select') || 
@@ -4396,7 +3980,6 @@
           const deltaX = touchStartX - touchCurrentX;
           const deltaY = Math.abs(touchCurrentY - touchStartY);
           
-          // 수평/수직 이동 구분
           if (!isDragging && !isSwiping) {
             if (Math.abs(deltaX) > 10 && Math.abs(deltaX) > deltaY) {
               isSwiping = true;
@@ -4407,19 +3990,16 @@
             }
           }
           
-          // 슬라이드 처리
           if (isSwiping) {
             e.preventDefault();
-            // 🆕 왼쪽으로만 슬라이드 가능, 최대 50px
             if (deltaX > 0 && deltaX <= 50) {
               card.style.transform = `translateX(-${deltaX}px)`;
             } else if (deltaX > 50) {
-              card.style.transform = `translateX(-50px)`;  // 최대치 고정
+              card.style.transform = `translateX(-50px)`;
             }
             return;
           }
           
-          // 드래그 처리
           if (isDragging) {
             e.preventDefault();
             e.stopPropagation();
@@ -4459,25 +4039,20 @@
           }
         }, { passive: false });
         
-        // 🆕 모바일: 터치 종료
         card.addEventListener('touchend', (e) => {
           document.body.classList.remove('dragging-active');
           
-          // 슬라이드 처리
           if (isSwiping) {
             const deltaX = touchStartX - touchCurrentX;
             
-            // 🆕 25px 이상 슬라이드하면 삭제 버튼 표시 (더 민감하게)
             if (deltaX > 25) {
               card.classList.add('swiped-left');
-              // CSS의 transform이 처리하므로 여기서는 제거
               card.style.transform = '';
             } else {
               card.classList.remove('swiped-left');
               card.style.transform = '';
             }
             
-            // 🆕 햅틱 피드백 추가
             if (deltaX > 25 && navigator.vibrate) {
               navigator.vibrate(30);
             }
@@ -4489,7 +4064,6 @@
             return;
           }
           
-          // 드래그 처리
           if (!isDragging) {
             card.classList.remove('dragging');
             document.querySelectorAll('.task-card').forEach(c => c.classList.remove('drag-over'));
@@ -4527,7 +4101,7 @@
                 const myActiveWorks = [];
                 Object.keys(works).forEach(workId => {
                   const work = works[workId];
-                  if (work.completed) return;
+                if (work.completed) return;
                   if (work.assignee !== currentUser) return;
                   let shouldShow = false;
                   if (work.work === '시험' || work.parentWorkId) {
@@ -4573,20 +4147,18 @@
           isSwiping = false;
         });
         
-        // 다른 카드 터치 시 슬라이드 상태 초기화
         document.addEventListener('touchstart', function resetSwipe(e) {
           if (!e.target.closest('.task-card')) {
             document.querySelectorAll('.task-card.swiped-left').forEach(c => {
               c.classList.remove('swiped-left');
-              c.style.transform = '';  // 🆕 CSS가 처리하도록
+              c.style.transform = '';
             });
           } else if (e.target.closest('.task-card') !== card) {
             card.classList.remove('swiped-left');
-            card.style.transform = '';  // 🆕 CSS가 처리하도록
+            card.style.transform = '';
           }
         });
         
-        // PC: 마우스 다운
         card.addEventListener('mousedown', (e) => {
           if (e.target.closest('.task-checkbox') || 
               e.target.closest('.assignee-select') || 
@@ -4599,7 +4171,6 @@
           dragStarted = false;
         });
         
-        // PC: 마우스 이동
         card.addEventListener('mousemove', (e) => {
           if (e.buttons === 1) {
             const deltaX = Math.abs(e.clientX - touchStartX);
@@ -4610,7 +4181,6 @@
           }
         });
         
-        // PC: 클릭 (드래그와 구분)
         card.addEventListener('click', (e) => {
           if (e.target.closest('.task-checkbox') || 
               e.target.closest('.assignee-select') || 
@@ -4634,7 +4204,6 @@
         card.addEventListener('dragstart', handleDragStart);
         card.addEventListener('dragend', handleDragEnd);
         
-        // 번호와 체크박스 컨테이너
         const numberCheckContainer = document.createElement('div');
         numberCheckContainer.className = 'number-check-container';
         
@@ -4655,7 +4224,6 @@
         
         card.appendChild(numberCheckContainer);
       } else {
-        // 🆕 완료된 작업에도 체크박스 추가 (완료 취소용)
         const completedCheckContainer = document.createElement('div');
         completedCheckContainer.className = 'number-check-container';
         
@@ -4664,7 +4232,6 @@
         checkbox.style.cursor = 'pointer';
         checkbox.onclick = (e) => {
           e.stopPropagation();
-          // 완료 취소 확인
           if (confirm('이 작업을 다시 진행중으로 되돌리시겠습니까?')) {
             toggleComplete(work.id);
           }
@@ -4689,7 +4256,6 @@
       }
       cardBody.appendChild(title);
       
-      // 완료 기한 또는 작업등록일자
       if (work.work !== '시험' && !work.parentWorkId) {
         const deadlineContainer = document.createElement('div');
         deadlineContainer.className = 'deadline-label-container';
@@ -4752,11 +4318,8 @@
         cardBody.appendChild(completedInfo);
       }
       
-      // 왼쪽 영역 추가
       card.appendChild(cardBody);
 
-      // 🆕 가운데 영역: 다른 회사 정보 (cardBody 밖으로!)
-      // 🆕 가운데 영역: 다른 회사 정보 (cardBody 밖으로!)
       if (work.otherCompanyInfo && work.otherCompanyInfo.length > 0) {
         const otherCompaniesSection = document.createElement('div');
         otherCompaniesSection.className = 'other-companies-section';
@@ -4765,14 +4328,12 @@
           const badge = document.createElement('div');
           badge.className = 'other-company-badge';
           
-          // 🟢 회사명 라인 (아이콘 제거)
           const nameLine = document.createElement('div');
           nameLine.className = 'other-company-name-line';
           nameLine.innerHTML = `
             <span class="other-company-name">${info.companyName}</span>
           `;
           
-          // 🟢 담당자 라인 (아이콘 제거)
           const assigneeLine = document.createElement('div');
           assigneeLine.className = 'other-company-assignee-line';
           assigneeLine.innerHTML = `
@@ -4787,7 +4348,6 @@
         card.appendChild(otherCompaniesSection);
       }
       
-      // 오른쪽 영역: 담당자 선택
       const personContainer = document.createElement('div');
       personContainer.className = 'person-select-container';
       const assigneeWrapper = document.createElement('div');
@@ -4820,7 +4380,6 @@
       personContainer.appendChild(assigneeWrapper);
       card.appendChild(personContainer);
       
-      // 삭제 버튼
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'action-btn';
       deleteBtn.textContent = '🗑️';
@@ -5010,7 +4569,6 @@
       document.getElementById('timelineModal').classList.remove('active');
     };
     
-    // 🟢 수정 후
     function toggleComplete(workId) {
       const work = works[workId];
       if (!work) return;
@@ -5023,23 +4581,18 @@
       };
       
       if (isCompleting) {
-        // 완료 처리
         updateData.completedDate = new Date().toISOString().split('T')[0];
         
-        // 🆕 햅틱 피드백 (완료 시)
         if (navigator.vibrate) {
           navigator.vibrate(50);
         }
       } else {
-        // 완료 취소
         updateData.completedDate = null;
         
-        // 🆕 햅틱 피드백 (취소 시)
         if (navigator.vibrate) {
-          navigator.vibrate([30, 50, 30]);  // 패턴 진동
+          navigator.vibrate([30, 50, 30]);
         }
         
-        // 🆕 완료 취소 시 order 값 복원 (맨 아래로)
         updateData.order = Date.now();
       }
       
@@ -5060,7 +4613,7 @@
         if (!confirm('이 시험 작업과 관련된 모든 작업(캡핑, 탈형, 7일강도, 28일강도)을 삭제하시겠습니까?')) return;
         Object.keys(works).forEach(id => {
           if (works[id].parentWorkId === workId) {
-            const childWorkRef = window.dbRef(window.db, `works/${id}`);
+            const childWorkRef = window.dbRef(window.db, `companies/${currentCompanyId}/works/${id}`);
             window.dbRemove(childWorkRef);
           }
         });
@@ -5071,11 +4624,9 @@
       window.dbRemove(workRef);
     }
     
-    // ✅ 이렇게 수정
     window.toggleSiteModal = function() {
       const modal = document.getElementById('siteModal');
       
-      // 🆕 모달 닫을 때 수정 모드 해제
       if (modal.classList.contains('active')) {
         cancelEditSite();
       }
@@ -5116,17 +4667,14 @@
         infoDiv.appendChild(name);
         infoDiv.appendChild(address);
         
-        // 🆕 버튼 컨테이너
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'site-item-actions';
         
-        // 🆕 수정 버튼
         const editBtn = document.createElement('button');
         editBtn.className = 'site-item-edit';
         editBtn.textContent = '수정';
         editBtn.onclick = () => editSite(id, site.name, site.address);
         
-        // 삭제 버튼
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'site-item-delete';
         deleteBtn.textContent = '삭제';
@@ -5162,7 +4710,6 @@
       toggleSiteSelectModal();
     }
     
-    // 🆕 현장 저장/수정 통합 함수
     window.saveSite = function() {
       const nameInput = document.getElementById('newSiteName');
       const addressInput = document.getElementById('newSiteAddress');
@@ -5179,16 +4726,13 @@
       }
       
       if (currentEditingSiteId) {
-        // 🆕 수정 모드
         console.log('✅ 현장 수정:', currentEditingSiteId);
         
-        // 1️⃣ 기존 현장명 가져오기
         const oldSite = sites[currentEditingSiteId];
         const oldSiteName = oldSite ? oldSite.name : '';
         
         console.log(`🔄 현장명 변경: "${oldSiteName}" → "${name}"`);
         
-        // 2️⃣ 현장 정보 업데이트
         const siteRef = window.dbRef(window.db, `companies/${currentCompanyId}/sites/${currentEditingSiteId}`);
         window.dbUpdate(siteRef, {
           name: name,
@@ -5196,39 +4740,34 @@
           updatedAt: new Date().toISOString()
         }).then(() => {
           
-          // 3️⃣ 현장명이 변경된 경우에만 작업들도 업데이트
           if (oldSiteName !== name) {
             console.log('📋 현장명이 변경되어 관련 작업들을 업데이트합니다...');
             
-            // 해당 현장을 사용하는 모든 작업 찾기
             const updates = {};
             let updatedCount = 0;
             
             Object.keys(works).forEach(workId => {
               const work = works[workId];
               
-              // 🆕 유사도 비교 (80% 이상 유사하면 같은 현장으로 간주)
               const oldSiteObj = Object.values(sites).find(s => s.name === oldSiteName);
               const oldSiteAddress = oldSiteObj ? oldSiteObj.address : '';
               
               const workSiteObj = Object.values(sites).find(s => s.name === work.site);
               const workSiteAddress = workSiteObj ? workSiteObj.address : '';
               
-              // 현장명과 주소를 함께 비교
               if (areSitesSimilar(oldSiteName, oldSiteAddress, work.site, workSiteAddress)) {
                 updates[`companies/${currentCompanyId}/works/${workId}/site`] = name;
-                works[workId].site = name; // 로컬 데이터도 업데이트
+                works[workId].site = name;
                 updatedCount++;
                 console.log(`  ✅ 작업 업데이트: ${workId} - "${work.work}"`);
               }
             });
             
-            // Firebase 일괄 업데이트
             if (updatedCount > 0) {
               window.dbUpdate(window.dbRef(window.db), updates).then(() => {
                 alert(`현장이 수정되었습니다.\n관련 작업 ${updatedCount}개도 함께 업데이트되었습니다.`);
                 cancelEditSite();
-                renderWorks(); // 작업 목록 새로고침
+                renderWorks();
               }).catch((error) => {
                 alert('작업 업데이트 중 오류가 발생했습니다: ' + error.message);
               });
@@ -5238,7 +4777,6 @@
             }
             
           } else {
-            // 현장명은 변경 안 되고 주소만 변경된 경우
             alert('현장 정보가 수정되었습니다.');
             cancelEditSite();
           }
@@ -5248,7 +4786,6 @@
         });
         
       } else {
-        // 기존 추가 모드
         console.log('✅ 현장 추가');
         
         const sitesRef = window.dbRef(window.db, `companies/${currentCompanyId}/sites`);
@@ -5266,7 +4803,6 @@
         });
       }
     };
-    
 
     function deleteSite(id) {
       if (!confirm('이 현장을 삭제하시겠습니까?')) return;
@@ -5274,47 +4810,35 @@
       window.dbRemove(siteRef);
     }
 
-    // 🆕 현장 수정 모드로 전환
     window.editSite = function(siteId, siteName, siteAddress) {
       console.log('✏️ 현장 수정 시작:', siteId);
       
       currentEditingSiteId = siteId;
       
-      // 입력 필드에 기존 값 채우기
       document.getElementById('newSiteName').value = siteName;
       document.getElementById('newSiteAddress').value = siteAddress;
       
-      // 모달 제목 변경
       document.getElementById('siteModalTitle').textContent = '현장 수정';
       
-      // 저장 버튼 텍스트 변경
       document.getElementById('saveSiteBtn').textContent = '수정 완료';
       
-      // 취소 버튼 표시
       document.getElementById('cancelEditBtn').style.display = 'block';
       
-      // 입력 필드에 포커스
       document.getElementById('newSiteName').focus();
-    };    
+    };
 
-    // ✅ editSite 함수 다음에 바로 추가
-    // 🆕 현장 수정 취소
     window.cancelEditSite = function() {
       console.log('❌ 현장 수정 취소');
       
       currentEditingSiteId = null;
       
-      // 입력 필드 초기화
       document.getElementById('newSiteName').value = '';
       document.getElementById('newSiteAddress').value = '';
       
-      // 모달 제목 복원
       document.getElementById('siteModalTitle').textContent = '현장 추가';
       
-      // 저장 버튼 텍스트 복원
       document.getElementById('saveSiteBtn').textContent = '저장';
       
-      // 취소 버튼 숨기기
       document.getElementById('cancelEditBtn').style.display = 'none';
     };
     
@@ -5399,7 +4923,6 @@
         createCompany();
       }
     });
-
         
     document.getElementById('siteInput').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
@@ -5413,7 +4936,7 @@
       if (e.key === 'Enter') addNewUser();
     });
     document.getElementById('newSiteName').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') saveSite();  // ✅ addSite → saveSite
+      if (e.key === 'Enter') saveSite();
     });
     
     let currentEditingWorkId = null;
@@ -5463,7 +4986,6 @@
           }
           break;
       }
-      // ✅ 올바른 경로: companies/${currentCompanyId}/works/${workId}
       const workRef = window.dbRef(window.db, `companies/${currentCompanyId}/works/${currentEditingWorkId}`);
       window.dbUpdate(workRef, {
         deadline: selectedDate
@@ -5479,7 +5001,6 @@
       }
     });
 
-    // 🆕 메뉴 렌더링 (관리자 여부에 따라)
     function renderMenu() {
       const adminSection = document.getElementById('adminMenuSection');
       
@@ -5494,7 +5015,6 @@
       }
     }
     
-// 🆕 메뉴 토글 (햄버거 애니메이션 포함)
     window.toggleMenu = function() {
       const menu = document.getElementById('menuDropdown');
       const menuBtn = document.querySelector('.menu-btn');
@@ -5503,19 +5023,16 @@
       const isActive = menu.classList.contains('active');
       
       if (isActive) {
-        // 메뉴 닫기
         menu.classList.remove('active');
         menuBtn.classList.remove('active');
         if (overlay) overlay.classList.remove('active');
       } else {
-        // 메뉴 열기
         menu.classList.add('active');
         menuBtn.classList.add('active');
         if (overlay) overlay.classList.add('active');
       }
     };
     
-    // 메뉴 외부 클릭 시 닫기
     document.addEventListener('click', (e) => {
       const menu = document.getElementById('menuDropdown');
       const menuBtn = document.querySelector('.menu-btn');
@@ -5530,18 +5047,15 @@
       }
     });
     
-    // 🆕 사용설명서 모달 토글
     window.toggleGuideModal = function() {
       const modal = document.getElementById('guideModal');
       modal.classList.toggle('active');
     };
 
-    // 🆕 회사 코드 모달 토글
     window.toggleCompanyCodeModal = function() {
       const modal = document.getElementById('companyCodeModal');
       
       if (!modal.classList.contains('active')) {
-        // 모달 열 때 회사 코드 표시
         if (companyInfo && companyInfo.companyCode) {
           document.getElementById('displayCompanyCode').textContent = companyInfo.companyCode;
         }
@@ -5550,7 +5064,6 @@
       modal.classList.toggle('active');
     };
 
-    // 🆕 회사 코드 복사
     window.copyCompanyCode = function() {
       if (!companyInfo || !companyInfo.companyCode) {
         alert('회사 코드를 불러올 수 없습니다.');
@@ -5559,17 +5072,14 @@
       
       const code = companyInfo.companyCode;
       
-      // 클립보드 복사
       if (navigator.clipboard) {
         navigator.clipboard.writeText(code).then(() => {
           alert(`회사 코드가 복사되었습니다!\n\n코드: ${code}\n\n이 코드를 직원들에게 공유하세요.`);
           
-          // 햅틱 피드백
           if (navigator.vibrate) {
             navigator.vibrate(50);
           }
         }).catch(err => {
-          // 폴백: 텍스트 영역 사용
           fallbackCopy(code);
         });
       } else {
@@ -5577,7 +5087,6 @@
       }
     };
 
-    // 🆕 직원 목록 렌더링
     function renderStaffList() {
       const list = document.getElementById('staffList');
       const countSpan = document.getElementById('staffCount');
@@ -5586,7 +5095,6 @@
       
       list.innerHTML = '';
       
-      // 관리자를 제외한 직원 수
       const staffCount = assignees.filter(a => !a.isAdmin).length;
       countSpan.textContent = assignees.length;
       
@@ -5594,7 +5102,6 @@
         const li = document.createElement('li');
         li.className = 'site-item';
         
-        // 관리자 배경색
         if (user.isAdmin) {
           li.style.background = 'linear-gradient(135deg, #fff8e1 0%, #ffe082 100%)';
           li.style.borderLeft = '4px solid #FFD700';
@@ -5607,7 +5114,6 @@
         name.className = 'site-item-name';
         name.textContent = user.name;
         
-        // 관리자 배지
         if (user.isAdmin) {
           const badge = document.createElement('span');
           badge.style.cssText = 'margin-left: 8px; font-size: 12px; color: #F57C00; font-weight: 600;';
@@ -5622,7 +5128,6 @@
         infoDiv.appendChild(name);
         infoDiv.appendChild(role);
         
-        // 삭제 버튼 (관리자는 삭제 불가)
         if (!user.isAdmin) {
           const actionsDiv = document.createElement('div');
           actionsDiv.className = 'site-item-actions';
@@ -5647,7 +5152,6 @@
       }
     }
     
-    // 🆕 직원 강제 퇴출
     window.removeStaff = function(userId, userName) {
       if (!isAdmin) {
         alert('관리자만 사용할 수 있습니다.');
@@ -5666,20 +5170,16 @@
         return;
       }
       
-      // Firebase에서 삭제
       const assigneeRef = window.dbRef(window.db, `companies/${currentCompanyId}/assignees/${userId}`);
       window.dbRemove(assigneeRef).then(() => {
         alert(`${userName}님이 퇴출되었습니다.`);
         console.log('✅ 직원 퇴출 완료:', userName);
-        
-        // 목록 새로고침은 Firebase 리스너가 자동으로 처리
       }).catch((error) => {
         alert('직원 퇴출 중 오류가 발생했습니다: ' + error.message);
         console.error('❌ 직원 퇴출 실패:', error);
       });
     };
 
-    // 🆕 회사 정보 저장
     window.saveCompanyInfo = function() {
       if (!isAdmin) {
         alert('관리자만 사용할 수 있습니다.');
@@ -5691,13 +5191,11 @@
       const newPassword = document.getElementById('newPasswordForEdit').value;
       const confirmPassword = document.getElementById('confirmNewPassword').value;
       
-      // 회사명 확인
       if (!newCompanyName) {
         alert('회사명을 입력하세요.');
         return;
       }
       
-      // 현재 비밀번호 확인
       if (!currentPassword) {
         alert('현재 비밀번호를 입력하세요.');
         return;
@@ -5708,7 +5206,6 @@
         return;
       }
       
-      // 새 비밀번호 검증 (입력한 경우에만)
       if (newPassword) {
         if (newPassword.length < 4) {
           alert('새 비밀번호는 최소 4자 이상이어야 합니다.');
@@ -5721,13 +5218,11 @@
         }
       }
       
-      // 업데이트할 데이터
       const updates = {
         name: newCompanyName,
         updatedAt: new Date().toISOString()
       };
       
-      // 비밀번호 변경 시
       if (newPassword) {
         updates.password = newPassword;
       }
@@ -5739,7 +5234,6 @@
         if (newPassword) {
           message += '\n\n비밀번호도 변경되었습니다.';
           
-          // 🆕 자동 로그인 정보 업데이트
           if (localStorage.getItem('autoLogin') === 'true') {
             localStorage.setItem('savedPassword', newPassword);
           }
@@ -5747,7 +5241,6 @@
         
         alert(message);
         
-        // 모달 닫기
         toggleCompanyInfoModal();
         
         console.log('✅ 회사 정보 수정 완료');
@@ -5757,16 +5250,13 @@
       });
     };
 
-    // 🆕 권한 이전 대상 목록 렌더링
     function renderTransferAdminList() {
       const select = document.getElementById('newAdminSelect');
       
       if (!select) return;
       
-      // 초기화
       select.innerHTML = '<option value="">선택하세요</option>';
       
-      // 본인을 제외한 다른 직원들만 표시
       assignees.forEach(user => {
         if (user.id !== currentUserId && !user.isAdmin) {
           const option = document.createElement('option');
@@ -5784,7 +5274,6 @@
       }
     }
     
-    // 🆕 관리자 권한 이전
     window.transferAdmin = function() {
       if (!isAdmin) {
         alert('관리자만 사용할 수 있습니다.');
@@ -5830,16 +5319,12 @@
         return;
       }
       
-      // Firebase 업데이트
       const updates = {};
       
-      // 1. 회사 정보에 새 관리자 ID 저장
       updates[`companies/${currentCompanyId}/info/adminId`] = newAdminId;
       
-      // 2. 새 관리자에게 isAdmin 플래그 추가
       updates[`companies/${currentCompanyId}/assignees/${newAdminId}/isAdmin`] = true;
       
-      // 3. 기존 관리자(본인)의 isAdmin 플래그 제거
       updates[`companies/${currentCompanyId}/assignees/${currentUserId}/isAdmin`] = false;
       
       window.dbUpdate(window.dbRef(window.db), updates).then(() => {
@@ -5849,7 +5334,6 @@
           `앱을 다시 시작합니다.`
         );
         
-        // 로그아웃 처리
         logout();
         
         console.log('✅ 관리자 권한 이전 완료:', newAdmin.name);
@@ -5859,8 +5343,6 @@
       });
     };
 
-    
-    // 폴백 복사 방법
     function fallbackCopy(text) {
       const textArea = document.createElement('textarea');
       textArea.value = text;
@@ -5879,7 +5361,6 @@
       document.body.removeChild(textArea);
     }
     
-    // 🆕 회사 코드 재발급
     window.regenerateCompanyCode = function() {
       if (!isAdmin) {
         alert('관리자만 사용할 수 있습니다.');
@@ -5910,7 +5391,6 @@
         return;
       }
       
-      // 새 코드 생성
       const newCode = generateCompanyCode();
       
       const companyInfoRef = window.dbRef(window.db, `companies/${currentCompanyId}/info`);
@@ -5920,7 +5400,6 @@
       }).then(() => {
         alert(`회사 코드가 재발급되었습니다!\n\n새 코드: ${newCode}\n\n새로운 코드를 직원들에게 공유하세요.`);
         
-        // 화면 업데이트
         document.getElementById('displayCompanyCode').textContent = newCode;
         
         console.log('✅ 회사 코드 재발급 완료:', newCode);
@@ -5930,28 +5409,23 @@
       });
     };
     
-    // 🆕 직원 관리 모달 토글
     window.toggleStaffManageModal = function() {
       const modal = document.getElementById('staffManageModal');
       
       if (!modal.classList.contains('active')) {
-        // 모달 열 때 직원 목록 렌더링
         renderStaffList();
       }
       
       modal.classList.toggle('active');
     };
     
-    // 🆕 회사 정보 수정 모달 토글
     window.toggleCompanyInfoModal = function() {
       const modal = document.getElementById('companyInfoModal');
       
       if (!modal.classList.contains('active')) {
-        // 모달 열 때 현재 정보 채우기
         if (companyInfo) {
           document.getElementById('editCompanyName').value = companyInfo.name || '';
         }
-        // 비밀번호 필드 초기화
         document.getElementById('currentPasswordForEdit').value = '';
         document.getElementById('newPasswordForEdit').value = '';
         document.getElementById('confirmNewPassword').value = '';
@@ -5960,12 +5434,10 @@
       modal.classList.toggle('active');
     };
     
-    // 🆕 관리자 권한 이전 모달 토글
     window.toggleTransferAdminModal = function() {
       const modal = document.getElementById('transferAdminModal');
       
       if (!modal.classList.contains('active')) {
-        // 모달 열 때 직원 목록 채우기
         renderTransferAdminList();
         document.getElementById('passwordForTransfer').value = '';
       }
@@ -5973,7 +5445,6 @@
       modal.classList.toggle('active');
     };
     
-    // 모달 외부 클릭 시 닫기
     document.addEventListener('DOMContentLoaded', function() {
       const modals = [
         'companyCodeModal',
@@ -5994,143 +5465,11 @@
       });
     });
     
-    //회사코드 확인 모달
-    <div class="modal-overlay" id="companyCodeModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title">🔑 회사 코드</h3>
-          <button class="close-btn" onclick="toggleCompanyCodeModal()">×</button>
-        </div>
-        
-        <div style="text-align: center; padding: 30px 20px;">
-          <p style="font-size: 14px; color: #666; margin-bottom: 20px;">
-            직원 초대 시 이 코드를 공유하세요
-          </p>
-          
-          <div style="
-            background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%);
-            border: 3px dashed #2a459c;
-            border-radius: 12px;
-            padding: 30px;
-            margin-bottom: 20px;
-          ">
-            <div style="font-size: 36px; font-weight: 700; color: #2a459c; letter-spacing: 4px; font-family: 'Courier New', monospace;" id="displayCompanyCode">
-              ------
-            </div>
-          </div>
-          
-          <div style="display: flex; gap: 10px; justify-content: center;">
-            <button class="admin-btn" onclick="copyCompanyCode()" style="flex: 1; max-width: 200px;">
-              📋 복사하기
-            </button>
-            <button class="admin-btn" onclick="regenerateCompanyCode()" style="flex: 1; max-width: 200px; background: #ff9800;">
-              🔄 코드 재발급
-            </button>
-          </div>
-          
-          <p style="font-size: 12px; color: #999; margin-top: 20px;">
-            💡 코드를 재발급하면 기존 코드는 사용할 수 없습니다
-          </p>
-        </div>
-      </div>
-    </div>
-    
-    <!-- 🆕 직원 관리 모달 -->
-    <div class="modal-overlay" id="staffManageModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title">👥 직원 관리</h3>
-          <button class="close-btn" onclick="toggleStaffManageModal()">×</button>
-        </div>
-        
-        <div style="padding: 10px 0;">
-          <div style="margin-bottom: 20px;">
-            <h4 style="font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 600;">
-              현재 직원 목록 (<span id="staffCount">0</span>명)
-            </h4>
-            <ul class="site-list" id="staffList"></ul>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- 🆕 회사 정보 수정 모달 -->
-    <div class="modal-overlay" id="companyInfoModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title">🏢 회사 정보 수정</h3>
-          <button class="close-btn" onclick="toggleCompanyInfoModal()">×</button>
-        </div>
-        
-        <div style="padding: 10px 0;">
-          <div class="input-group">
-            <label class="input-label">회사명</label>
-            <input type="text" class="admin-input" id="editCompanyName" placeholder="회사명">
-          </div>
-          
-          <div class="input-group">
-            <label class="input-label">현재 비밀번호</label>
-            <input type="password" class="admin-input" id="currentPasswordForEdit" placeholder="현재 비밀번호">
-            <div class="input-hint">변경하려면 현재 비밀번호를 입력하세요</div>
-          </div>
-          
-          <div class="input-group">
-            <label class="input-label">새 비밀번호 (선택)</label>
-            <input type="password" class="admin-input" id="newPasswordForEdit" placeholder="변경할 비밀번호">
-            <div class="input-hint">변경하지 않으려면 비워두세요</div>
-          </div>
-          
-          <div class="input-group">
-            <label class="input-label">새 비밀번호 확인</label>
-            <input type="password" class="admin-input" id="confirmNewPassword" placeholder="비밀번호 재입력">
-          </div>
-          
-          <button class="admin-btn" onclick="saveCompanyInfo()">💾 저장</button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- 🆕 관리자 권한 이전 모달 -->
-    <div class="modal-overlay" id="transferAdminModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title">🔄 관리자 권한 이전</h3>
-          <button class="close-btn" onclick="toggleTransferAdminModal()">×</button>
-        </div>
-        
-        <div style="padding: 10px 0;">
-          <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 12px; margin-bottom: 20px; border-radius: 4px;">
-            <p style="font-size: 13px; color: #e65100; line-height: 1.6;">
-              ⚠️ <strong>주의:</strong> 관리자 권한을 이전하면 본인은 일반 직원이 됩니다. 이 작업은 되돌릴 수 없습니다.
-            </p>
-          </div>
-          
-          <div class="input-group">
-            <label class="input-label">새 관리자 선택</label>
-            <select class="admin-input" id="newAdminSelect">
-              <option value="">선택하세요</option>
-            </select>
-          </div>
-          
-          <div class="input-group">
-            <label class="input-label">비밀번호 확인</label>
-            <input type="password" class="admin-input" id="passwordForTransfer" placeholder="현재 비밀번호">
-            <div class="input-hint">권한 이전을 확인하기 위해 비밀번호를 입력하세요</div>
-          </div>
-          
-          <button class="admin-btn" onclick="transferAdmin()" style="background: #ff9800;">
-            🔄 권한 이전
-          </button>
-        </div>
-      </div>
-    </div>
-    
-    // 사용설명서 모달 외부 클릭 시 닫기
     document.getElementById('guideModal').addEventListener('click', (e) => {
       if (e.target === document.getElementById('guideModal')) {
         toggleGuideModal();
       }
-    });    
+    });
     
     window.onload = function() {
       waitForFirebase();
@@ -6138,4 +5477,9 @@
   </script>
 </body>
 
-</html>
+</html>                  
+
+
+
+
+                                           
