@@ -2291,7 +2291,9 @@
   </div>
 
   <!-- Kakao Map API -->
-  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=edfe0792f24f219880fc608009d59a0f&libraries=services"></script>
+  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=edfe0792f24f219880fc608009d59a0f&libraries=services">
+    
+  </script>
 
   <!-- Firebase SDK -->
   <script type="module">
@@ -2330,6 +2332,55 @@
   </script>
   
   <script>
+
+window.toggleMenu = function(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      
+      console.log('🎯 toggleMenu 호출됨');
+      
+      const menu = document.getElementById('menuDropdown');
+      const menuBtn = document.querySelector('.menu-btn');
+      const overlay = document.getElementById('menuOverlay');
+      
+      console.log('📍 메뉴 요소 체크:', {
+        menu: !!menu,
+        menuBtn: !!menuBtn,
+        overlay: !!overlay
+      });
+      
+      if (!menu) {
+        console.error('❌ menuDropdown 요소를 찾을 수 없습니다');
+        return;
+      }
+      
+      if (!menuBtn) {
+        console.error('❌ menu-btn 요소를 찾을 수 없습니다');
+        return;
+      }
+      
+      const isActive = menu.classList.contains('active');
+      console.log('📊 현재 메뉴 상태:', isActive ? '열림' : '닫힘');
+      
+      if (isActive) {
+        // 메뉴 닫기
+        menu.classList.remove('active');
+        menuBtn.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+        console.log('✅ 메뉴 닫힘');
+      } else {
+        // 메뉴 열기
+        menu.classList.add('active');
+        menuBtn.classList.add('active');
+        if (overlay) overlay.classList.add('active');
+        console.log('✅ 메뉴 열림');
+      }
+    };
+    
+    console.log('✅ toggleMenu 함수 정의 완료');
+    
     // 문자열 유사도 계산 함수
     function calculateSimilarity(str1, str2) {
       if (!str1 || !str2) return 0;
@@ -3414,50 +3465,58 @@
     };
 
     function showMainApp() {
-      console.log('📱 메인 앱 표시');
-      
-      const loginContainer = document.getElementById('loginContainer');
-      loginContainer.style.display = 'none';
-      loginContainer.style.visibility = 'hidden';
-      loginContainer.style.opacity = '0';
-      
-      const appContainer = document.getElementById('appContainer');
-      appContainer.style.display = 'flex';
-      appContainer.classList.add('active');
-      
-      console.log('✅ 화면 전환 완료');
-      
-      document.getElementById('userAvatar').textContent = currentUser.charAt(0);
-      document.getElementById('headerUserName').textContent = currentUser;
-      
-      if (isAdmin) {
-        document.getElementById('headerUserName').innerHTML = 
-          `${currentUser} <span style="color: #FFD700; font-size: 11px;">👑 관리자</span>`;
-      }
-      
-      updateDateDisplay();
-      
-      // ✅ 핵심: loadAssignees() 먼저 호출!
-      loadAssignees();
-      
-      loadWorks();
-      loadSites();
-      loadAllCompaniesWorks();
-      renderMenu();
-      
-      // ✅ 메뉴 이벤트 리스너 초기화
-      setTimeout(() => {
-        initMenuEventListeners();
-        console.log('🎯 메뉴 이벤트 리스너 초기화 완료');
-      }, 100);
-      
-      setTimeout(() => {
-        console.log('🗺️ 지도 초기화 시작...');
-        initMap();
-      }, 500);
-      
-      console.log('✅ 메인 앱 로드 완료');
-    }
+  console.log('📱 메인 앱 표시');
+  
+  const loginContainer = document.getElementById('loginContainer');
+  loginContainer.style.display = 'none';
+  loginContainer.style.visibility = 'hidden';
+  loginContainer.style.opacity = '0';
+  
+  const appContainer = document.getElementById('appContainer');
+  appContainer.style.display = 'flex';
+  appContainer.classList.add('active');
+  
+  console.log('✅ 화면 전환 완료');
+  
+  document.getElementById('userAvatar').textContent = currentUser.charAt(0);
+  document.getElementById('headerUserName').textContent = currentUser;
+  
+  if (isAdmin) {
+    document.getElementById('headerUserName').innerHTML = 
+      `${currentUser} <span style="color: #FFD700; font-size: 11px;">👑 관리자</span>`;
+  }
+  
+  // ✅ 메뉴 버튼 이벤트 직접 연결
+  const menuBtn = document.getElementById('mainMenuBtn');
+  if (menuBtn) {
+    menuBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleMenuFunction();
+    });
+    console.log('✅ 메뉴 버튼 이벤트 연결 완료');
+  } else {
+    console.error('❌ 메뉴 버튼을 찾을 수 없습니다');
+  }
+  
+  updateDateDisplay();
+  loadAssignees();
+  loadWorks();
+  loadSites();
+  loadAllCompaniesWorks();
+  renderMenu();
+  
+  setTimeout(() => {
+    initMenuEventListeners();
+  }, 100);
+  
+  setTimeout(() => {
+    console.log('🗺️ 지도 초기화 시작...');
+    initMap();
+  }, 500);
+  
+  console.log('✅ 메인 앱 로드 완료');
+}
     
     window.login = function(userName) {
       console.log('🎯 로그인 시도:', userName);
@@ -3481,6 +3540,44 @@
       
       console.log('✅ 로그인 완료');
     };
+
+    // toggleMenuFunction으로 이름 변경
+    function toggleMenuFunction() {
+      console.log('🎯 toggleMenu 호출됨');
+      
+      const menu = document.getElementById('menuDropdown');
+      const menuBtn = document.getElementById('mainMenuBtn');
+      const overlay = document.getElementById('menuOverlay');
+      
+      console.log('📍 메뉴 요소:', {
+        menu: !!menu,
+        menuBtn: !!menuBtn,
+        overlay: !!overlay
+      });
+      
+      if (!menu || !menuBtn) {
+        console.error('❌ 메뉴 요소를 찾을 수 없습니다');
+        return;
+      }
+      
+      const isActive = menu.classList.contains('active');
+      console.log('📊 현재 상태:', isActive ? '열림' : '닫힘');
+      
+      if (isActive) {
+        menu.classList.remove('active');
+        menuBtn.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+        console.log('✅ 메뉴 닫힘');
+      } else {
+        menu.classList.add('active');
+        menuBtn.classList.add('active');
+        if (overlay) overlay.classList.add('active');
+        console.log('✅ 메뉴 열림');
+      }
+    }
+    
+    // window 객체에도 등록 (하위 메뉴에서 사용)
+    window.toggleMenu = toggleMenuFunction;
     
     function loadCompanyInfo() {
       const companyRef = window.dbRef(window.db, `companies/${currentCompanyId}/info`);
@@ -5027,53 +5124,7 @@
     }
     
     // ✅ toggleMenu 함수 - renderMenu() 함수 바로 다음에 위치
-    window.toggleMenu = function(event) {
-      if (event) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-      
-      console.log('🎯 toggleMenu 호출됨');
-      
-      const menu = document.getElementById('menuDropdown');
-      const menuBtn = document.querySelector('.menu-btn');
-      const overlay = document.getElementById('menuOverlay');
-      
-      console.log('📍 메뉴 요소 체크:', {
-        menu: !!menu,
-        menuBtn: !!menuBtn,
-        overlay: !!overlay
-      });
-      
-      if (!menu) {
-        console.error('❌ menuDropdown 요소를 찾을 수 없습니다');
-        return;
-      }
-      
-      if (!menuBtn) {
-        console.error('❌ menu-btn 요소를 찾을 수 없습니다');
-        return;
-      }
-      
-      const isActive = menu.classList.contains('active');
-      console.log('📊 현재 메뉴 상태:', isActive ? '열림' : '닫힘');
-      
-      if (isActive) {
-        // 메뉴 닫기
-        menu.classList.remove('active');
-        menuBtn.classList.remove('active');
-        if (overlay) overlay.classList.remove('active');
-        console.log('✅ 메뉴 닫힘');
-      } else {
-        // 메뉴 열기
-        menu.classList.add('active');
-        menuBtn.classList.add('active');
-        if (overlay) overlay.classList.add('active');
-        console.log('✅ 메뉴 열림');
-      }
-    };
     
-    console.log('✅ toggleMenu 함수 정의 완료');
     
     // 외부 클릭 감지 (DOMContentLoaded 후에 실행되도록 수정)
     function initMenuEventListeners() {
