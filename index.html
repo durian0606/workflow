@@ -3390,8 +3390,7 @@
         });
         
         console.log('✅ 사용자 목록 로드 완료:', assignees.length, '명');
-        
-        renderUserGrid();
+  
       }, (error) => {
         console.error('❌ 사용자 목록 로드 실패:', error);
         alert('사용자 목록을 불러오는데 실패했습니다.');
@@ -5521,29 +5520,6 @@
       }
     });
 
-    // ✅ 모달 외부 클릭 이벤트 설정
-    document.addEventListener('DOMContentLoaded', function() {
-      const modals = [
-        'companyCodeModal',
-        'staffManageModal', 
-        'companyInfoModal',
-        'transferAdminModal'
-      ];
-      
-      modals.forEach(modalId => {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-          modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-              modal.classList.remove('active');
-            }
-          });
-        }
-      });
-      
-      console.log('✅ 모달 외부 클릭 이벤트 설정 완료');
-    });
-    
     window.onload = function() {
       waitForFirebase();
     };
