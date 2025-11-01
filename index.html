@@ -35,16 +35,16 @@
     .app-container {
       display: none !important;
       min-height: 100vh;
-      height: 100vh;         /* 🆕 추가 */
+      height: 100vh;
       background: #f5f7fa;
       margin: 0;
       padding: 0;
-      position: fixed;       /* 🆕 추가: 화면에 고정 */
-      top: 0;                /* 🆕 추가 */
-      left: 0;               /* 🆕 추가 */
-      right: 0;              /* 🆕 추가 */
-      bottom: 0;             /* 🆕 추가 */
-      overflow-y: auto;      /* 🆕 추가: 스크롤 가능하게 */
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow-y: auto;
     }
     
     .app-container.active {
@@ -65,21 +65,6 @@
       bottom: 0;             /* 🆕 추가 */
       margin: 0;             /* 🆕 추가 */
       padding: 0;            /* 🆕 추가 */
-    }
-    
-    .app-container {
-      display: none !important;
-      min-height: 100vh;
-      background: #f5f7fa;
-      margin: 0;           /* 🆕 추가 */
-      padding: 0;          /* 🆕 추가 */
-    }
-    
-    .app-container.active {
-      display: flex !important;
-      flex-direction: column;
-      margin: 0;           /* 🆕 추가 */
-      padding: 0;          /* 🆕 추가 */
     }
     
     /* 🆕 추가: 헤더의 상단 여백 제거 */
@@ -2016,23 +2001,6 @@
         .other-company-text {
           white-space: nowrap;
         }
-        .other-company-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 4px;
-          background: #fff3e0;
-          border: 1px solid #ffb74d;
-          padding: 3px 8px;
-          border-radius: 4px;
-          font-size: 10px;
-          color: #f57c00;
-          margin-top: 4px;
-          font-weight: 500;
-        }
-        
-        .other-company-text {
-          white-space: nowrap;
-        }
       }
     
   </style>
@@ -2188,6 +2156,132 @@
 
         <div class="task-container" id="taskContainer"></div>
 
+      <!-- 회사 코드 확인 모달 -->
+        <div class="modal-overlay" id="companyCodeModal">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title">🔑 회사 코드</h3>
+              <button class="close-btn" onclick="toggleCompanyCodeModal()">×</button>
+            </div>
+            
+            <div style="text-align: center; padding: 30px 20px;">
+              <p style="font-size: 14px; color: #666; margin-bottom: 20px;">
+                직원 초대 시 이 코드를 공유하세요
+              </p>
+              
+              <div style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%); border: 3px dashed #2a459c; border-radius: 12px; padding: 30px; margin-bottom: 20px;">
+                <div style="font-size: 36px; font-weight: 700; color: #2a459c; letter-spacing: 4px; font-family: 'Courier New', monospace;" id="displayCompanyCode">
+                  ------
+                </div>
+              </div>
+              
+              <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="admin-btn" onclick="copyCompanyCode()" style="flex: 1; max-width: 200px;">
+                  📋 복사하기
+                </button>
+                <button class="admin-btn" onclick="regenerateCompanyCode()" style="flex: 1; max-width: 200px; background: #ff9800;">
+                  🔄 코드 재발급
+                </button>
+              </div>
+              
+              <p style="font-size: 12px; color: #999; margin-top: 20px;">
+                💡 코드를 재발급하면 기존 코드는 사용할 수 없습니다
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 직원 관리 모달 -->
+        <div class="modal-overlay" id="staffManageModal">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title">👥 직원 관리</h3>
+              <button class="close-btn" onclick="toggleStaffManageModal()">×</button>
+            </div>
+            
+            <div style="padding: 10px 0;">
+              <div style="margin-bottom: 20px;">
+                <h4 style="font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 600;">
+                  현재 직원 목록 (<span id="staffCount">0</span>명)
+                </h4>
+                <ul class="site-list" id="staffList"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 회사 정보 수정 모달 -->
+        <div class="modal-overlay" id="companyInfoModal">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title">🏢 회사 정보 수정</h3>
+              <button class="close-btn" onclick="toggleCompanyInfoModal()">×</button>
+            </div>
+            
+            <div style="padding: 10px 0;">
+              <div class="input-group">
+                <label class="input-label">회사명</label>
+                <input type="text" class="admin-input" id="editCompanyName" placeholder="회사명">
+              </div>
+              
+              <div class="input-group">
+                <label class="input-label">현재 비밀번호</label>
+                <input type="password" class="admin-input" id="currentPasswordForEdit" placeholder="현재 비밀번호">
+                <div class="input-hint">변경하려면 현재 비밀번호를 입력하세요</div>
+              </div>
+              
+              <div class="input-group">
+                <label class="input-label">새 비밀번호 (선택)</label>
+                <input type="password" class="admin-input" id="newPasswordForEdit" placeholder="변경할 비밀번호">
+                <div class="input-hint">변경하지 않으려면 비워두세요</div>
+              </div>
+              
+              <div class="input-group">
+                <label class="input-label">새 비밀번호 확인</label>
+                <input type="password" class="admin-input" id="confirmNewPassword" placeholder="비밀번호 재입력">
+              </div>
+              
+              <button class="admin-btn" onclick="saveCompanyInfo()">💾 저장</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 관리자 권한 이전 모달 -->
+        <div class="modal-overlay" id="transferAdminModal">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title">🔄 관리자 권한 이전</h3>
+              <button class="close-btn" onclick="toggleTransferAdminModal()">×</button>
+            </div>
+            
+            <div style="padding: 10px 0;">
+              <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 12px; margin-bottom: 20px; border-radius: 4px;">
+                <p style="font-size: 13px; color: #e65100; line-height: 1.6;">
+                  ⚠️ <strong>주의:</strong> 관리자 권한을 이전하면 본인은 일반 직원이 됩니다. 이 작업은 되돌릴 수 없습니다.
+                </p>
+              </div>
+              
+              <div class="input-group">
+                <label class="input-label">새 관리자 선택</label>
+                <select class="admin-input" id="newAdminSelect">
+                  <option value="">선택하세요</option>
+                </select>
+              </div>
+              
+              <div class="input-group">
+                <label class="input-label">비밀번호 확인</label>
+                <input type="password" class="admin-input" id="passwordForTransfer" placeholder="현재 비밀번호">
+                <div class="input-hint">권한 이전을 확인하기 위해 비밀번호를 입력하세요</div>
+              </div>
+              
+              <button class="admin-btn" onclick="transferAdmin()" style="background: #ff9800;">
+                🔄 권한 이전
+              </button>
+            </div>
+          </div>
+        </div>
+              
+        
         <!-- 지도 섹션 -->
         <div class="map-section">
           <div class="map-section-header">
@@ -3688,23 +3782,6 @@
       });
       input.value = '';
     };
-    
-    window.login = function(userName) {
-      console.log('🎯 로그인 시도:', userName);
-      
-      currentUser = userName;
-      
-      // 🆕 사용자 ID와 관리자 여부 확인
-      const userEntry = assignees.find(a => a.name === userName);
-      if (userEntry) {
-        currentUserId = userEntry.id;
-        isAdmin = userEntry.isAdmin || false;
-        console.log('👤 사용자 정보:', { 
-          name: userName, 
-          id: currentUserId, 
-          isAdmin: isAdmin 
-        });
-      }
 
       // ✅ 1단계: showMainApp 함수를 먼저 독립적으로 정의
       function showMainApp() {
@@ -3747,33 +3824,6 @@
       }
       
       // ✅ 2단계: login 함수를 간단하게 정의 (중복 제거)
-      window.login = function(userName) {
-        console.log('🎯 로그인 시도:', userName);
-        
-        currentUser = userName;
-        
-        // 사용자 ID와 관리자 여부 확인
-        const userEntry = assignees.find(a => a.name === userName);
-        if (userEntry) {
-          currentUserId = userEntry.id;
-          isAdmin = userEntry.isAdmin || false;
-          console.log('👤 사용자 정보:', { 
-            name: userName, 
-            id: currentUserId, 
-            isAdmin: isAdmin 
-          });
-        }
-        
-        // 회사 정보 로드
-        loadCompanyInfo();
-        
-        // ✅ showMainApp() 호출 (이제 위에서 정의했으므로 사용 가능!)
-        showMainApp();
-        
-        console.log('✅ 로그인 완료');
-      };
-  
-      // ✅ 2단계: login 함수를 간단하게 만드세요!
       window.login = function(userName) {
         console.log('🎯 로그인 시도:', userName);
         
