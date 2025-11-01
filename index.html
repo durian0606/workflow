@@ -5006,7 +5006,7 @@
         currentEditingWorkId = null;
       }
     });
-
+    
     function renderMenu() {
       const adminSection = document.getElementById('adminMenuSection');
       
@@ -5027,90 +5027,72 @@
         event.stopPropagation();
       }
       
-      console.log('🍔 메뉴 토글 시작');
-      
       const menu = document.getElementById('menuDropdown');
       const menuBtn = document.querySelector('.menu-btn');
       const overlay = document.getElementById('menuOverlay');
       
-      console.log('메뉴 요소:', menu);
-      console.log('버튼 요소:', menuBtn);
-      console.log('오버레이 요소:', overlay);
-      
-      if (!menu) {
-        console.error('❌ 메뉴를 찾을 수 없습니다');
-        return;
-      }
-      
-      if (!menuBtn) {
-        console.error('❌ 메뉴 버튼을 찾을 수 없습니다');
+      if (!menu || !menuBtn) {
+        console.error('❌ 메뉴 요소를 찾을 수 없습니다');
         return;
       }
       
       const isActive = menu.classList.contains('active');
-      console.log('현재 메뉴 상태:', isActive ? '열림' : '닫힘');
       
       if (isActive) {
-        console.log('➡️ 메뉴 닫기 시작');
         menu.classList.remove('active');
         menuBtn.classList.remove('active');
         if (overlay) overlay.classList.remove('active');
-        console.log('✅ 메뉴 닫힘 완료');
       } else {
-        console.log('➡️ 메뉴 열기 시작');
         menu.classList.add('active');
         menuBtn.classList.add('active');
         if (overlay) overlay.classList.add('active');
-        console.log('✅ 메뉴 열림 완료');
-        
-        // 메뉴 위치 확인 (디버깅용)
-        setTimeout(() => {
-          const rect = menu.getBoundingClientRect();
-          console.log('메뉴 위치:', {
-            top: rect.top,
-            left: rect.left,
-            width: rect.width,
-            height: rect.height,
-            opacity: window.getComputedStyle(menu).opacity,
-            visibility: window.getComputedStyle(menu).visibility,
-            display: window.getComputedStyle(menu).display
-          });
-        }, 100);
       }
     };
     
-    // 페이지 클릭 시 메뉴 닫기
+    // 외부 클릭 감지
+    let isMenuButtonClick = false;
     document.addEventListener('click', function(e) {
+      if (isMenuButtonClick) {
+        isMenuButtonClick = false;
+        return;
+      }
+      
       const menu = document.getElementById('menuDropdown');
       const menuBtn = document.querySelector('.menu-btn');
       
       if (!menu || !menuBtn) return;
       
-      // 메뉴나 버튼을 클릭한 게 아니면 메뉴 닫기
-      if (!menu.contains(e.target) && !menuBtn.contains(e.target)) {
-        if (menu.classList.contains('active')) {
-          toggleMenu();
-        }
+      if (menuBtn.contains(e.target)) {
+        isMenuButtonClick = true;
+        return;
+      }
+      
+      if (menu.contains(e.target)) {
+        return;
+      }
+      
+      if (menu.classList.contains('active')) {
+        menu.classList.remove('active');
+        menuBtn.classList.remove('active');
+        const overlay = document.getElementById('menuOverlay');
+        if (overlay) overlay.classList.remove('active');
       }
     });
     
-    // 오버레이 클릭 시 메뉴 닫기
+    // 오버레이 클릭 처리
     document.addEventListener('DOMContentLoaded', function() {
       const overlay = document.getElementById('menuOverlay');
       if (overlay) {
         overlay.addEventListener('click', function(e) {
+          e.preventDefault();
           e.stopPropagation();
-          toggleMenu();
-        });
-      }
-    });
-    
-    // 오버레이 클릭 시 메뉴 닫기
-    document.addEventListener('DOMContentLoaded', function() {
-      const overlay = document.getElementById('menuOverlay');
-      if (overlay) {
-        overlay.addEventListener('click', function() {
-          toggleMenu();
+          
+          const menu = document.getElementById('menuDropdown');
+          const menuBtn = document.querySelector('.menu-btn');
+          
+          if (menu) menu.classList.remove('active');
+          if (menuBtn) menuBtn.classList.remove('active');
+          if (overlay) overlay.classList.remove('active');
         });
       }
     });
