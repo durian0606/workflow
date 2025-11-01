@@ -1227,6 +1227,7 @@
       justify-content: center;
       position: relative;
       overflow: hidden;
+      z-index: 1000;
     }
     
     .menu-btn:hover {
@@ -1629,12 +1630,7 @@
       .task-grid::-webkit-scrollbar-thumb:hover {
         background: #5b7fd6;
       }
-
-      .menu-btn {
-        width: 44px;
-        height: 44px;
-      }
-    
+      
       .menu-line {
         width: 22px;
         height: 2.5px;
@@ -5030,34 +5026,46 @@
       }
     }
     
+    // ✅ toggleMenu 함수 - renderMenu() 함수 바로 다음에 위치
     window.toggleMenu = function(event) {
       if (event) {
         event.preventDefault();
         event.stopPropagation();
       }
       
-      console.log('🎯 toggleMenu 호출됨'); // 디버깅용
+      console.log('🎯 toggleMenu 호출됨');
       
       const menu = document.getElementById('menuDropdown');
       const menuBtn = document.querySelector('.menu-btn');
       const overlay = document.getElementById('menuOverlay');
       
-      console.log('메뉴 요소:', menu, menuBtn, overlay); // 디버깅용
+      console.log('📍 메뉴 요소 체크:', {
+        menu: !!menu,
+        menuBtn: !!menuBtn,
+        overlay: !!overlay
+      });
       
-      if (!menu || !menuBtn) {
-        console.error('❌ 메뉴 요소를 찾을 수 없습니다');
+      if (!menu) {
+        console.error('❌ menuDropdown 요소를 찾을 수 없습니다');
+        return;
+      }
+      
+      if (!menuBtn) {
+        console.error('❌ menu-btn 요소를 찾을 수 없습니다');
         return;
       }
       
       const isActive = menu.classList.contains('active');
-      console.log('현재 상태:', isActive ? '열림' : '닫힘'); // 디버깅용
+      console.log('📊 현재 메뉴 상태:', isActive ? '열림' : '닫힘');
       
       if (isActive) {
+        // 메뉴 닫기
         menu.classList.remove('active');
         menuBtn.classList.remove('active');
         if (overlay) overlay.classList.remove('active');
         console.log('✅ 메뉴 닫힘');
       } else {
+        // 메뉴 열기
         menu.classList.add('active');
         menuBtn.classList.add('active');
         if (overlay) overlay.classList.add('active');
@@ -5065,10 +5073,15 @@
       }
     };
     
+    console.log('✅ toggleMenu 함수 정의 완료');
+    
     // 외부 클릭 감지 (DOMContentLoaded 후에 실행되도록 수정)
     function initMenuEventListeners() {
+      console.log('🚀 메뉴 이벤트 리스너 초기화 시작...');
+      
       let isMenuButtonClick = false;
       
+      // 전역 클릭 이벤트
       document.addEventListener('click', function(e) {
         if (isMenuButtonClick) {
           isMenuButtonClick = false;
@@ -5080,24 +5093,28 @@
         
         if (!menu || !menuBtn) return;
         
+        // 메뉴 버튼 클릭
         if (menuBtn.contains(e.target)) {
           isMenuButtonClick = true;
           return;
         }
         
+        // 메뉴 내부 클릭
         if (menu.contains(e.target)) {
           return;
         }
         
+        // 외부 클릭 - 메뉴 닫기
         if (menu.classList.contains('active')) {
           menu.classList.remove('active');
           menuBtn.classList.remove('active');
           const overlay = document.getElementById('menuOverlay');
           if (overlay) overlay.classList.remove('active');
+          console.log('🔒 외부 클릭으로 메뉴 닫힘');
         }
       });
       
-      // 오버레이 클릭 처리
+      // 오버레이 클릭 이벤트
       const overlay = document.getElementById('menuOverlay');
       if (overlay) {
         overlay.addEventListener('click', function(e) {
@@ -5110,6 +5127,8 @@
           if (menu) menu.classList.remove('active');
           if (menuBtn) menuBtn.classList.remove('active');
           if (overlay) overlay.classList.remove('active');
+          
+          console.log('🔒 오버레이 클릭으로 메뉴 닫힘');
         });
       }
       
