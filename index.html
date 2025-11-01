@@ -1809,7 +1809,7 @@
           </div>
         </div>
         <div class="header-right">
-          <button class="menu-btn" onclick="toggleMenu()">
+          <button class="menu-btn" onclick="toggleMenu(event)">
             <span class="menu-hamburger">
               <span class="menu-line"></span>
               <span class="menu-line"></span>
@@ -5026,7 +5026,7 @@
     }
     
     window.toggleMenu = function(event) {
-      console.log('🍔 메뉴 버튼 클릭됨'); // 디버깅용
+      console.log('🍔 메뉴 버튼 클릭됨');
       
       if (event) {
         event.stopPropagation();
@@ -5059,6 +5059,16 @@
         console.log('✅ 메뉴 열림');
       }
     };
+    
+    // 오버레이 클릭 시 메뉴 닫기
+    document.addEventListener('DOMContentLoaded', function() {
+      const overlay = document.getElementById('menuOverlay');
+      if (overlay) {
+        overlay.addEventListener('click', function() {
+          toggleMenu();
+        });
+      }
+    });
 
     window.toggleGuideModal = function() {
       const modal = document.getElementById('guideModal');
