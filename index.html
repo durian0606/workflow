@@ -1785,11 +1785,11 @@
   <div class="login-container" id="loginContainer">
     <!-- Step 1: 회사 로그인 -->
     <div class="login-box" id="companyLoginStep">
-      <h1 class="login-title">🏢 회사 로그인</h1>
+      <h1 class="login-title">로그인</h1>
       
       <div class="input-group">
-        <label class="input-label">회사 ID</label>
-        <input type="text" class="admin-input" id="companyIdInput" placeholder="회사 ID 입력" autocomplete="username">
+        <label class="input-label">ID</label>
+        <input type="text" class="admin-input" id="companyIdInput" placeholder="ID 입력" autocomplete="username">
         <div class="input-hint">회사 관리자에게 문의하세요</div>
       </div>
       
@@ -1811,7 +1811,7 @@
         <span>또는</span>
       </div>
       
-      <button class="secondary-btn" onclick="showCreateCompanyStep()">새 회사 만들기</button>
+      <button class="secondary-btn" onclick="showCreateCompanyStep()">가입하기</button>
     </div>
 
     <!-- Step 2: 새 회사 만들기 -->
@@ -2716,6 +2716,7 @@
       }
       
       try {
+        // 1. 관리자 사용자 생성
         const assigneesRef = window.dbRef(window.db, `companies/${companyId}/assignees`);
         const newAdminRef = window.dbPush(assigneesRef);
         const adminId = newAdminRef.key;
@@ -2726,16 +2727,27 @@
           createdAt: new Date().toISOString()
         });
         
+        // 2. 회사 정보 생성
+        const newCompanyCode = generateCompanyCode();
         const companyInfoRef = window.dbRef(window.db, `companies/${companyId}/info`);
         await window.dbSet(companyInfoRef, {
           name: companyName,
           password: password,
           createdAt: new Date().toISOString(),
           adminId: adminId,
-          companyCode: generateCompanyCode()
+          companyCode: newCompanyCode
         });
         
-        alert(`회사가 생성되었습니다!\n\n회사명: ${companyName}\n회사 ID: ${companyId}\n관리자: ${adminName}\n\n팀원들과 공유하세요.`);
+        // ✅ companyInfo 즉시 설정
+        companyInfo = {
+          name: companyName,
+          password: password,
+          createdAt: new Date().toISOString(),
+          adminId: adminId,
+          companyCode: newCompanyCode
+        };
+        
+        alert(`회사가 생성되었습니다!\n\n회사명: ${companyName}\n회사 ID: ${companyId}\n관리자: ${adminName}\n회사 코드: ${newCompanyCode}\n\n팀원들과 공유하세요.`);
         
         currentCompanyId = companyId;
         currentUser = adminName;
@@ -2744,6 +2756,7 @@
         
         localStorage.setItem('currentCompanyId', companyId);
         
+        // ✅ companyInfo가 설정된 후 메인 앱 표시
         showMainApp();
         
       } catch (error) {
@@ -3649,12 +3662,70 @@
         site: site,
         work: work,
         displayWork: work,
-        assignee: currentUser,
+        assignee: '',  // ✅ 담당자 미지정 (팀 작업으로)
         completed: false,
         createdAt: new Date().toISOString(),
         deadline: work === '시험' ? null : todayStr,
         order: Date.now()
       });
+      if (work === '시험') {
+        const testDateStr = todayStr;
+        const cappingDate = addBusinessDays(testDateStr, 1);
+        const cappingRef = window.dbPush(worksRef);
+        window.dbSet(cappingRef, {
+          date: cappingDate,
+          site: site,
+          work: '캡핑',
+          displayWork: '캡핑',
+          assignee: '',  // ✅ 시험 관련 작업도 미지정
+          completed: false,
+          createdAt: new Date().toISOString(),
+          parentWorkId: parentWorkId,
+          testDate: testDateStr
+        });
+        const demoldingDate = addBusinessDays(testDateStr, 2);
+        const demoldingRef = window.dbPush(worksRef);
+        window.dbSet(demoldingRef, {
+          date: demoldingDate,
+          site: site,
+          work: '탈형',
+          displayWork: '탈형',
+          assignee: '',  // ✅ 미지정
+          completed: false,
+          createdAt: new Date().toISOString(),
+          parentWorkId: parentWorkId,
+          testDate: testDateStr
+        });
+        const day7Date = addCalendarDays(testDateStr, 7);
+        const day7Ref = window.dbPush(worksRef);
+        window.dbSet(day7Ref, {
+          date: day7Date,
+          site: site,
+          work: '7일 강도 시험',
+          displayWork: '7일 강도 시험',
+          assignee: '',  // ✅ 미지정
+          completed: false,
+          createdAt: new Date().toISOString(),
+          parentWorkId: parentWorkId,
+          testDate: testDateStr
+        });
+        const day28Date = addCalendarDays(testDateStr, 28);
+        const day28Ref = window.dbPush(worksRef);
+        window.dbSet(day28Ref, {
+          date: day28Date,
+          site: site,
+          work: '28일 강도 시험',
+          displayWork: '28일 강도 시험',
+          assignee: '',  // ✅ 미지정
+          completed: false,
+          createdAt: new Date().toISOString(),
+          parentWorkId: parentWorkId,
+          testDate: testDateStr
+        });
+      }
+      document.getElementById('siteInput').value = '';
+      document.getElementById('workInput').value = '';
+    };
       if (work === '시험') {
         const testDateStr = todayStr;
         const cappingDate = addBusinessDays(testDateStr, 1);
@@ -3819,7 +3890,7 @@
             isOverdue: isOverdue,
             otherCompanyInfo: otherCompanyInfo
           };
-          if (work.assignee === currentUser) {
+          if (work.assignee && work.assignee === currentUser) {
             myWorks.push(visibleWork);
           } else {
             teamWorks.push(visibleWork);
@@ -5095,13 +5166,14 @@
       
       list.innerHTML = '';
       
-      const staffCount = assignees.filter(a => !a.isAdmin).length;
+      // ✅ 관리자 포함한 전체 직원 수
       countSpan.textContent = assignees.length;
       
       assignees.forEach(user => {
         const li = document.createElement('li');
         li.className = 'site-item';
         
+        // 관리자는 노란색 배경
         if (user.isAdmin) {
           li.style.background = 'linear-gradient(135deg, #fff8e1 0%, #ffe082 100%)';
           li.style.borderLeft = '4px solid #FFD700';
@@ -5128,21 +5200,20 @@
         infoDiv.appendChild(name);
         infoDiv.appendChild(role);
         
+        // ✅ 관리자가 아닐 때만 퇴출 버튼 표시
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'site-item-actions';
+        
         if (!user.isAdmin) {
-          const actionsDiv = document.createElement('div');
-          actionsDiv.className = 'site-item-actions';
-          
           const deleteBtn = document.createElement('button');
           deleteBtn.className = 'site-item-delete';
           deleteBtn.textContent = '퇴출';
           deleteBtn.onclick = () => removeStaff(user.id, user.name);
-          
           actionsDiv.appendChild(deleteBtn);
-          li.appendChild(infoDiv);
-          li.appendChild(actionsDiv);
-        } else {
-          li.appendChild(infoDiv);
         }
+        
+        li.appendChild(infoDiv);
+        li.appendChild(actionsDiv);  // ✅ 항상 추가 (빈 div라도)
         
         list.appendChild(li);
       });
