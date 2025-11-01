@@ -1299,7 +1299,7 @@
     
     .menu-dropdown {
       position: fixed;
-      top: 80px;
+      top: 70px;
       right: 16px;
       background: white;
       border-radius: 12px;
@@ -1309,14 +1309,16 @@
       visibility: hidden;
       transform: translateY(-20px) scale(0.9);
       transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-      z-index: 10001;
+      z-index: 10001 !important;
       overflow: hidden;
+      pointer-events: none;
     }
     
     .menu-dropdown.active {
       opacity: 1;
       visibility: visible;
       transform: translateY(0) scale(1);
+      pointer-events: auto;
     }
     
     .menu-item {
@@ -1638,12 +1640,6 @@
         height: 2.5px;
       }
     
-      .menu-dropdown {
-        top: 70px;
-        right: 8px;
-        min-width: 180px;
-      }
-    
       .menu-item {
         padding: 14px 16px;
       }
@@ -1809,7 +1805,7 @@
           </div>
         </div>
         <div class="header-right">
-          <button class="menu-btn" onclick="toggleMenu(event)">
+          <button class="menu-btn" type="button" onclick="toggleMenu(event)">
             <span class="menu-hamburger">
               <span class="menu-line"></span>
               <span class="menu-line"></span>
@@ -5026,39 +5022,88 @@
     }
     
     window.toggleMenu = function(event) {
-      console.log('🍔 메뉴 버튼 클릭됨');
-      
       if (event) {
+        event.preventDefault();
         event.stopPropagation();
       }
+      
+      console.log('🍔 메뉴 토글 시작');
       
       const menu = document.getElementById('menuDropdown');
       const menuBtn = document.querySelector('.menu-btn');
       const overlay = document.getElementById('menuOverlay');
       
-      if (!menu || !menuBtn) {
-        console.error('❌ 메뉴 요소를 찾을 수 없습니다');
+      console.log('메뉴 요소:', menu);
+      console.log('버튼 요소:', menuBtn);
+      console.log('오버레이 요소:', overlay);
+      
+      if (!menu) {
+        console.error('❌ 메뉴를 찾을 수 없습니다');
+        return;
+      }
+      
+      if (!menuBtn) {
+        console.error('❌ 메뉴 버튼을 찾을 수 없습니다');
         return;
       }
       
       const isActive = menu.classList.contains('active');
-      
-      console.log('📊 메뉴 상태:', isActive ? '열림' : '닫힘');
+      console.log('현재 메뉴 상태:', isActive ? '열림' : '닫힘');
       
       if (isActive) {
-        // 메뉴 닫기
+        console.log('➡️ 메뉴 닫기 시작');
         menu.classList.remove('active');
         menuBtn.classList.remove('active');
         if (overlay) overlay.classList.remove('active');
-        console.log('✅ 메뉴 닫힘');
+        console.log('✅ 메뉴 닫힘 완료');
       } else {
-        // 메뉴 열기
+        console.log('➡️ 메뉴 열기 시작');
         menu.classList.add('active');
         menuBtn.classList.add('active');
         if (overlay) overlay.classList.add('active');
-        console.log('✅ 메뉴 열림');
+        console.log('✅ 메뉴 열림 완료');
+        
+        // 메뉴 위치 확인 (디버깅용)
+        setTimeout(() => {
+          const rect = menu.getBoundingClientRect();
+          console.log('메뉴 위치:', {
+            top: rect.top,
+            left: rect.left,
+            width: rect.width,
+            height: rect.height,
+            opacity: window.getComputedStyle(menu).opacity,
+            visibility: window.getComputedStyle(menu).visibility,
+            display: window.getComputedStyle(menu).display
+          });
+        }, 100);
       }
     };
+    
+    // 페이지 클릭 시 메뉴 닫기
+    document.addEventListener('click', function(e) {
+      const menu = document.getElementById('menuDropdown');
+      const menuBtn = document.querySelector('.menu-btn');
+      
+      if (!menu || !menuBtn) return;
+      
+      // 메뉴나 버튼을 클릭한 게 아니면 메뉴 닫기
+      if (!menu.contains(e.target) && !menuBtn.contains(e.target)) {
+        if (menu.classList.contains('active')) {
+          toggleMenu();
+        }
+      }
+    });
+    
+    // 오버레이 클릭 시 메뉴 닫기
+    document.addEventListener('DOMContentLoaded', function() {
+      const overlay = document.getElementById('menuOverlay');
+      if (overlay) {
+        overlay.addEventListener('click', function(e) {
+          e.stopPropagation();
+          toggleMenu();
+        });
+      }
+    });
     
     // 오버레이 클릭 시 메뉴 닫기
     document.addEventListener('DOMContentLoaded', function() {
