@@ -3446,6 +3446,11 @@
       loadAllCompaniesWorks();
       renderMenu();
       
+      // ✅ 메뉴 이벤트 리스너 초기화 추가
+      setTimeout(() => {
+        initMenuEventListeners();
+      }, 100);
+      
       setTimeout(() => {
         console.log('🗺️ 지도 초기화 시작...');
         initMap();
@@ -5027,9 +5032,13 @@
         event.stopPropagation();
       }
       
+      console.log('🎯 toggleMenu 호출됨'); // 디버깅용
+      
       const menu = document.getElementById('menuDropdown');
       const menuBtn = document.querySelector('.menu-btn');
       const overlay = document.getElementById('menuOverlay');
+      
+      console.log('메뉴 요소:', menu, menuBtn, overlay); // 디버깅용
       
       if (!menu || !menuBtn) {
         console.error('❌ 메뉴 요소를 찾을 수 없습니다');
@@ -5037,50 +5046,54 @@
       }
       
       const isActive = menu.classList.contains('active');
+      console.log('현재 상태:', isActive ? '열림' : '닫힘'); // 디버깅용
       
       if (isActive) {
         menu.classList.remove('active');
         menuBtn.classList.remove('active');
         if (overlay) overlay.classList.remove('active');
+        console.log('✅ 메뉴 닫힘');
       } else {
         menu.classList.add('active');
         menuBtn.classList.add('active');
         if (overlay) overlay.classList.add('active');
+        console.log('✅ 메뉴 열림');
       }
     };
     
-    // 외부 클릭 감지
-    let isMenuButtonClick = false;
-    document.addEventListener('click', function(e) {
-      if (isMenuButtonClick) {
-        isMenuButtonClick = false;
-        return;
-      }
+    // 외부 클릭 감지 (DOMContentLoaded 후에 실행되도록 수정)
+    function initMenuEventListeners() {
+      let isMenuButtonClick = false;
       
-      const menu = document.getElementById('menuDropdown');
-      const menuBtn = document.querySelector('.menu-btn');
+      document.addEventListener('click', function(e) {
+        if (isMenuButtonClick) {
+          isMenuButtonClick = false;
+          return;
+        }
+        
+        const menu = document.getElementById('menuDropdown');
+        const menuBtn = document.querySelector('.menu-btn');
+        
+        if (!menu || !menuBtn) return;
+        
+        if (menuBtn.contains(e.target)) {
+          isMenuButtonClick = true;
+          return;
+        }
+        
+        if (menu.contains(e.target)) {
+          return;
+        }
+        
+        if (menu.classList.contains('active')) {
+          menu.classList.remove('active');
+          menuBtn.classList.remove('active');
+          const overlay = document.getElementById('menuOverlay');
+          if (overlay) overlay.classList.remove('active');
+        }
+      });
       
-      if (!menu || !menuBtn) return;
-      
-      if (menuBtn.contains(e.target)) {
-        isMenuButtonClick = true;
-        return;
-      }
-      
-      if (menu.contains(e.target)) {
-        return;
-      }
-      
-      if (menu.classList.contains('active')) {
-        menu.classList.remove('active');
-        menuBtn.classList.remove('active');
-        const overlay = document.getElementById('menuOverlay');
-        if (overlay) overlay.classList.remove('active');
-      }
-    });
-    
-    // 오버레이 클릭 처리
-    document.addEventListener('DOMContentLoaded', function() {
+      // 오버레이 클릭 처리
       const overlay = document.getElementById('menuOverlay');
       if (overlay) {
         overlay.addEventListener('click', function(e) {
@@ -5095,8 +5108,10 @@
           if (overlay) overlay.classList.remove('active');
         });
       }
-    });
-
+      
+      console.log('✅ 메뉴 이벤트 리스너 초기화 완료');
+    }
+    
     window.toggleGuideModal = function() {
       const modal = document.getElementById('guideModal');
       modal.classList.toggle('active');
@@ -5494,27 +5509,7 @@
       
       modal.classList.toggle('active');
     };
-    
-    document.addEventListener('DOMContentLoaded', function() {
-      const modals = [
-        'companyCodeModal',
-        'staffManageModal', 
-        'companyInfoModal',
-        'transferAdminModal'
-      ];
-      
-      modals.forEach(modalId => {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-          modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-              modal.classList.remove('active');
-            }
-          });
-        }
-      });
-    });
-    
+        
     document.getElementById('guideModal').addEventListener('click', (e) => {
       if (e.target === document.getElementById('guideModal')) {
         toggleGuideModal();
