@@ -5545,6 +5545,37 @@
     window.onload = function() {
       waitForFirebase();
     };
+
+    // 모달 외부 클릭 이벤트 추가
+    document.getElementById('companyCodeModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('companyCodeModal')) {
+        toggleCompanyCodeModal();
+      }
+    });
+    
+    document.getElementById('staffManageModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('staffManageModal')) {
+        toggleStaffManageModal();
+      }
+    });
+    
+    document.getElementById('companyInfoModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('companyInfoModal')) {
+        toggleCompanyInfoModal();
+      }
+    });
+    
+    document.getElementById('transferAdminModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('transferAdminModal')) {
+        toggleTransferAdminModal();
+      }
+    });
+    
+    // 닫기 버튼 이벤트도 추가로 확인
+    console.log('✅ 모든 모달 이벤트 리스너 등록 완료');
+
+
+    
   </script>
 </body>
 
