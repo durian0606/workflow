@@ -5144,15 +5144,43 @@
     };
 
     window.toggleCompanyCodeModal = function() {
+      console.log('🔑 회사 코드 모달 토글');
+      
       const modal = document.getElementById('companyCodeModal');
       
+      if (!modal) {
+        console.error('❌ companyCodeModal을 찾을 수 없습니다');
+        return;
+      }
+      
       if (!modal.classList.contains('active')) {
+        console.log('✅ 모달 열기 - 회사 코드 표시');
+        
         if (companyInfo && companyInfo.companyCode) {
           document.getElementById('displayCompanyCode').textContent = companyInfo.companyCode;
+          console.log('✅ 회사 코드:', companyInfo.companyCode);
+        } else {
+          console.error('❌ companyInfo가 없습니다:', companyInfo);
+          document.getElementById('displayCompanyCode').textContent = '로딩 중...';
+          
+          // companyInfo 다시 로드 시도
+          setTimeout(() => {
+            if (companyInfo && companyInfo.companyCode) {
+              document.getElementById('displayCompanyCode').textContent = companyInfo.companyCode;
+            } else {
+              document.getElementById('displayCompanyCode').textContent = '코드 없음';
+            }
+          }, 500);
         }
       }
       
       modal.classList.toggle('active');
+      
+      if (modal.classList.contains('active')) {
+        console.log('✅ 회사 코드 모달 열림');
+      } else {
+        console.log('✅ 회사 코드 모달 닫힘');
+      }
     };
 
     window.copyCompanyCode = function() {
@@ -5501,39 +5529,87 @@
     };
     
     window.toggleStaffManageModal = function() {
+      console.log('👥 직원 관리 모달 토글');
+      
       const modal = document.getElementById('staffManageModal');
       
+      if (!modal) {
+        console.error('❌ staffManageModal을 찾을 수 없습니다');
+        return;
+      }
+      
       if (!modal.classList.contains('active')) {
+        console.log('✅ 모달 열기 - 직원 목록 렌더링');
         renderStaffList();
       }
       
       modal.classList.toggle('active');
+      
+      if (modal.classList.contains('active')) {
+        console.log('✅ 직원 관리 모달 열림');
+      } else {
+        console.log('✅ 직원 관리 모달 닫힘');
+      }
     };
     
     window.toggleCompanyInfoModal = function() {
+      console.log('🏢 회사 정보 모달 토글');
+      
       const modal = document.getElementById('companyInfoModal');
       
+      if (!modal) {
+        console.error('❌ companyInfoModal을 찾을 수 없습니다');
+        return;
+      }
+      
       if (!modal.classList.contains('active')) {
+        console.log('✅ 모달 열기 - 회사 정보 로드');
+        
         if (companyInfo) {
           document.getElementById('editCompanyName').value = companyInfo.name || '';
+          console.log('✅ 회사명 로드:', companyInfo.name);
+        } else {
+          console.error('❌ companyInfo가 없습니다');
+          document.getElementById('editCompanyName').value = '';
         }
+        
         document.getElementById('currentPasswordForEdit').value = '';
         document.getElementById('newPasswordForEdit').value = '';
         document.getElementById('confirmNewPassword').value = '';
       }
       
       modal.classList.toggle('active');
+      
+      if (modal.classList.contains('active')) {
+        console.log('✅ 회사 정보 모달 열림');
+      } else {
+        console.log('✅ 회사 정보 모달 닫힘');
+      }
     };
     
     window.toggleTransferAdminModal = function() {
+      console.log('🔄 권한 이전 모달 토글');
+      
       const modal = document.getElementById('transferAdminModal');
       
+      if (!modal) {
+        console.error('❌ transferAdminModal을 찾을 수 없습니다');
+        return;
+      }
+      
       if (!modal.classList.contains('active')) {
+        console.log('✅ 모달 열기 - 직원 목록 렌더링');
         renderTransferAdminList();
         document.getElementById('passwordForTransfer').value = '';
       }
       
       modal.classList.toggle('active');
+      
+      if (modal.classList.contains('active')) {
+        console.log('✅ 권한 이전 모달 열림');
+      } else {
+        console.log('✅ 권한 이전 모달 닫힘');
+      }
     };
         
     document.getElementById('guideModal').addEventListener('click', (e) => {
