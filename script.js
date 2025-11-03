@@ -1,4 +1,40 @@
 <script>
+
+<!-- Firebase SDK -->
+  <script type="module">
+    import {
+      initializeApp
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import {
+      getDatabase,
+      ref,
+      set,
+      push,
+      onValue,
+      update,
+      remove
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyAMv0BmH24fyd0F8CUTkSYSXMlvbcnUXU4",
+      authDomain: "work-todo-6ab7f.firebaseapp.com",
+      databaseURL: "https://work-todo-6ab7f-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "work-todo-6ab7f",
+      storageBucket: "work-todo-6ab7f.firebasestorage.app",
+      messagingSenderId: "263893669261",
+      appId: "1:263893669261:web:bdce10bec177ff1f67d9c4"
+    };
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    window.db = database;
+    window.dbRef = ref;
+    window.dbSet = set;
+    window.dbPush = push;
+    window.dbOnValue = onValue;
+    window.dbUpdate = update;
+    window.dbRemove = remove;
+    window.firebaseReady = true;
+    console.log('✅ Firebase initialized');
+
     // ========================================
     // ⭐ 모달 토글 함수들 - 가장 먼저 정의!
     // ========================================
