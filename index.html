@@ -1827,6 +1827,18 @@
               <input type="text" class="task-input" id="workInput" placeholder="작업 내용 입력">
               <button class="add-btn" onclick="addWork()">+ 추가</button>
             </div>
+            <!-- 개인/팀 선택 (팀에 속한 경우만 표시) -->
+            <div class="form-row" id="workTypeSelector" style="display: none; align-items: center; padding: 8px 12px; background: #f5f7fa; border-radius: 8px; gap: 15px;">
+              <span style="font-size: 12px; color: #666; font-weight: 600;">저장 위치:</span>
+              <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 12px;">
+                <input type="radio" name="workType" value="personal" checked style="cursor: pointer;">
+                <span style="color: #F57C00; font-weight: 600;">개인 작업</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 12px;">
+                <input type="radio" name="workType" value="team" style="cursor: pointer;">
+                <span style="color: #1976d2; font-weight: 600;">팀 작업</span>
+              </label>
+            </div>
           </div>
         </div>
 
@@ -4176,6 +4188,16 @@
   loadSites();
   loadAllCompaniesWorks();
   renderMenu();
+
+  // 팀에 속해 있으면 작업 타입 선택 UI 표시
+  const workTypeSelector = document.getElementById('workTypeSelector');
+  if (workTypeSelector) {
+    if (currentTeamId) {
+      workTypeSelector.style.display = 'flex';
+    } else {
+      workTypeSelector.style.display = 'none';
+    }
+  }
   
   setTimeout(() => {
     initMenuEventListeners();
@@ -4424,7 +4446,26 @@
         alert('현장명과 작업 내용을 입력하세요.');
         return;
       }
-      const worksRef = window.dbRef(window.db, `companies/${currentCompanyId}/works`);
+
+      // 선택된 작업 타입 확인 (개인/팀)
+      const workTypeRadios = document.getElementsByName('workType');
+      let selectedWorkType = 'personal'; // 기본값: 개인
+      for (const radio of workTypeRadios) {
+        if (radio.checked) {
+          selectedWorkType = radio.value;
+          break;
+        }
+      }
+
+      // 작업 타입에 따라 저장 위치 결정
+      let worksPath;
+      if (selectedWorkType === 'team' && currentTeamId) {
+        worksPath = `teams/${currentTeamId}/worklists`;
+      } else {
+        worksPath = `companies/${currentCompanyId}/works`;
+      }
+
+      const worksRef = window.dbRef(window.db, worksPath);
       const todayStr = currentDate.toISOString().split('T')[0];
       const newWorkRef = window.dbPush(worksRef);
       const parentWorkId = newWorkRef.key;
@@ -4500,17 +4541,48 @@
      
     function loadWorks() {
       console.log('📋 작업 데이터 로드 중...');
-      
+
       if (!currentCompanyId) {
         console.error('❌ currentCompanyId가 설정되지 않음');
         return;
       }
-      
-      const worksRef = window.dbRef(window.db, `companies/${currentCompanyId}/works`);
-      window.dbOnValue(worksRef, (snapshot) => {
-        works = snapshot.val() || {};
-        console.log('✅ 작업 데이터 로드 완료:', Object.keys(works).length, '개');
-        renderWorks();
+
+      // 개인 작업 로드 (companies 구조 - 기존 호환성)
+      const personalWorksRef = window.dbRef(window.db, `companies/${currentCompanyId}/works`);
+      window.dbOnValue(personalWorksRef, (snapshot) => {
+        const personalWorks = snapshot.val() || {};
+
+        // 각 개인 작업에 workType 추가
+        Object.keys(personalWorks).forEach(workId => {
+          personalWorks[workId].workType = 'personal';
+        });
+
+        console.log('✅ 개인 작업 로드 완료:', Object.keys(personalWorks).length, '개');
+
+        // 팀에 속해 있으면 팀 작업도 로드
+        if (currentTeamId) {
+          const teamWorksRef = window.dbRef(window.db, `teams/${currentTeamId}/worklists`);
+          window.dbOnValue(teamWorksRef, (teamSnapshot) => {
+            const teamWorks = teamSnapshot.val() || {};
+
+            // 각 팀 작업에 workType 추가
+            Object.keys(teamWorks).forEach(workId => {
+              teamWorks[workId].workType = 'team';
+            });
+
+            console.log('✅ 팀 작업 로드 완료:', Object.keys(teamWorks).length, '개');
+
+            // 개인 작업 + 팀 작업 합치기
+            works = { ...personalWorks, ...teamWorks };
+            console.log('✅ 전체 작업:', Object.keys(works).length, '개');
+            renderWorks();
+          });
+        } else {
+          // 팀이 없으면 개인 작업만
+          works = personalWorks;
+          console.log('✅ 전체 작업 (개인만):', Object.keys(works).length, '개');
+          renderWorks();
+        }
       });
     }
     
@@ -5030,7 +5102,23 @@
       
       const title = document.createElement('div');
       title.className = 'task-title';
-      title.textContent = `${work.site} - ${work.displayWork}`;
+
+      // [개인]/[팀] 태그 추가
+      const workTypeTag = document.createElement('span');
+      workTypeTag.style.cssText = 'font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-right: 6px; font-weight: 600;';
+      if (work.workType === 'team') {
+        workTypeTag.textContent = '[팀]';
+        workTypeTag.style.backgroundColor = '#e3f2fd';
+        workTypeTag.style.color = '#1976d2';
+      } else {
+        workTypeTag.textContent = '[개인]';
+        workTypeTag.style.backgroundColor = '#fff8e1';
+        workTypeTag.style.color = '#F57C00';
+      }
+
+      title.appendChild(workTypeTag);
+      title.appendChild(document.createTextNode(`${work.site} - ${work.displayWork}`));
+
       if (!isCompleted && work.isOverdue) {
         const warningBadge = document.createElement('span');
         warningBadge.className = 'overdue-warning';
