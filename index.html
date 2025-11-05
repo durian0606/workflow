@@ -2660,181 +2660,110 @@
       });
     }
     
-    // ✅ 팀 생성 (로그인 후)
-    window.createTeam = async function() {
-      const teamName = document.getElementById('newTeamName').value.trim();
+    window.loginCompany = async function() {
+      const companyId = document.getElementById('companyIdInput').value.trim();
+      const password = document.getElementById('companyPasswordInput').value;
+      const autoLogin = document.getElementById('autoLoginCheckbox').checked;
       
-      if (!teamName) {
-        alert('팀 이름을 입력하세요.');
+      if (!companyId) {
+        alert('회사 ID를 입력하세요.');
         return;
       }
       
-      const teamsRef = window.dbRef(window.db, 'teams');
-      const newTeamRef = window.dbPush(teamsRef);
-      const teamId = newTeamRef.key;
-      const teamCode = generateTeamCode();  // 6자리 랜덤 코드
+      if (!password) {
+        alert('비밀번호를 입력하세요.');
+        return;
+      }
       
-      // 팀 정보 생성
-      await window.dbSet(newTeamRef, {
-        info: {
-          name: teamName,
-          teamCode: teamCode,
-          createdAt: new Date().toISOString(),
-          createdBy: currentUserId
-        },
-        members: {
-          [currentUserId]: {
-            displayName: currentUser.displayName,
-            joinedAt: new Date().toISOString(),
-            role: 'main'  // 메인 팀
+      try {
+        console.log('🔐 로그인 시도:', companyId);
+        
+        // 1. 회사 정보 확인
+        const companyRef = window.dbRef(window.db, `companies/${companyId}/info`);
+        const companyData = await new Promise((resolve, reject) => {
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          window.dbOnValue(companyRef, (snapshot) => {
+            clearTimeout(timeoutId);
+            resolve(snapshot.val());
+          }, { onlyOnce: true });
+        });
+        
+        if (!companyData) {
+          alert('존재하지 않는 회사 ID입니다.');
+          return;
+        }
+        
+        if (companyData.password !== password) {
+          alert('비밀번호가 일치하지 않습니다.');
+          return;
+        }
+        
+        console.log('✅ 비밀번호 확인 완료');
+        
+        // 2. 관리자 정보 로드
+        const assigneesRef = window.dbRef(window.db, `companies/${companyId}/assignees`);
+        const assigneesData = await new Promise((resolve, reject) => {
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          window.dbOnValue(assigneesRef, (snapshot) => {
+            clearTimeout(timeoutId);
+            resolve(snapshot.val());
+          }, { onlyOnce: true });
+        });
+        
+        if (!assigneesData) {
+          alert('사용자 정보를 찾을 수 없습니다.');
+          return;
+        }
+        
+        // 3. 관리자 찾기
+        let adminUser = null;
+        Object.keys(assigneesData).forEach(key => {
+          if (assigneesData[key].isAdmin) {
+            adminUser = {
+              id: key,
+              name: assigneesData[key].name,
+              isAdmin: true
+            };
           }
-        },
-        works: {},
-        sites: {}
-      });
-      
-      // 사용자의 팀 목록에 추가
-      const userTeamRef = window.dbRef(window.db, `users/${currentUserId}/teams/${teamId}`);
-      await window.dbSet(userTeamRef, {
-        role: 'main',
-        joinedAt: new Date().toISOString()
-      });
-      
-      alert(`팀이 생성되었습니다!\n\n팀 이름: ${teamName}\n팀 코드: ${teamCode}\n\n이 코드를 팀원들에게 공유하세요.`);
-      
-      loadUserTeams();  // 팀 목록 새로고침
-    }
-    
-    // ✅ 팀 코드로 참여
-    window.joinTeamByCode = async function() {
-      const teamCode = document.getElementById('teamCodeInput').value.trim();
-      const isSubTeam = document.getElementById('isSubTeam').checked;
-      const expireDate = document.getElementById('subTeamExpire').value;
-      
-      if (!teamCode) {
-        alert('팀 코드를 입력하세요.');
-        return;
-      }
-      
-      if (isSubTeam && !expireDate) {
-        alert('보조 팀은 참여 기한을 설정해야 합니다.');
-        return;
-      }
-      
-      // 팀 코드로 팀 찾기
-      const teamsRef = window.dbRef(window.db, 'teams');
-      const snapshot = await new Promise(resolve => {
-        window.dbOnValue(teamsRef, resolve, { onlyOnce: true });
-      });
-      
-      const teams = snapshot.val() || {};
-      let foundTeamId = null;
-      
-      Object.keys(teams).forEach(teamId => {
-        if (teams[teamId].info?.teamCode === teamCode) {
-          foundTeamId = teamId;
+        });
+        
+        if (!adminUser) {
+          alert('관리자 정보를 찾을 수 없습니다.');
+          return;
         }
-      });
-      
-      if (!foundTeamId) {
-        alert('존재하지 않는 팀 코드입니다.');
-        return;
-      }
-      
-      // ✅ 이미 참여 중인지 확인
-      const userTeamsRef = window.dbRef(window.db, `users/${currentUserId}/teams`);
-      const userTeamsSnapshot = await new Promise(resolve => {
-        window.dbOnValue(userTeamsRef, resolve, { onlyOnce: true });
-      });
-      
-      const userTeams = userTeamsSnapshot.val() || {};
-      if (userTeams[foundTeamId]) {
-        alert('이미 참여 중인 팀입니다.');
-        return;
-      }
-      
-      // ✅ 메인 팀이 이미 있는지 확인
-      const hasMainTeam = Object.values(userTeams).some(t => t.role === 'main');
-      
-      if (hasMainTeam && !isSubTeam) {
-        alert('메인 팀은 1개만 가입할 수 있습니다.\n보조 팀으로 참여하시겠습니까?');
-        return;
-      }
-      
-      // 팀 멤버에 추가
-      const memberRef = window.dbRef(window.db, `teams/${foundTeamId}/members/${currentUserId}`);
-      await window.dbSet(memberRef, {
-        displayName: currentUser.displayName,
-        joinedAt: new Date().toISOString(),
-        role: isSubTeam ? 'sub' : 'main',
-        ...(isSubTeam && { expireDate: expireDate })
-      });
-      
-      // 사용자의 팀 목록에 추가
-      const userTeamRef = window.dbRef(window.db, `users/${currentUserId}/teams/${foundTeamId}`);
-      await window.dbSet(userTeamRef, {
-        role: isSubTeam ? 'sub' : 'main',
-        joinedAt: new Date().toISOString(),
-        ...(isSubTeam && { expireDate: expireDate })
-      });
-      
-      const teamName = teams[foundTeamId].info?.name;
-      alert(`팀 참여 완료!\n\n팀: ${teamName}\n역할: ${isSubTeam ? '보조 팀' : '메인 팀'}${isSubTeam ? `\n기한: ${expireDate}` : ''}`);
-      
-      loadUserTeams();
-    }
-    
-    // ✅ 아이디로 초대
-    window.inviteByUsername = async function(teamId) {
-      const username = prompt('초대할 팀원의 아이디를 입력하세요:');
-      
-      if (!username) return;
-      
-      // 사용자 찾기
-      const usersRef = window.dbRef(window.db, 'users');
-      const snapshot = await new Promise(resolve => {
-        window.dbOnValue(usersRef, resolve, { onlyOnce: true });
-      });
-      
-      const users = snapshot.val() || {};
-      let foundUserId = null;
-      let foundUser = null;
-      
-      Object.keys(users).forEach(userId => {
-        if (users[userId].profile?.username === username) {
-          foundUserId = userId;
-          foundUser = users[userId];
+        
+        console.log('✅ 관리자 찾음:', adminUser.name);
+        
+        // 4. 전역 변수 설정
+        currentCompanyId = companyId;
+        currentUser = adminUser.name;
+        currentUserId = adminUser.id;
+        isAdmin = true;
+        companyInfo = companyData;
+        
+        // 5. 자동 로그인 저장
+        if (autoLogin) {
+          localStorage.setItem('autoLogin', 'true');
+          localStorage.setItem('savedCompanyId', companyId);
+          localStorage.setItem('savedPassword', password);
+          console.log('✅ 자동 로그인 정보 저장됨');
+        } else {
+          localStorage.removeItem('autoLogin');
+          localStorage.setItem('savedCompanyId', companyId);
+          localStorage.removeItem('savedPassword');
+          console.log('ℹ️ 회사 ID만 저장됨');
         }
-      });
-      
-      if (!foundUserId) {
-        alert('존재하지 않는 아이디입니다.');
-        return;
+        
+        console.log('🎉 로그인 성공! 메인 앱으로 이동...');
+        
+        // 6. 바로 메인 앱 표시
+        showMainApp();
+        
+      } catch (error) {
+        console.error('❌ 로그인 오류:', error);
+        alert('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
       }
-      
-      // 이미 팀원인지 확인
-      const teamMembersRef = window.dbRef(window.db, `teams/${teamId}/members`);
-      const membersSnapshot = await new Promise(resolve => {
-        window.dbOnValue(teamMembersRef, resolve, { onlyOnce: true });
-      });
-      
-      const members = membersSnapshot.val() || {};
-      if (members[foundUserId]) {
-        alert('이미 팀에 참여 중인 사용자입니다.');
-        return;
-      }
-      
-      // 초대 (실제로는 알림 시스템 구축 권장)
-      const inviteRef = window.dbRef(window.db, `users/${foundUserId}/invites/${teamId}`);
-      await window.dbSet(inviteRef, {
-        teamId: teamId,
-        invitedBy: currentUserId,
-        invitedAt: new Date().toISOString(),
-        status: 'pending'
-      });
-      
-      alert(`${foundUser.profile.displayName}님에게 초대를 보냈습니다.`);
-    }
+    };
     
     window.showCreateCompanyStep = function() {
       document.getElementById('companyLoginStep').style.display = 'none';
@@ -2893,48 +2822,113 @@
       }
     });
 
-    // 개인 계정 생성 (관리자 개념 없음)
-    window.signUp = async function() {
-      const username = document.getElementById('signupUsername').value.trim();
-      const password = document.getElementById('signupPassword').value;
-      const displayName = document.getElementById('signupDisplayName').value.trim();
+    window.createCompany = async function() {
+      const companyName = document.getElementById('newCompanyNameInput').value.trim();
+      const companyId = document.getElementById('newCompanyIdInput').value.trim();
+      const password = document.getElementById('newCompanyPasswordInput').value;
+      const confirmPassword = document.getElementById('confirmPasswordInput').value;
+      const adminName = document.getElementById('newAdminNameInput').value.trim();
       
-      if (!username || !password || !displayName) {
-        alert('모든 항목을 입력하세요.');
+      if (!companyName) {
+        alert('회사명을 입력하세요.');
         return;
       }
       
-      // ✅ 아이디 중복 확인
-      const usersRef = window.dbRef(window.db, 'users');
-      const snapshot = await new Promise(resolve => {
-        window.dbOnValue(usersRef, resolve, { onlyOnce: true });
-      });
-      
-      const users = snapshot.val() || {};
-      const exists = Object.values(users).some(u => u.profile?.username === username);
-      
-      if (exists) {
-        alert('이미 사용 중인 아이디입니다.');
+      if (!companyId) {
+        alert('회사 ID를 입력하세요.');
         return;
       }
       
-      // ✅ 새 사용자 생성
-      const newUserRef = window.dbPush(usersRef);
-      const userId = newUserRef.key;
+      const regex = /^[a-zA-Z0-9]{4,20}$/;
+      if (!regex.test(companyId)) {
+        alert('회사 ID는 영문과 숫자 조합으로 4-20자여야 합니다.');
+        return;
+      }
       
-      await window.dbSet(newUserRef, {
-        profile: {
-          username: username,
-          password: password,  // 실제로는 해시 처리 권장
-          displayName: displayName,
+      if (!password) {
+        alert('비밀번호를 입력하세요.');
+        return;
+      }
+      
+      if (password.length < 4) {
+        alert('비밀번호는 최소 4자 이상이어야 합니다.');
+        return;
+      }
+      
+      if (password !== confirmPassword) {
+        alert('비밀번호가 일치하지 않습니다.');
+        return;
+      }
+      
+      if (!adminName) {
+        alert('관리자 이름을 입력하세요.');
+        return;
+      }
+      
+      const available = await checkCompanyIdAvailability(companyId);
+      if (!available) {
+        alert('이미 사용 중인 회사 ID입니다.');
+        return;
+      }
+      
+      try {
+        // 1. 관리자 생성
+        const assigneesRef = window.dbRef(window.db, `companies/${companyId}/assignees`);
+        const newAdminRef = window.dbPush(assigneesRef);
+        const adminId = newAdminRef.key;
+        
+        await window.dbSet(newAdminRef, {
+          name: adminName,
+          isAdmin: true,
           createdAt: new Date().toISOString()
-        },
-        teams: {}  // 빈 팀 목록으로 시작
-      });
-      
-      alert(`회원가입 완료!\n\n아이디: ${username}\n이름: ${displayName}\n\n로그인해주세요.`);
-      showLoginScreen();
-    }
+        });
+        
+        // 2. 회사 정보 생성
+        const newCompanyCode = generateCompanyCode();
+        const companyInfoRef = window.dbRef(window.db, `companies/${companyId}/info`);
+        
+        await window.dbSet(companyInfoRef, {
+          name: companyName,
+          password: password,
+          createdAt: new Date().toISOString(),
+          adminId: adminId,
+          companyCode: newCompanyCode
+        });
+        
+        // 3. 전역 변수 설정
+        currentCompanyId = companyId;
+        currentUser = adminName;
+        currentUserId = adminId;
+        isAdmin = true;
+        
+        companyInfo = {
+          name: companyName,
+          password: password,
+          createdAt: new Date().toISOString(),
+          adminId: adminId,
+          companyCode: newCompanyCode
+        };
+        
+        localStorage.setItem('currentCompanyId', companyId);
+        
+        alert(
+          `회사가 생성되었습니다!\n\n` +
+          `회사명: ${companyName}\n` +
+          `회사 ID: ${companyId}\n` +
+          `관리자: ${adminName}\n` +
+          `회사 코드: ${newCompanyCode}`
+        );
+        
+        console.log('🎉 회사 생성 완료! 메인 앱으로 이동...');
+        
+        // 4. 바로 메인 앱 표시
+        showMainApp();
+        
+      } catch (error) {
+        console.error('❌ 회사 생성 중 오류:', error);
+        alert('회사 생성 중 오류가 발생했습니다.\n\n오류: ' + error.message);
+      }
+    };
     
     function generateCompanyCode() {
       const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -3542,64 +3536,63 @@
     };
 
     function showMainApp() {
-      console.log('📱 메인 앱 표시');
-      
-      const loginContainer = document.getElementById('loginContainer');
-      loginContainer.style.display = 'none';
-      loginContainer.style.visibility = 'hidden';
-      loginContainer.style.opacity = '0';
-      
-      const appContainer = document.getElementById('appContainer');
-      appContainer.style.display = 'flex';
-      appContainer.classList.add('active');
-      
-      console.log('✅ 화면 전환 완료');
-      
-      document.getElementById('userAvatar').textContent = currentUser.charAt(0);
-      document.getElementById('headerUserName').textContent = currentUser;
-      
-      if (isAdmin) {
-        document.getElementById('headerUserName').innerHTML = 
-          `${currentUser} <span style="color: #FFD700; font-size: 11px;">👑 관리자</span>`;
-      }
-      
-      // ✅ 메뉴 버튼 이벤트 직접 연결
-      const menuBtn = document.getElementById('mainMenuBtn');
-      if (menuBtn) {
-        menuBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          toggleMenuFunction();
-        });
-        console.log('✅ 메뉴 버튼 이벤트 연결 완료');
-      } else {
-        console.error('❌ 메뉴 버튼을 찾을 수 없습니다');
-      }
+  console.log('📱 메인 앱 표시');
   
-      updateDateDisplay();
-      loadAssignees();
-      checkExpiredSubTeams();
-      loadWorks();
-      loadSites();
-      loadAllCompaniesWorks();
-      renderMenu();
-      
-      setTimeout(() => {
-        initMenuEventListeners();
-      }, 100);
-      
-      // ✅ 추가: 모달 이벤트 리스너도 초기화
-      setTimeout(() => {
-        initModalEventListeners();
-      }, 200);
-      
-      setTimeout(() => {
-        console.log('🗺️ 지도 초기화 시작...');
-        initMap();
-      }, 500);
-      
-      console.log('✅ 메인 앱 로드 완료');
-    }
+  const loginContainer = document.getElementById('loginContainer');
+  loginContainer.style.display = 'none';
+  loginContainer.style.visibility = 'hidden';
+  loginContainer.style.opacity = '0';
+  
+  const appContainer = document.getElementById('appContainer');
+  appContainer.style.display = 'flex';
+  appContainer.classList.add('active');
+  
+  console.log('✅ 화면 전환 완료');
+  
+  document.getElementById('userAvatar').textContent = currentUser.charAt(0);
+  document.getElementById('headerUserName').textContent = currentUser;
+  
+  if (isAdmin) {
+    document.getElementById('headerUserName').innerHTML = 
+      `${currentUser} <span style="color: #FFD700; font-size: 11px;">👑 관리자</span>`;
+  }
+  
+  // ✅ 메뉴 버튼 이벤트 직접 연결
+  const menuBtn = document.getElementById('mainMenuBtn');
+  if (menuBtn) {
+    menuBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleMenuFunction();
+    });
+    console.log('✅ 메뉴 버튼 이벤트 연결 완료');
+  } else {
+    console.error('❌ 메뉴 버튼을 찾을 수 없습니다');
+  }
+  
+  updateDateDisplay();
+  loadAssignees();
+  loadWorks();
+  loadSites();
+  loadAllCompaniesWorks();
+  renderMenu();
+  
+  setTimeout(() => {
+    initMenuEventListeners();
+  }, 100);
+  
+  // ✅ 추가: 모달 이벤트 리스너도 초기화
+  setTimeout(() => {
+    initModalEventListeners();
+  }, 200);
+  
+  setTimeout(() => {
+    console.log('🗺️ 지도 초기화 시작...');
+    initMap();
+  }, 500);
+  
+  console.log('✅ 메인 앱 로드 완료');
+}
     
     window.login = function(userName) {
       console.log('🎯 로그인 시도:', userName);
@@ -4791,32 +4784,27 @@
     }
     
     function saveAssignee(workId, assignee) {
-      const workRef = window.dbRef(window.db, `teams/${currentTeamId}/works/${workId}`);
+      const workRef = window.dbRef(window.db, `companies/${currentCompanyId}/works/${workId}`);
       window.dbUpdate(workRef, {
-        assignee: assignee,
-        assignedAt: new Date().toISOString()
+        assignee: assignee
       });
     }
     
     function deleteWork(workId) {
-      // 권한 체크 제거 - 모든 팀원이 삭제 가능
       const work = works[workId];
       if (!work) return;
-      
       if (work.work === '시험') {
-        if (!confirm('이 시험 작업과 관련된 모든 작업을 삭제하시겠습니까?')) return;
-        // 관련 작업도 삭제
+        if (!confirm('이 시험 작업과 관련된 모든 작업(캡핑, 탈형, 7일강도, 28일강도)을 삭제하시겠습니까?')) return;
         Object.keys(works).forEach(id => {
           if (works[id].parentWorkId === workId) {
-            const childWorkRef = window.dbRef(window.db, `teams/${currentTeamId}/works/${id}`);
+            const childWorkRef = window.dbRef(window.db, `companies/${currentCompanyId}/works/${id}`);
             window.dbRemove(childWorkRef);
           }
         });
       } else {
         if (!confirm('이 작업을 삭제하시겠습니까?')) return;
       }
-      
-      const workRef = window.dbRef(window.db, `teams/${currentTeamId}/works/${workId}`);
+      const workRef = window.dbRef(window.db, `companies/${currentCompanyId}/works/${workId}`);
       window.dbRemove(workRef);
     }
     
