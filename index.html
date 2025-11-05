@@ -1751,9 +1751,9 @@
       <button class="secondary-btn" onclick="showCreateCompanyStep()">가입하기</button>
     </div>
 
-    <!-- Step 2: 새 회사 만들기 -->
+    <!-- Step 2: 계정 만들기 -->
     <div class="login-box" id="createCompanyStep" style="display: none;">
-      <h1 class="login-title">🏢 새 회사 만들기</h1>
+      <h1 class="login-title">🏢 계정 만들기</h1>
       <button class="back-btn" onclick="backToCompanyLogin()">← 뒤로</button>
       
       <div class="input-group">
@@ -1867,34 +1867,38 @@
       <span class="menu-item-text">사용 설명서</span>
     </div>
     
-    <div id="adminMenuSection" style="display: none;">
+    <div id="teamMenuSection">
       <div class="menu-divider"></div>
-      <div class="menu-item" style="background: #fff8e1; pointer-events: none;">
-        <span class="menu-item-icon">👑</span>
-        <span class="menu-item-text" style="font-weight: 600; color: #F57C00;">관리 메뉴</span>
+      <div class="menu-item" style="background: #e3f2fd; pointer-events: none;">
+        <span class="menu-item-icon">🌟</span>
+        <span class="menu-item-text" style="font-weight: 600; color: #1976d2;">팀 관리</span>
+      </div>
+      <div class="menu-item" onclick="toggleCreateTeamModal(); toggleMenu();">
+        <span class="menu-item-icon">➕</span>
+        <span class="menu-item-text">팀 만들기</span>
+      </div>
+      <div class="menu-item" onclick="toggleJoinTeamModal(); toggleMenu();">
+        <span class="menu-item-icon">🔗</span>
+        <span class="menu-item-text">팀 참여하기</span>
       </div>
       <div class="menu-item" onclick="toggleCompanyCodeModal(); toggleMenu();">
         <span class="menu-item-icon">🔑</span>
-        <span class="menu-item-text">회사 코드 확인</span>
+        <span class="menu-item-text">팀코드 확인</span>
       </div>
-      <div class="menu-item" onclick="toggleStaffManageModal(); toggleMenu();">
+      <div class="menu-item" onclick="toggleInviteMemberModal(); toggleMenu();">
         <span class="menu-item-icon">👥</span>
-        <span class="menu-item-text">직원 관리</span>
+        <span class="menu-item-text">팀원 초대</span>
       </div>
-      <div class="menu-item" onclick="toggleCompanyInfoModal(); toggleMenu();">
-        <span class="menu-item-icon">🏢</span>
-        <span class="menu-item-text">회사 정보 수정</span>
-      </div>
-      <div class="menu-item" onclick="toggleTransferAdminModal(); toggleMenu();">
-        <span class="menu-item-icon">🔄</span>
-        <span class="menu-item-text">관리자 권한 이전</span>
+      <div class="menu-item" onclick="toggleTeamSettingsModal(); toggleMenu();">
+        <span class="menu-item-icon">⚙️</span>
+        <span class="menu-item-text">팀 설정</span>
       </div>
     </div>
     
     <div class="menu-divider"></div>
     <div class="menu-item menu-item-danger" onclick="deleteCompany()">
       <span class="menu-item-icon">⚠️</span>
-      <span class="menu-item-text">회사 탈퇴</span>
+      <span class="menu-item-text">팀 나가기</span>
     </div>
     <div class="menu-item menu-item-danger" onclick="logout()">
       <span class="menu-item-icon">🚪</span>
@@ -1971,11 +1975,11 @@
     </div>
   </div>
 
-  <!-- 회사 코드 확인 모달 -->
+  <!-- 팀코드 확인 모달 -->
   <div class="modal-overlay" id="companyCodeModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title">🔑 회사 코드</h3>
+        <h3 class="modal-title">🔑 팀코드</h3>
         <button class="close-btn" onclick="toggleCompanyCodeModal()">×</button>
       </div>
       
@@ -1991,7 +1995,7 @@
         </div>
         
         <div style="display: flex; gap: 10px; justify-content: center;">
-          <button class="admin-btn" onclick="copyCompanyCode()" style="flex: 1; max-width: 200px;">
+          <button class="admin-btn" id="copyBtn" onclick="copyCompanyCode()" style="flex: 1; max-width: 200px;">
             📋 복사하기
           </button>
           <button class="admin-btn" onclick="regenerateCompanyCode()" style="flex: 1; max-width: 200px; background: #ff9800;">
@@ -2005,7 +2009,136 @@
       </div>
     </div>
   </div>
-  
+
+  <!-- 팀 만들기 모달 -->
+  <div class="modal-overlay" id="createTeamModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">➕ 팀 만들기</h3>
+        <button class="close-btn" onclick="toggleCreateTeamModal()">×</button>
+      </div>
+
+      <div style="padding: 20px;">
+        <div class="input-group">
+          <label class="input-label">팀명</label>
+          <input type="text" class="admin-input" id="newTeamNameInput" placeholder="예: 프로젝트 A팀" autocomplete="off">
+          <div class="input-hint">팀원들과 공유할 팀 이름을 입력하세요</div>
+        </div>
+
+        <button class="admin-btn" onclick="createTeam()" style="width: 100%; margin-top: 20px;">
+          팀 만들기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 팀 참여하기 모달 -->
+  <div class="modal-overlay" id="joinTeamModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">🔗 팀 참여하기</h3>
+        <button class="close-btn" onclick="toggleJoinTeamModal()">×</button>
+      </div>
+
+      <div style="padding: 20px;">
+        <p style="font-size: 14px; color: #666; margin-bottom: 20px; text-align: center;">
+          팀 관리자에게 받은 팀코드를 입력하세요
+        </p>
+
+        <div class="input-group">
+          <label class="input-label">팀코드</label>
+          <input type="text" class="admin-input" id="joinTeamCodeInput" placeholder="예: ABC123" autocomplete="off" style="text-transform: uppercase; letter-spacing: 2px; text-align: center; font-family: 'Courier New', monospace; font-size: 18px;">
+          <div class="input-hint">6자리 팀코드를 입력하세요</div>
+        </div>
+
+        <button class="admin-btn" onclick="joinTeam()" style="width: 100%; margin-top: 20px;">
+          참여하기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 팀원 초대 모달 -->
+  <div class="modal-overlay" id="inviteMemberModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">👥 팀원 초대</h3>
+        <button class="close-btn" onclick="toggleInviteMemberModal()">×</button>
+      </div>
+
+      <div style="padding: 20px;">
+        <div style="margin-bottom: 30px;">
+          <h4 style="font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 600;">
+            ① 팀코드 공유
+          </h4>
+          <div style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%); border: 2px dashed #1976d2; border-radius: 12px; padding: 20px; text-align: center;">
+            <div style="font-size: 24px; font-weight: 700; color: #1976d2; letter-spacing: 3px; font-family: 'Courier New', monospace; margin-bottom: 15px;" id="inviteTeamCode">
+              ------
+            </div>
+            <button class="admin-btn" id="copyInviteCodeBtn" onclick="copyTeamCodeForInvite()" style="max-width: 200px;">
+              📋 코드 복사하기
+            </button>
+          </div>
+          <p style="font-size: 12px; color: #999; margin-top: 10px; text-align: center;">
+            이 코드를 팀원에게 공유하세요
+          </p>
+        </div>
+
+        <div class="divider" style="margin: 30px 0;">
+          <span>또는</span>
+        </div>
+
+        <div>
+          <h4 style="font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 600;">
+            ② ID로 직접 초대
+          </h4>
+          <div class="input-group">
+            <label class="input-label">사용자 ID</label>
+            <input type="text" class="admin-input" id="inviteUserIdInput" placeholder="초대할 사용자의 ID 입력" autocomplete="off">
+            <div class="input-hint">초대하려는 사용자의 로그인 ID를 입력하세요</div>
+          </div>
+
+          <button class="admin-btn" onclick="inviteByUserId()" style="width: 100%; margin-top: 15px;">
+            초대 보내기
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 팀 설정 모달 -->
+  <div class="modal-overlay" id="teamSettingsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">⚙️ 팀 설정</h3>
+        <button class="close-btn" onclick="toggleTeamSettingsModal()">×</button>
+      </div>
+
+      <div style="padding: 20px;">
+        <div class="input-group" style="margin-bottom: 30px;">
+          <label class="input-label">팀명</label>
+          <input type="text" class="admin-input" id="editTeamNameInput" placeholder="팀 이름" autocomplete="off">
+        </div>
+
+        <div style="margin-bottom: 30px;">
+          <h4 style="font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 600;">
+            팀원 목록 (<span id="teamMemberCount">0</span>명)
+          </h4>
+          <ul class="site-list" id="teamMemberList"></ul>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button class="admin-btn" onclick="saveTeamSettings()" style="flex: 1;">
+            저장
+          </button>
+          <button class="admin-btn" onclick="leaveTeam()" style="flex: 1; background: #f44336;">
+            팀 나가기
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- 직원 관리 모달 -->
   <div class="modal-overlay" id="staffManageModal">
     <div class="modal-content">
@@ -2348,7 +2481,7 @@
     };
     
     window.toggleCompanyCodeModal = function() {
-      console.log('🔑 회사 코드 모달 토글');
+      console.log('🔑 팀코드 모달 토글');
       const modal = document.getElementById('companyCodeModal');
       
       if (!modal) {
@@ -2379,7 +2512,149 @@
       modal.classList.toggle('active');
       console.log(modal.classList.contains('active') ? '✅ 열림' : '✅ 닫힘');
     };
-    
+
+    // ===== 팀 관리 함수들 =====
+
+    window.toggleCreateTeamModal = function() {
+      console.log('➕ 팀 만들기 모달 토글');
+      const modal = document.getElementById('createTeamModal');
+      if (modal) {
+        modal.classList.toggle('active');
+      }
+    };
+
+    window.toggleJoinTeamModal = function() {
+      console.log('🔗 팀 참여하기 모달 토글');
+      const modal = document.getElementById('joinTeamModal');
+      if (modal) {
+        modal.classList.toggle('active');
+      }
+    };
+
+    window.toggleInviteMemberModal = function() {
+      console.log('👥 팀원 초대 모달 토글');
+      const modal = document.getElementById('inviteMemberModal');
+      if (modal) {
+        // 팀코드 표시
+        if (companyInfo && companyInfo.companyCode) {
+          document.getElementById('inviteTeamCode').textContent = companyInfo.companyCode;
+        }
+        modal.classList.toggle('active');
+      }
+    };
+
+    window.toggleTeamSettingsModal = function() {
+      console.log('⚙️ 팀 설정 모달 토글');
+      const modal = document.getElementById('teamSettingsModal');
+      if (modal) {
+        // TODO: 팀 정보 로드
+        modal.classList.toggle('active');
+      }
+    };
+
+    window.createTeam = function() {
+      const teamName = document.getElementById('newTeamNameInput').value.trim();
+
+      if (!teamName) {
+        alert('팀명을 입력하세요.');
+        return;
+      }
+
+      // TODO: Phase 2에서 구현
+      console.log('팀 만들기:', teamName);
+      alert('팀 만들기 기능은 Phase 2에서 구현됩니다.\n\n팀명: ' + teamName);
+
+      toggleCreateTeamModal();
+    };
+
+    window.joinTeam = function() {
+      const teamCode = document.getElementById('joinTeamCodeInput').value.trim().toUpperCase();
+
+      if (!teamCode) {
+        alert('팀코드를 입력하세요.');
+        return;
+      }
+
+      if (teamCode.length !== 6) {
+        alert('팀코드는 6자리입니다.');
+        return;
+      }
+
+      // TODO: Phase 2에서 구현
+      console.log('팀 참여하기:', teamCode);
+      alert('팀 참여 기능은 Phase 2에서 구현됩니다.\n\n입력한 코드: ' + teamCode);
+
+      toggleJoinTeamModal();
+    };
+
+    window.copyTeamCodeForInvite = function() {
+      if (!companyInfo || !companyInfo.companyCode) {
+        alert('팀코드를 불러올 수 없습니다.');
+        return;
+      }
+
+      const code = companyInfo.companyCode;
+      const btn = document.getElementById('copyInviteCodeBtn');
+
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(code).then(() => {
+          if (btn) {
+            btn.innerHTML = '✓ 복사완료!';
+            btn.style.background = '#4caf50';
+
+            setTimeout(() => {
+              btn.innerHTML = '📋 코드 복사하기';
+              btn.style.background = '';
+            }, 2000);
+          }
+
+          if (navigator.vibrate) {
+            navigator.vibrate(50);
+          }
+        }).catch(err => {
+          alert('복사 실패: ' + err.message);
+        });
+      } else {
+        alert('클립보드 기능을 사용할 수 없습니다.');
+      }
+    };
+
+    window.inviteByUserId = function() {
+      const userId = document.getElementById('inviteUserIdInput').value.trim();
+
+      if (!userId) {
+        alert('사용자 ID를 입력하세요.');
+        return;
+      }
+
+      // TODO: Phase 2에서 구현
+      console.log('ID로 초대:', userId);
+      alert('ID 초대 기능은 Phase 2에서 구현됩니다.\n\n초대할 ID: ' + userId);
+    };
+
+    window.saveTeamSettings = function() {
+      const teamName = document.getElementById('editTeamNameInput').value.trim();
+
+      if (!teamName) {
+        alert('팀명을 입력하세요.');
+        return;
+      }
+
+      // TODO: Phase 2에서 구현
+      console.log('팀 설정 저장:', teamName);
+      alert('팀 설정 저장 기능은 Phase 2에서 구현됩니다.');
+    };
+
+    window.leaveTeam = function() {
+      if (!confirm('정말 팀을 나가시겠습니까?\n\n팀을 나가면 팀의 작업 목록에 접근할 수 없습니다.')) {
+        return;
+      }
+
+      // TODO: Phase 2에서 구현
+      console.log('팀 나가기');
+      alert('팀 나가기 기능은 Phase 2에서 구현됩니다.');
+    };
+
     window.toggleStaffManageModal = function() {
       console.log('👥 직원 관리 모달 토글');
       const modal = document.getElementById('staffManageModal');
@@ -5264,16 +5539,27 @@
 
     window.copyCompanyCode = function() {
       if (!companyInfo || !companyInfo.companyCode) {
-        alert('회사 코드를 불러올 수 없습니다.');
+        alert('팀코드를 불러올 수 없습니다.');
         return;
       }
-      
+
       const code = companyInfo.companyCode;
-      
+      const btn = document.getElementById('copyBtn');
+
       if (navigator.clipboard) {
         navigator.clipboard.writeText(code).then(() => {
-          alert(`회사 코드가 복사되었습니다!\n\n코드: ${code}\n\n이 코드를 직원들에게 공유하세요.`);
-          
+          // 버튼 텍스트 변경
+          if (btn) {
+            btn.innerHTML = '✓ 복사완료!';
+            btn.style.background = '#4caf50';
+
+            // 2초 후 원래대로
+            setTimeout(() => {
+              btn.innerHTML = '📋 복사하기';
+              btn.style.background = '';
+            }, 2000);
+          }
+
           if (navigator.vibrate) {
             navigator.vibrate(50);
           }
@@ -5548,14 +5834,27 @@
       textArea.style.left = '-999999px';
       document.body.appendChild(textArea);
       textArea.select();
-      
+
+      const btn = document.getElementById('copyBtn');
+
       try {
         document.execCommand('copy');
-        alert(`회사 코드가 복사되었습니다!\n\n코드: ${text}\n\n이 코드를 직원들에게 공유하세요.`);
+
+        // 버튼 텍스트 변경
+        if (btn) {
+          btn.innerHTML = '✓ 복사완료!';
+          btn.style.background = '#4caf50';
+
+          // 2초 후 원래대로
+          setTimeout(() => {
+            btn.innerHTML = '📋 복사하기';
+            btn.style.background = '';
+          }, 2000);
+        }
       } catch (err) {
         alert(`코드를 복사할 수 없습니다.\n\n수동으로 복사하세요: ${text}`);
       }
-      
+
       document.body.removeChild(textArea);
     }
     
