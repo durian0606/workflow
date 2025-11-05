@@ -2817,76 +2817,41 @@
     
     async function checkSavedCompany() {
       const autoLogin = localStorage.getItem('autoLogin') === 'true';
-      const savedCompanyId = localStorage.getItem('savedCompanyId');
+      const savedUserId = localStorage.getItem('savedUserId');
       const savedPassword = localStorage.getItem('savedPassword');
-      
-      if (autoLogin && savedCompanyId && savedPassword) {
+
+      if (autoLogin && savedUserId && savedPassword) {
         console.log('🔐 자동 로그인 시도...');
-        
+
         try {
-          // 1. 회사 정보 확인
-          const companyRef = window.dbRef(window.db, `companies/${savedCompanyId}/info`);
-          const companyData = await new Promise((resolve, reject) => {
+          // 1. 사용자 정보 확인
+          const userRef = window.dbRef(window.db, `users/${savedUserId}/info`);
+          const userData = await new Promise((resolve, reject) => {
             const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
-            window.dbOnValue(companyRef, (snapshot) => {
+            window.dbOnValue(userRef, (snapshot) => {
               clearTimeout(timeoutId);
               resolve(snapshot.val());
             }, { onlyOnce: true });
           });
-          
-          if (!companyData || companyData.password !== savedPassword) {
+
+          if (!userData || userData.password !== savedPassword) {
             console.log('❌ 자동 로그인 실패 - 로그인 화면 표시');
             clearAutoLogin();
             showLoginScreen();
             return;
           }
-          
-          // 2. 관리자 정보 로드
-          const assigneesRef = window.dbRef(window.db, `companies/${savedCompanyId}/assignees`);
-          const assigneesData = await new Promise((resolve, reject) => {
-            const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
-            window.dbOnValue(assigneesRef, (snapshot) => {
-              clearTimeout(timeoutId);
-              resolve(snapshot.val());
-            }, { onlyOnce: true });
-          });
-          
-          if (!assigneesData) {
-            clearAutoLogin();
-            showLoginScreen();
-            return;
-          }
-          
-          // 3. 관리자 찾기
-          let adminUser = null;
-          Object.keys(assigneesData).forEach(key => {
-            if (assigneesData[key].isAdmin) {
-              adminUser = {
-                id: key,
-                name: assigneesData[key].name,
-                isAdmin: true
-              };
-            }
-          });
-          
-          if (!adminUser) {
-            clearAutoLogin();
-            showLoginScreen();
-            return;
-          }
-          
-          // 4. 전역 변수 설정
-          currentCompanyId = savedCompanyId;
-          currentUser = adminUser.name;
-          currentUserId = adminUser.id;
-          isAdmin = true;
-          companyInfo = companyData;
-          
+
+          // 2. 전역 변수 설정
+          currentUserId = savedUserId;
+          currentUser = userData.name;
+          currentTeamId = userData.currentTeamId || null;
+          userInfo = userData;
+
           console.log('✅ 자동 로그인 성공!');
-          
-          // 5. 바로 메인 앱 표시
+
+          // 3. 바로 메인 앱 표시
           showMainApp();
-          
+
         } catch (error) {
           console.error('❌ 자동 로그인 오류:', error);
           clearAutoLogin();
@@ -2899,16 +2864,16 @@
 
     function showLoginScreen() {
       document.getElementById('companyLoginStep').style.display = 'block';
-      
-      const savedCompanyId = localStorage.getItem('savedCompanyId');
-      if (savedCompanyId) {
-        document.getElementById('companyIdInput').value = savedCompanyId;
+
+      const savedUserId = localStorage.getItem('savedUserId');
+      if (savedUserId) {
+        document.getElementById('companyIdInput').value = savedUserId;
       }
     }
 
     function clearAutoLogin() {
       localStorage.removeItem('autoLogin');
-      localStorage.removeItem('savedCompanyId');
+      localStorage.removeItem('savedUserId');
       localStorage.removeItem('savedPassword');
     }
     
@@ -2930,104 +2895,69 @@
     }
     
     window.loginCompany = async function() {
-      const companyId = document.getElementById('companyIdInput').value.trim();
+      const userId = document.getElementById('companyIdInput').value.trim();
       const password = document.getElementById('companyPasswordInput').value;
       const autoLogin = document.getElementById('autoLoginCheckbox').checked;
-      
-      if (!companyId) {
+
+      if (!userId) {
         alert('ID를 입력하세요.');
         return;
       }
-      
+
       if (!password) {
         alert('비밀번호를 입력하세요.');
         return;
       }
-      
+
       try {
-        console.log('🔐 로그인 시도:', companyId);
-        
-        // 1. 회사 정보 확인
-        const companyRef = window.dbRef(window.db, `companies/${companyId}/info`);
-        const companyData = await new Promise((resolve, reject) => {
+        console.log('🔐 로그인 시도:', userId);
+
+        // 1. 사용자 정보 확인
+        const userRef = window.dbRef(window.db, `users/${userId}/info`);
+        const userData = await new Promise((resolve, reject) => {
           const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
-          window.dbOnValue(companyRef, (snapshot) => {
+          window.dbOnValue(userRef, (snapshot) => {
             clearTimeout(timeoutId);
             resolve(snapshot.val());
           }, { onlyOnce: true });
         });
-        
-        if (!companyData) {
+
+        if (!userData) {
           alert('존재하지 않는 ID입니다.');
           return;
         }
-        
-        if (companyData.password !== password) {
+
+        if (userData.password !== password) {
           alert('비밀번호가 일치하지 않습니다.');
           return;
         }
-        
+
         console.log('✅ 비밀번호 확인 완료');
-        
-        // 2. 관리자 정보 로드
-        const assigneesRef = window.dbRef(window.db, `companies/${companyId}/assignees`);
-        const assigneesData = await new Promise((resolve, reject) => {
-          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
-          window.dbOnValue(assigneesRef, (snapshot) => {
-            clearTimeout(timeoutId);
-            resolve(snapshot.val());
-          }, { onlyOnce: true });
-        });
-        
-        if (!assigneesData) {
-          alert('사용자 정보를 찾을 수 없습니다.');
-          return;
-        }
-        
-        // 3. 관리자 찾기
-        let adminUser = null;
-        Object.keys(assigneesData).forEach(key => {
-          if (assigneesData[key].isAdmin) {
-            adminUser = {
-              id: key,
-              name: assigneesData[key].name,
-              isAdmin: true
-            };
-          }
-        });
-        
-        if (!adminUser) {
-          alert('관리자 정보를 찾을 수 없습니다.');
-          return;
-        }
-        
-        console.log('✅ 관리자 찾음:', adminUser.name);
-        
-        // 4. 전역 변수 설정
-        currentCompanyId = companyId;
-        currentUser = adminUser.name;
-        currentUserId = adminUser.id;
-        isAdmin = true;
-        companyInfo = companyData;
-        
-        // 5. 자동 로그인 저장
+
+        // 2. 전역 변수 설정
+        currentUserId = userId;
+        currentUser = userData.name;
+        currentTeamId = userData.currentTeamId || null;
+        userInfo = userData;
+
+        // 3. 자동 로그인 저장
         if (autoLogin) {
           localStorage.setItem('autoLogin', 'true');
-          localStorage.setItem('savedCompanyId', companyId);
+          localStorage.setItem('savedUserId', userId);
           localStorage.setItem('savedPassword', password);
           console.log('✅ 자동 로그인 정보 저장됨');
         } else {
           localStorage.removeItem('autoLogin');
-          localStorage.setItem('savedCompanyId', companyId);
+          localStorage.setItem('savedUserId', userId);
           localStorage.removeItem('savedPassword');
-          console.log('ℹ️ 회사 ID만 저장됨');
+          console.log('ℹ️ 사용자 ID만 저장됨');
         }
-        
+
         console.log('🎉 로그인 성공! 메인 앱으로 이동...');
-        
-        // 6. 바로 메인 앱 표시
+
+        // 4. 바로 메인 앱 표시
         showMainApp();
-        
+
       } catch (error) {
         console.error('❌ 로그인 오류:', error);
         alert('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
