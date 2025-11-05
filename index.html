@@ -1755,17 +1755,11 @@
     <div class="login-box" id="createCompanyStep" style="display: none;">
       <h1 class="login-title">🏢 계정 만들기</h1>
       <button class="back-btn" onclick="backToCompanyLogin()">← 뒤로</button>
-      
-      <div class="input-group">
-        <label class="input-label">회사명</label>
-        <input type="text" class="admin-input" id="newCompanyNameInput" placeholder="예: (주)건설회사" autocomplete="off">
-        <div class="input-hint">실제 회사 이름을 입력하세요</div>
-      </div>
-      
+
       <div class="input-group">
         <label class="input-label">이름</label>
         <input type="text" class="admin-input" id="newAdminNameInput" placeholder="예: 홍길동" autocomplete="off">
-        <div class="input-hint">회사 관리자의 이름을 입력하세요</div>
+        <div class="input-hint">본인의 이름을 입력하세요</div>
       </div>
       
       <div class="input-group">
@@ -1785,7 +1779,7 @@
         <input type="password" class="admin-input" id="confirmPasswordInput" placeholder="비밀번호 재입력" autocomplete="new-password">
       </div>
       
-      <button class="admin-btn" onclick="createCompany()">회사 만들기</button>
+      <button class="admin-btn" onclick="createCompany()">가입하기</button>
     </div>
   </div>
 
@@ -2918,18 +2912,18 @@
       localStorage.removeItem('savedPassword');
     }
     
-    async function checkCompanyIdAvailability(companyId) {
+    async function checkCompanyIdAvailability(userId) {
       return new Promise((resolve) => {
-        const companiesRef = window.dbRef(window.db, 'companies');
-        window.dbOnValue(companiesRef, (snapshot) => {
-          const companies = snapshot.val();
-          
-          if (!companies) {
+        const usersRef = window.dbRef(window.db, 'users');
+        window.dbOnValue(usersRef, (snapshot) => {
+          const users = snapshot.val();
+
+          if (!users) {
             resolve(true);
             return;
           }
-          
-          const exists = Object.keys(companies).some(id => id === companyId);
+
+          const exists = Object.keys(users).some(id => id === userId);
           resolve(!exists);
         }, { onlyOnce: true });
       });
@@ -3098,110 +3092,104 @@
     });
 
     window.createCompany = async function() {
-      const companyName = document.getElementById('newCompanyNameInput').value.trim();
-      const companyId = document.getElementById('newCompanyIdInput').value.trim();
+      const userId = document.getElementById('newCompanyIdInput').value.trim();
       const password = document.getElementById('newCompanyPasswordInput').value;
       const confirmPassword = document.getElementById('confirmPasswordInput').value;
-      const adminName = document.getElementById('newAdminNameInput').value.trim();
-      
-      if (!companyName) {
-        alert('회사명을 입력하세요.');
+      const userName = document.getElementById('newAdminNameInput').value.trim();
+
+      if (!userName) {
+        alert('이름을 입력하세요.');
         return;
       }
-      
-      if (!companyId) {
+
+      if (!userId) {
         alert('ID를 입력하세요.');
         return;
       }
-      
+
       const regex = /^[a-zA-Z0-9]{4,20}$/;
-      if (!regex.test(companyId)) {
-        alert('회사 ID는 영문과 숫자 조합으로 4-20자여야 합니다.');
+      if (!regex.test(userId)) {
+        alert('ID는 영문과 숫자 조합으로 4-20자여야 합니다.');
         return;
       }
-      
+
       if (!password) {
         alert('비밀번호를 입력하세요.');
         return;
       }
-      
+
       if (password.length < 4) {
         alert('비밀번호는 최소 4자 이상이어야 합니다.');
         return;
       }
-      
+
       if (password !== confirmPassword) {
         alert('비밀번호가 일치하지 않습니다.');
         return;
       }
-      
-      if (!adminName) {
-        alert('이름을 입력하세요.');
-        return;
-      }
-      
-      const available = await checkCompanyIdAvailability(companyId);
+
+      const available = await checkCompanyIdAvailability(userId);
       if (!available) {
-        alert('이미 사용 중인 회사 ID입니다.');
+        alert('이미 사용 중인 ID입니다.');
         return;
       }
-      
+
       try {
-        // 1. 관리자 생성
-        const assigneesRef = window.dbRef(window.db, `companies/${companyId}/assignees`);
-        const newAdminRef = window.dbPush(assigneesRef);
-        const adminId = newAdminRef.key;
-        
-        await window.dbSet(newAdminRef, {
-          name: adminName,
-          isAdmin: true,
+        // 1. 사용자 정보 생성
+        const userInfoRef = window.dbRef(window.db, `users/${userId}/info`);
+
+        await window.dbSet(userInfoRef, {
+          userId: userId,
+          name: userName,
+          password: password,
+          currentTeamId: null,
           createdAt: new Date().toISOString()
         });
-        
-        // 2. 회사 정보 생성
-        const newCompanyCode = generateCompanyCode();
-        const companyInfoRef = window.dbRef(window.db, `companies/${companyId}/info`);
-        
-        await window.dbSet(companyInfoRef, {
-          name: companyName,
-          password: password,
-          createdAt: new Date().toISOString(),
-          adminId: adminId,
-          companyCode: newCompanyCode
-        });
-        
+
+        // 2. 개인 작업 목록 초기화
+        const personalWorklistsRef = window.dbRef(window.db, `users/${userId}/personalWorklists`);
+        await window.dbSet(personalWorklistsRef, {});
+
         // 3. 전역 변수 설정
-        currentCompanyId = companyId;
-        currentUser = adminName;
-        currentUserId = adminId;
-        isAdmin = true;
-        
-        companyInfo = {
-          name: companyName,
+        currentUserId = userId;
+        currentUser = userName;
+        currentTeamId = null;
+
+        userInfo = {
+          userId: userId,
+          name: userName,
           password: password,
-          createdAt: new Date().toISOString(),
-          adminId: adminId,
-          companyCode: newCompanyCode
+          currentTeamId: null,
+          createdAt: new Date().toISOString()
         };
-        
-        localStorage.setItem('currentCompanyId', companyId);
-        
+
+        localStorage.setItem('currentUserId', userId);
+
         alert(
-          `회사가 생성되었습니다!\n\n` +
-          `회사명: ${companyName}\n` +
-          `회사 ID: ${companyId}\n` +
-          `관리자: ${adminName}\n` +
-          `회사 코드: ${newCompanyCode}`
+          `가입이 완료되었습니다!\n\n` +
+          `이름: ${userName}\n` +
+          `ID: ${userId}\n\n` +
+          `로그인하여 작업을 시작하세요.`
         );
-        
-        console.log('🎉 회사 생성 완료! 메인 앱으로 이동...');
-        
-        // 4. 바로 메인 앱 표시
-        showMainApp();
-        
+
+        console.log('🎉 회원가입 완료! 로그인 화면으로 이동...');
+
+        // 4. 로그인 화면으로 돌아가기
+        document.getElementById('createCompanyStep').style.display = 'none';
+        document.getElementById('companyLoginStep').style.display = 'block';
+
+        // 입력란 초기화
+        document.getElementById('newAdminNameInput').value = '';
+        document.getElementById('newCompanyIdInput').value = '';
+        document.getElementById('newCompanyPasswordInput').value = '';
+        document.getElementById('confirmPasswordInput').value = '';
+
+        // 로그인 ID 자동 입력
+        document.getElementById('companyIdInput').value = userId;
+
       } catch (error) {
-        console.error('❌ 회사 생성 중 오류:', error);
-        alert('회사 생성 중 오류가 발생했습니다.\n\n오류: ' + error.message);
+        console.error('❌ 회원가입 중 오류:', error);
+        alert('회원가입 중 오류가 발생했습니다.\n\n오류: ' + error.message);
       }
     };
     
