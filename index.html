@@ -1763,13 +1763,13 @@
       </div>
       
       <div class="input-group">
-        <label class="input-label">관리자 이름</label>
+        <label class="input-label">이름</label>
         <input type="text" class="admin-input" id="newAdminNameInput" placeholder="예: 홍길동" autocomplete="off">
         <div class="input-hint">회사 관리자의 이름을 입력하세요</div>
       </div>
       
       <div class="input-group">
-        <label class="input-label">회사 ID</label>
+        <label class="input-label">ID</label>
         <input type="text" class="admin-input" id="newCompanyIdInput" placeholder="영문+숫자 조합" autocomplete="off">
         <div class="input-hint" id="companyIdHint">영문, 숫자 조합 (4-20자)</div>
       </div>
@@ -2666,7 +2666,7 @@
       const autoLogin = document.getElementById('autoLoginCheckbox').checked;
       
       if (!companyId) {
-        alert('회사 ID를 입력하세요.');
+        alert('ID를 입력하세요.');
         return;
       }
       
@@ -2689,7 +2689,7 @@
         });
         
         if (!companyData) {
-          alert('존재하지 않는 회사 ID입니다.');
+          alert('존재하지 않는 ID입니다.');
           return;
         }
         
@@ -2835,7 +2835,7 @@
       }
       
       if (!companyId) {
-        alert('회사 ID를 입력하세요.');
+        alert('ID를 입력하세요.');
         return;
       }
       
@@ -2861,7 +2861,7 @@
       }
       
       if (!adminName) {
-        alert('관리자 이름을 입력하세요.');
+        alert('이름을 입력하세요.');
         return;
       }
       
