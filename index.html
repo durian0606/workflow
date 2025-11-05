@@ -1875,14 +1875,6 @@
         <span class="menu-item-icon">🔗</span>
         <span class="menu-item-text">팀 참여하기</span>
       </div>
-      <div class="menu-item" onclick="toggleCompanyCodeModal(); toggleMenu();">
-        <span class="menu-item-icon">🔑</span>
-        <span class="menu-item-text">팀코드 확인</span>
-      </div>
-      <div class="menu-item" onclick="toggleInviteMemberModal(); toggleMenu();">
-        <span class="menu-item-icon">👥</span>
-        <span class="menu-item-text">팀원 초대</span>
-      </div>
       <div class="menu-item" onclick="toggleTeamSettingsModal(); toggleMenu();">
         <span class="menu-item-icon">⚙️</span>
         <span class="menu-item-text">팀 설정</span>
@@ -2109,11 +2101,46 @@
       </div>
 
       <div style="padding: 20px;">
+        <!-- 팀명 수정 -->
         <div class="input-group" style="margin-bottom: 30px;">
           <label class="input-label">팀명</label>
           <input type="text" class="admin-input" id="editTeamNameInput" placeholder="팀 이름" autocomplete="off">
         </div>
 
+        <!-- 팀코드 표시 -->
+        <div style="margin-bottom: 30px;">
+          <h4 style="font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 600;">
+            팀코드
+          </h4>
+          <div style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%); border: 2px dashed #1976d2; border-radius: 12px; padding: 20px; text-align: center;">
+            <div style="font-size: 24px; font-weight: 700; color: #1976d2; letter-spacing: 3px; font-family: 'Courier New', monospace; margin-bottom: 15px;" id="settingsTeamCode">
+              ------
+            </div>
+            <button class="admin-btn" id="copySettingsCodeBtn" onclick="copyTeamCodeFromSettings()" style="max-width: 200px;">
+              📋 코드 복사하기
+            </button>
+          </div>
+          <p style="font-size: 12px; color: #999; margin-top: 10px; text-align: center;">
+            이 코드를 팀원에게 공유하세요
+          </p>
+        </div>
+
+        <!-- 팀원 초대 -->
+        <div style="margin-bottom: 30px;">
+          <h4 style="font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 600;">
+            ID로 팀원 초대
+          </h4>
+          <div class="input-group">
+            <label class="input-label">사용자 ID</label>
+            <input type="text" class="admin-input" id="settingsInviteUserIdInput" placeholder="초대할 사용자의 ID 입력" autocomplete="off">
+            <div class="input-hint">초대하려는 사용자의 로그인 ID를 입력하세요</div>
+          </div>
+          <button class="admin-btn" onclick="inviteByUserIdFromSettings()" style="width: 100%; margin-top: 15px;">
+            초대 보내기
+          </button>
+        </div>
+
+        <!-- 팀원 목록 -->
         <div style="margin-bottom: 30px;">
           <h4 style="font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 600;">
             팀원 목록 (<span id="teamMemberCount">0</span>명)
@@ -2121,6 +2148,7 @@
           <ul class="site-list" id="teamMemberList"></ul>
         </div>
 
+        <!-- 버튼들 -->
         <div style="display: flex; gap: 10px;">
           <button class="admin-btn" onclick="saveTeamSettings()" style="flex: 1;">
             저장
@@ -2537,16 +2565,104 @@
       }
     };
 
-    window.toggleTeamSettingsModal = function() {
+    window.toggleTeamSettingsModal = async function() {
       console.log('⚙️ 팀 설정 모달 토글');
       const modal = document.getElementById('teamSettingsModal');
       if (modal) {
-        // TODO: 팀 정보 로드
+        const isOpening = !modal.classList.contains('active');
+
+        if (isOpening && currentTeamId) {
+          // 팀 정보 로드
+          try {
+            const teamInfoRef = window.dbRef(window.db, `teams/${currentTeamId}/info`);
+            const teamInfoSnapshot = await new Promise((resolve, reject) => {
+              const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+              window.dbOnValue(teamInfoRef, (snapshot) => {
+                clearTimeout(timeoutId);
+                resolve(snapshot);
+              }, { onlyOnce: true });
+            });
+
+            if (teamInfoSnapshot.exists()) {
+              const teamInfo = teamInfoSnapshot.val();
+
+              // 팀명 표시
+              const nameInput = document.getElementById('editTeamNameInput');
+              if (nameInput) {
+                nameInput.value = teamInfo.name || '';
+              }
+
+              // 팀코드 표시
+              const codeDisplay = document.getElementById('settingsTeamCode');
+              if (codeDisplay) {
+                codeDisplay.textContent = teamInfo.teamCode || '------';
+              }
+            }
+
+            // 팀원 목록 로드
+            const membersRef = window.dbRef(window.db, `teams/${currentTeamId}/members`);
+            const membersSnapshot = await new Promise((resolve, reject) => {
+              const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+              window.dbOnValue(membersRef, (snapshot) => {
+                clearTimeout(timeoutId);
+                resolve(snapshot);
+              }, { onlyOnce: true });
+            });
+
+            const memberList = document.getElementById('teamMemberList');
+            const memberCount = document.getElementById('teamMemberCount');
+
+            if (membersSnapshot.exists()) {
+              const members = membersSnapshot.val();
+              const memberArray = Object.entries(members);
+
+              if (memberCount) {
+                memberCount.textContent = memberArray.length;
+              }
+
+              if (memberList) {
+                memberList.innerHTML = '';
+                memberArray.forEach(([userId, memberData]) => {
+                  const li = document.createElement('li');
+                  li.className = 'site-item';
+
+                  const roleIcon = memberData.role === 'creator' ? '👑 ' : '👤 ';
+                  const roleText = memberData.role === 'creator' ? ' (생성자)' : '';
+
+                  li.innerHTML = `
+                    <span style="display: flex; align-items: center; gap: 8px;">
+                      <span>${roleIcon}${memberData.name}${roleText}</span>
+                      <span style="font-size: 11px; color: #999;">(${userId})</span>
+                    </span>
+                  `;
+                  memberList.appendChild(li);
+                });
+              }
+            } else {
+              if (memberCount) memberCount.textContent = '0';
+              if (memberList) memberList.innerHTML = '<li class="site-item" style="text-align: center; color: #999;">팀원이 없습니다</li>';
+            }
+
+          } catch (error) {
+            console.error('팀 정보 로드 실패:', error);
+          }
+        }
+
         modal.classList.toggle('active');
       }
     };
 
-    window.createTeam = function() {
+    // 팀 코드 생성 함수 (6자리 영문+숫자)
+    function generateTeamCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 혼동되기 쉬운 문자 제외 (I, O, 0, 1)
+      let code = '';
+      for (let i = 0; i < 6; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
+    }
+
+    window.createTeam = async function() {
       const teamName = document.getElementById('newTeamNameInput').value.trim();
 
       if (!teamName) {
@@ -2554,14 +2670,72 @@
         return;
       }
 
-      // TODO: Phase 2에서 구현
-      console.log('팀 만들기:', teamName);
-      alert('팀 만들기 기능은 Phase 2에서 구현됩니다.\n\n팀명: ' + teamName);
+      // 로그인 확인
+      if (!currentUserId || !userInfo) {
+        alert('로그인이 필요합니다.');
+        return;
+      }
 
-      toggleCreateTeamModal();
+      // 이미 팀에 속해있는지 확인
+      if (currentTeamId) {
+        alert('이미 팀에 속해 있습니다. 새 팀을 만들려면 먼저 현재 팀에서 나가야 합니다.');
+        return;
+      }
+
+      try {
+        // 1. 고유한 팀 ID 및 코드 생성
+        const teamId = 'team_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        const teamCode = generateTeamCode();
+
+        // 2. 팀 정보 저장
+        const teamInfoRef = window.dbRef(window.db, `teams/${teamId}/info`);
+        await window.dbSet(teamInfoRef, {
+          teamId: teamId,
+          name: teamName,
+          teamCode: teamCode,
+          createdBy: currentUserId,
+          createdAt: new Date().toISOString()
+        });
+
+        // 3. 팀원 목록에 생성자 추가
+        const memberRef = window.dbRef(window.db, `teams/${teamId}/members/${currentUserId}`);
+        await window.dbSet(memberRef, {
+          name: userInfo.name,
+          joinedAt: new Date().toISOString(),
+          role: 'creator'
+        });
+
+        // 4. 팀 작업 목록 초기화
+        const worklistsRef = window.dbRef(window.db, `teams/${teamId}/worklists`);
+        await window.dbSet(worklistsRef, {});
+
+        // 5. 사용자의 currentTeamId 업데이트
+        const userInfoRef = window.dbRef(window.db, `users/${currentUserId}/info`);
+        await window.dbUpdate(userInfoRef, {
+          currentTeamId: teamId
+        });
+
+        // 6. 전역 변수 업데이트
+        currentTeamId = teamId;
+        userInfo.currentTeamId = teamId;
+
+        alert(`팀이 성공적으로 생성되었습니다!\n\n팀명: ${teamName}\n팀코드: ${teamCode}\n\n팀코드를 팀원들과 공유하세요.`);
+
+        // 입력 필드 초기화
+        document.getElementById('newTeamNameInput').value = '';
+
+        toggleCreateTeamModal();
+
+        // TODO: 메인 화면 새로고침하여 팀 정보 표시
+        console.log('팀 생성 완료:', teamId, teamCode);
+
+      } catch (error) {
+        console.error('팀 생성 실패:', error);
+        alert('팀 생성에 실패했습니다: ' + error.message);
+      }
     };
 
-    window.joinTeam = function() {
+    window.joinTeam = async function() {
       const teamCode = document.getElementById('joinTeamCodeInput').value.trim().toUpperCase();
 
       if (!teamCode) {
@@ -2574,11 +2748,80 @@
         return;
       }
 
-      // TODO: Phase 2에서 구현
-      console.log('팀 참여하기:', teamCode);
-      alert('팀 참여 기능은 Phase 2에서 구현됩니다.\n\n입력한 코드: ' + teamCode);
+      // 로그인 확인
+      if (!currentUserId || !userInfo) {
+        alert('로그인이 필요합니다.');
+        return;
+      }
 
-      toggleJoinTeamModal();
+      // 이미 팀에 속해있는지 확인
+      if (currentTeamId) {
+        alert('이미 팀에 속해 있습니다. 새 팀에 참여하려면 먼저 현재 팀에서 나가야 합니다.');
+        return;
+      }
+
+      try {
+        // 1. 팀코드로 팀 찾기
+        const teamsRef = window.dbRef(window.db, 'teams');
+        const teamsSnapshot = await new Promise((resolve, reject) => {
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 10000);
+          window.dbOnValue(teamsRef, (snapshot) => {
+            clearTimeout(timeoutId);
+            resolve(snapshot);
+          }, { onlyOnce: true });
+        });
+
+        let foundTeamId = null;
+        let foundTeamInfo = null;
+
+        if (teamsSnapshot.exists()) {
+          const teams = teamsSnapshot.val();
+          for (const teamId in teams) {
+            if (teams[teamId].info && teams[teamId].info.teamCode === teamCode) {
+              foundTeamId = teamId;
+              foundTeamInfo = teams[teamId].info;
+              break;
+            }
+          }
+        }
+
+        if (!foundTeamId) {
+          alert('존재하지 않는 팀코드입니다.');
+          return;
+        }
+
+        // 2. 팀에 멤버로 추가
+        const memberRef = window.dbRef(window.db, `teams/${foundTeamId}/members/${currentUserId}`);
+        await window.dbSet(memberRef, {
+          name: userInfo.name,
+          joinedAt: new Date().toISOString(),
+          role: 'member'
+        });
+
+        // 3. 사용자의 currentTeamId 업데이트
+        const userInfoRef = window.dbRef(window.db, `users/${currentUserId}/info`);
+        await window.dbUpdate(userInfoRef, {
+          currentTeamId: foundTeamId
+        });
+
+        // 4. 전역 변수 업데이트
+        currentTeamId = foundTeamId;
+        userInfo.currentTeamId = foundTeamId;
+
+        alert(`팀에 성공적으로 참여했습니다!\n\n팀명: ${foundTeamInfo.name}`);
+
+        // 입력 필드 초기화
+        document.getElementById('joinTeamCodeInput').value = '';
+
+        toggleJoinTeamModal();
+
+        // TODO: 메인 화면 새로고침하여 팀 정보 표시
+        console.log('팀 참여 완료:', foundTeamId);
+
+      } catch (error) {
+        console.error('팀 참여 실패:', error);
+        alert('팀 참여에 실패했습니다: ' + error.message);
+      }
     };
 
     window.copyTeamCodeForInvite = function() {
@@ -2626,7 +2869,112 @@
       alert('ID 초대 기능은 Phase 2에서 구현됩니다.\n\n초대할 ID: ' + userId);
     };
 
-    window.saveTeamSettings = function() {
+    // 팀 설정 모달에서 팀코드 복사
+    window.copyTeamCodeFromSettings = function() {
+      if (!companyInfo || !companyInfo.companyCode) {
+        alert('팀코드를 불러올 수 없습니다.');
+        return;
+      }
+
+      const code = companyInfo.companyCode;
+      const btn = document.getElementById('copySettingsCodeBtn');
+
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(code).then(() => {
+          if (btn) {
+            btn.innerHTML = '✓ 복사완료!';
+            btn.style.background = '#4caf50';
+
+            setTimeout(() => {
+              btn.innerHTML = '📋 코드 복사하기';
+              btn.style.background = '';
+            }, 2000);
+          }
+
+          if (navigator.vibrate) {
+            navigator.vibrate(50);
+          }
+        }).catch(err => {
+          alert('복사 실패: ' + err.message);
+        });
+      } else {
+        alert('클립보드 기능을 사용할 수 없습니다.');
+      }
+    };
+
+    // 팀 설정 모달에서 ID로 초대
+    window.inviteByUserIdFromSettings = async function() {
+      const userId = document.getElementById('settingsInviteUserIdInput').value.trim();
+
+      if (!userId) {
+        alert('사용자 ID를 입력하세요.');
+        return;
+      }
+
+      // 로그인 및 팀 확인
+      if (!currentUserId || !currentTeamId) {
+        alert('팀에 속해 있지 않습니다.');
+        return;
+      }
+
+      // 자기 자신 초대 방지
+      if (userId === currentUserId) {
+        alert('자기 자신은 초대할 수 없습니다.');
+        return;
+      }
+
+      try {
+        // 1. 초대할 사용자가 존재하는지 확인
+        const targetUserRef = window.dbRef(window.db, `users/${userId}/info`);
+        const targetUserSnapshot = await new Promise((resolve, reject) => {
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          window.dbOnValue(targetUserRef, (snapshot) => {
+            clearTimeout(timeoutId);
+            resolve(snapshot);
+          }, { onlyOnce: true });
+        });
+
+        if (!targetUserSnapshot.exists()) {
+          alert('존재하지 않는 사용자 ID입니다.');
+          return;
+        }
+
+        const targetUserInfo = targetUserSnapshot.val();
+
+        // 2. 대상 사용자가 이미 다른 팀에 속해 있는지 확인
+        if (targetUserInfo.currentTeamId) {
+          alert(`${targetUserInfo.name}님은 이미 다른 팀에 속해 있습니다.`);
+          return;
+        }
+
+        // 3. 팀에 멤버로 추가
+        const memberRef = window.dbRef(window.db, `teams/${currentTeamId}/members/${userId}`);
+        await window.dbSet(memberRef, {
+          name: targetUserInfo.name,
+          joinedAt: new Date().toISOString(),
+          role: 'member'
+        });
+
+        // 4. 대상 사용자의 currentTeamId 업데이트
+        await window.dbUpdate(targetUserRef, {
+          currentTeamId: currentTeamId
+        });
+
+        alert(`${targetUserInfo.name}님을 팀에 초대했습니다.`);
+
+        // 입력 필드 초기화
+        document.getElementById('settingsInviteUserIdInput').value = '';
+
+        // TODO: 팀원 목록 새로고침
+        console.log('초대 완료:', userId);
+
+      } catch (error) {
+        console.error('초대 실패:', error);
+        alert('초대에 실패했습니다: ' + error.message);
+      }
+    };
+
+    window.saveTeamSettings = async function() {
       const teamName = document.getElementById('editTeamNameInput').value.trim();
 
       if (!teamName) {
@@ -2634,19 +2982,72 @@
         return;
       }
 
-      // TODO: Phase 2에서 구현
-      console.log('팀 설정 저장:', teamName);
-      alert('팀 설정 저장 기능은 Phase 2에서 구현됩니다.');
+      // 로그인 및 팀 확인
+      if (!currentUserId || !currentTeamId) {
+        alert('팀에 속해 있지 않습니다.');
+        return;
+      }
+
+      try {
+        // 팀명 업데이트
+        const teamInfoRef = window.dbRef(window.db, `teams/${currentTeamId}/info`);
+        await window.dbUpdate(teamInfoRef, {
+          name: teamName
+        });
+
+        alert('팀 설정이 저장되었습니다.');
+
+        // TODO: 메인 화면 새로고침하여 변경사항 반영
+        console.log('팀 설정 저장 완료:', teamName);
+
+      } catch (error) {
+        console.error('팀 설정 저장 실패:', error);
+        alert('팀 설정 저장에 실패했습니다: ' + error.message);
+      }
     };
 
-    window.leaveTeam = function() {
+    window.leaveTeam = async function() {
       if (!confirm('정말 팀을 나가시겠습니까?\n\n팀을 나가면 팀의 작업 목록에 접근할 수 없습니다.')) {
         return;
       }
 
-      // TODO: Phase 2에서 구현
-      console.log('팀 나가기');
-      alert('팀 나가기 기능은 Phase 2에서 구현됩니다.');
+      // 로그인 및 팀 확인
+      if (!currentUserId || !currentTeamId) {
+        alert('팀에 속해 있지 않습니다.');
+        return;
+      }
+
+      try {
+        // 1. 팀 멤버 목록에서 제거
+        const memberRef = window.dbRef(window.db, `teams/${currentTeamId}/members/${currentUserId}`);
+        await window.dbRemove(memberRef);
+
+        // 2. 사용자의 currentTeamId 초기화
+        const userInfoRef = window.dbRef(window.db, `users/${currentUserId}/info`);
+        await window.dbUpdate(userInfoRef, {
+          currentTeamId: null
+        });
+
+        // 3. 전역 변수 업데이트
+        const oldTeamId = currentTeamId;
+        currentTeamId = null;
+        userInfo.currentTeamId = null;
+
+        alert('팀에서 나갔습니다.');
+
+        // 팀 설정 모달 닫기
+        const modal = document.getElementById('teamSettingsModal');
+        if (modal && modal.classList.contains('active')) {
+          modal.classList.remove('active');
+        }
+
+        // TODO: 메인 화면 새로고침하여 변경사항 반영
+        console.log('팀 나가기 완료:', oldTeamId);
+
+      } catch (error) {
+        console.error('팀 나가기 실패:', error);
+        alert('팀 나가기에 실패했습니다: ' + error.message);
+      }
     };
 
     window.toggleStaffManageModal = function() {
