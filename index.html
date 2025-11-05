@@ -2782,6 +2782,8 @@
     let currentUserId = null;
     let isAdmin = false;
     let companyInfo = null;
+    let userInfo = null;
+    let currentTeamId = null;
     let map = null;
     let currentMarker = null;
     let currentLocationMarker = null;
@@ -2845,6 +2847,7 @@
           currentUserId = savedUserId;
           currentUser = userData.name;
           currentTeamId = userData.currentTeamId || null;
+          currentCompanyId = savedUserId; // 기존 코드 호환성을 위해
           userInfo = userData;
 
           console.log('✅ 자동 로그인 성공!');
@@ -2938,6 +2941,7 @@
         currentUserId = userId;
         currentUser = userData.name;
         currentTeamId = userData.currentTeamId || null;
+        currentCompanyId = userId; // 기존 코드 호환성을 위해
         userInfo = userData;
 
         // 3. 자동 로그인 저장
@@ -3080,7 +3084,14 @@
         const personalWorklistsRef = window.dbRef(window.db, `users/${userId}/personalWorklists`);
         await window.dbSet(personalWorklistsRef, {});
 
-        // 3. 전역 변수 설정
+        // 3. companies 구조 초기화 (기존 코드 호환성)
+        const companiesWorksRef = window.dbRef(window.db, `companies/${userId}/works`);
+        await window.dbSet(companiesWorksRef, {});
+
+        const companiesSitesRef = window.dbRef(window.db, `companies/${userId}/sites`);
+        await window.dbSet(companiesSitesRef, {});
+
+        // 4. 전역 변수 설정
         currentUserId = userId;
         currentUser = userName;
         currentTeamId = null;
@@ -3104,7 +3115,7 @@
 
         console.log('🎉 회원가입 완료! 로그인 화면으로 이동...');
 
-        // 4. 로그인 화면으로 돌아가기
+        // 5. 로그인 화면으로 돌아가기
         document.getElementById('createCompanyStep').style.display = 'none';
         document.getElementById('companyLoginStep').style.display = 'block';
 
@@ -3744,11 +3755,6 @@
   
   document.getElementById('userAvatar').textContent = currentUser.charAt(0);
   document.getElementById('headerUserName').textContent = currentUser;
-  
-  if (isAdmin) {
-    document.getElementById('headerUserName').innerHTML = 
-      `${currentUser} <span style="color: #FFD700; font-size: 11px;">👑 관리자</span>`;
-  }
   
   // ✅ 메뉴 버튼 이벤트 직접 연결
   const menuBtn = document.getElementById('mainMenuBtn');
