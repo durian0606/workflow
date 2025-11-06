@@ -1795,7 +1795,7 @@
           </div>
         </div>
         <div class="header-right">
-          <button class="menu-btn" type="button" id="mainMenuBtn">
+          <button class="menu-btn" type="button" id="mainMenuBtn" onclick="toggleMenu()">
             <span class="menu-hamburger">
               <span class="menu-line"></span>
               <span class="menu-line"></span>
@@ -2657,7 +2657,7 @@
                   li.className = 'site-item';
 
                   const roleIcon = memberData.role === 'creator' ? '👑 ' : '👤 ';
-                  const roleText = memberData.role === 'creator' ? ' (생성자)' : '';
+                  const roleText = '';
 
                   li.innerHTML = `
                     <span style="display: flex; align-items: center; gap: 8px;">
@@ -4183,20 +4183,7 @@
   
   document.getElementById('userAvatar').textContent = currentUser.charAt(0);
   document.getElementById('headerUserName').textContent = currentUser;
-  
-  // ✅ 메뉴 버튼 이벤트 직접 연결
-  const menuBtn = document.getElementById('mainMenuBtn');
-  if (menuBtn) {
-    menuBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      toggleMenuFunction();
-    });
-    console.log('✅ 메뉴 버튼 이벤트 연결 완료');
-  } else {
-    console.error('❌ 메뉴 버튼을 찾을 수 없습니다');
-  }
-  
+
   updateDateDisplay();
   loadAssignees();
   loadWorks();
@@ -4292,25 +4279,33 @@
     
     window.logout = function() {
       console.log('🚪 로그아웃 시작');
-      
+
+      // 메뉴 닫기
+      const menu = document.getElementById('menuDropdown');
+      const menuBtn = document.getElementById('mainMenuBtn');
+      const overlay = document.getElementById('menuOverlay');
+      if (menu) menu.classList.remove('active');
+      if (menuBtn) menuBtn.classList.remove('active');
+      if (overlay) overlay.classList.remove('active');
+
       currentUser = null;
       currentCompanyId = null;
-      
+
       const appContainer = document.getElementById('appContainer');
       appContainer.classList.remove('active');
       appContainer.style.display = 'none';
-      
+
       const loginContainer = document.getElementById('loginContainer');
       loginContainer.style.display = 'flex';
       loginContainer.style.visibility = 'visible';
       loginContainer.style.opacity = '1';
-      
+
       document.getElementById('companyLoginStep').style.display = 'block';
       document.getElementById('createCompanyStep').style.display = 'none';
       document.getElementById('userSelectStep').style.display = 'none';
-      
+
       document.getElementById('companyPasswordInput').value = '';
-      
+
       console.log('✅ 로그아웃 완료 - 회사 로그인 화면으로 이동');
     };
 
