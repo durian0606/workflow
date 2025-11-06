@@ -1,3 +1,2525 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>작업 관리</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background: linear-gradient(135deg, #2a459c 0%, #5b7fd6 100%);
+      touch-action: pan-y;
+      margin: 0 !important;
+      padding: 0 !important;
+      position: relative;
+    }
+    
+    /* 앱 컨테이너 */
+    .app-container {
+      display: none !important;
+      min-height: 100vh;
+      height: 100vh;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow-y: auto;
+    }
+    
+    .app-container.active {
+      display: flex !important;
+      flex-direction: column;
+    }
+
+    /* 로그인 화면 */
+    .login-container {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .app-header {
+      background: linear-gradient(135deg, #2a459c 0%, #5b7fd6 100%);
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      margin-top: 0;
+    }
+
+    .login-box {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .login-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #2a459c;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .admin-section {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .admin-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .admin-input:focus {
+      outline: none;
+      border-color: #2a459c;
+    }
+
+    .admin-btn {
+      width: 100%;
+      padding: 12px;
+      background: #2a459c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .admin-btn:hover {
+      background: #5b7fd6;
+    }
+
+    /* 로그인 화면 추가 스타일 */
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .input-hint {
+      font-size: 12px;
+      color: #999;
+      margin-top: 6px;
+    }
+
+    .input-hint.success {
+      color: #4caf50;
+    }
+
+    .input-hint.error {
+      color: #f44336;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 24px 0;
+      color: #999;
+      font-size: 13px;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .divider span {
+      padding: 0 16px;
+    }
+
+    .secondary-btn {
+      width: 100%;
+      padding: 12px;
+      background: white;
+      color: #2a459c;
+      border: 2px solid #2a459c;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .secondary-btn:hover {
+      background: #f5f7fa;
+    }
+
+    .back-btn {
+      background: #f5f7fa;
+      border: none;
+      color: #666;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-bottom: 20px;
+      transition: background 0.2s;
+    }
+
+    .back-btn:hover {
+      background: #e8eef3;
+    }
+
+    .company-info-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%);
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 2px solid #e0e0e0;
+    }
+
+    .company-badge-icon {
+      font-size: 18px;
+    }
+
+    .company-badge-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2a459c;
+    }
+
+    /* 자동 로그인 체크박스 */
+    .auto-login-container {
+      margin: 16px 0 20px 0;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .auto-login-checkbox {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #2a459c;
+    }
+
+    .checkbox-text {
+      font-size: 14px;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .checkbox-label:hover .checkbox-text {
+      color: #2a459c;
+    }
+
+    .header-row-1 {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-row-2 {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 18px;
+    }
+
+    .header-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .user-name {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .header-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+
+    .header-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .left-panel {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .date-display {
+      font-size: 15px;
+      font-weight: 600;
+      color: white;
+      flex: 1;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 6px;
+    }
+
+    .nav-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .task-input-container {
+      background: white;
+      padding: 20px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .task-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .task-input {
+      flex: 1;
+      padding: 14px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: border 0.2s;
+    }
+
+    .task-input:focus {
+      outline: none;
+      border-color: #2a459c;
+    }
+
+    .site-select-btn {
+      background: #f5f7fa;
+      border: 2px solid #e0e0e0;
+      color: #333;
+      padding: 14px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .site-select-btn:hover {
+      background: #e8eef3;
+      border-color: #2a459c;
+    }
+
+    .add-btn {
+      background: #2a459c;
+      border: none;
+      color: white;
+      padding: 14px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .add-btn:hover {
+      background: #5b7fd6;
+    }
+
+    .task-container {
+      background: white;
+      padding: 20px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .task-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .task-card {
+      background: white;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s;
+      position: relative;
+      cursor: grab;
+      overflow: hidden;
+    }
+    
+    .task-card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .other-companies-section {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex-shrink: 0;
+      margin: 0 4px;
+      align-self: center;
+    }
+    
+    .other-company-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      background: #fff3e0;
+      border: 1px solid #ffb74d;
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-size: 9px;
+      color: #f57c00;
+      font-weight: 500;
+    }
+    
+    .other-company-name-line {
+      display: flex;
+      align-items: center;
+    }
+       
+    .other-company-name {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    
+    .other-company-assignee-line {
+      display: flex;
+      align-items: center;
+      padding-left: 8px;
+    }
+    
+    .other-company-assignee {
+      font-size: 10px;
+      opacity: 0.9;
+      white-space: nowrap;
+    }
+    
+    .person-select-container {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+      align-self: center;
+    }
+
+    .task-card:active {
+      cursor: grabbing;
+    }
+
+    .task-card:hover {
+      border-color: #2a459c;
+      box-shadow: 0 2px 8px rgba(42, 69, 156, 0.15);
+    }
+
+    .task-card.dragging {
+      opacity: 0.5;
+    }
+
+    .task-card.drag-over {
+      border-color: #5b7fd6;
+      background: #f0f9f9;
+    }
+
+    body.dragging-active {
+      overflow: hidden;
+      position: fixed;
+      width: 100%;
+    }
+
+    .number-check-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+    
+    .order-number {
+      background: #2a459c;
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+    
+    .task-checkbox {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #2a459c;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .task-checkbox:hover {
+      background: #e8f4f5;
+      border-width: 3px;
+    }
+
+    .task-card.completed .task-checkbox {
+      background: #2a459c;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .task-card.completed .task-checkbox::after {
+      content: '✓';
+      position: absolute;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    .task-card.completed .task-checkbox:hover {
+      background: #5b7fd6;
+      border-color: #5b7fd6;
+      transform: scale(1.1);
+    }
+    
+    .task-card.completed .task-checkbox:active {
+      transform: scale(0.95);
+    }
+
+    .task-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      line-height: 1.3;
+    }
+
+    .task-card.completed .task-title {
+      text-decoration: line-through;
+      color: #999;
+    }
+
+    .task-card.my-task {
+      border-left: 4px solid #2a459c;
+      background: linear-gradient(to right, rgba(42, 69, 156, 0.03), white);
+    }
+
+    .select-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .select-label {
+      font-size: 9px;
+      color: #999;
+      font-weight: 500;
+    }
+
+    .assignee-select {
+      padding: 3px 6px;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 11px;
+      background: white;
+      cursor: pointer;
+      transition: border 0.2s;
+    }
+
+    .assignee-select:hover {
+      border-color: #2a459c;
+    }
+
+    .assignee-select:disabled {
+      background: #f5f7fa;
+      cursor: not-allowed;
+    }
+
+    .action-btn {
+      background: #ffe0e0;
+      border: none;
+      width: 50px;
+      height: 100%;
+      border-radius: 0;
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+      position: absolute;
+      right: -50px;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .action-btn:active {
+      background: #ffb3b3;
+    }
+
+    .action-btn:hover {
+      background: #ffcccc;
+      transform: scale(1.1);
+    }
+
+    .map-section {
+      background: white;
+      margin: 20px;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      min-height: 500px;
+    }
+
+    .map-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .map-section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .route-info {
+      font-size: 12px;
+      color: #2a459c;
+      font-weight: 600;
+      background: rgba(42, 69, 156, 0.1);
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+
+    .section-header {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    .section-header:hover {
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    .section-header.my-work {
+      color: #2a459c;
+    }
+
+    .section-toggle {
+      margin-right: 8px;
+      font-size: 14px;
+      transition: transform 0.3s;
+    }
+
+    .section-header.collapsed .section-toggle {
+      transform: rotate(-90deg);
+    }
+
+    .task-grid.collapsed {
+      display: none;
+    }
+
+    .section-divider {
+      margin: 20px 0;
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    #map {
+      width: 100%;
+      height: 450px;
+      border-radius: 8px;
+    }
+
+    .map-controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .map-btn {
+      background: #2a459c;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .map-btn:hover {
+      background: #5b7fd6;
+    }
+
+    .map-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: #999;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+    }
+
+    .timeline-item {
+      padding: 16px;
+      background: #f5f7fa;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .timeline-item.active {
+      background: #e8f4f5;
+      border-left: 4px solid #2a459c;
+    }
+
+    .timeline-work {
+      font-size: 15px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .timeline-date {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .site-list {
+      list-style: none;
+      margin-bottom: 20px;
+    }
+
+    .site-item {
+      padding: 14px;
+      background: #f5f7fa;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .site-item:hover {
+      background: #e8eef3;
+    }
+
+    .site-item-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .site-item-name {
+      font-size: 14px;
+      color: #333;
+      font-weight: 600;
+    }
+
+    .site-item-address {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .site-item-actions {
+      display: flex;
+      gap: 6px;
+    }
+    
+    .site-item-edit {
+      background: #e3f2fd;
+      border: none;
+      color: #1976d2;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .site-item-edit:hover {
+      background: #bbdefb;
+    }
+    
+    .site-item-delete {
+      background: #ffe0e0;
+      border: none;
+      color: #d13438;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .site-item-delete:hover {
+      background: #ffcdd2;
+    }
+
+    .deadline-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .deadline-modal.active {
+      display: flex;
+    }
+
+    .deadline-modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .deadline-modal-header {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .deadline-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .deadline-option {
+      padding: 14px 16px;
+      background: #f5f7fa;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+      font-size: 15px;
+    }
+
+    .deadline-option:hover {
+      background: #2a459c;
+      color: white;
+      border-color: #2a459c;
+    }
+
+    .deadline-option-label {
+      font-weight: 500;
+      display: block;
+    }
+
+    .deadline-option-date {
+      font-size: 13px;
+      opacity: 0.7;
+      margin-top: 4px;
+    }
+
+    .deadline-custom {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .deadline-date-input {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .deadline-date-input:focus {
+      outline: none;
+      border-color: #2a459c;
+    }
+
+    .deadline-confirm-btn {
+      padding: 12px 24px;
+      background: #2a459c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .deadline-confirm-btn:hover {
+      background: #5b7fd6;
+    }
+
+    .deadline-label-container {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+      cursor: pointer;
+      width: fit-content;
+    }
+    
+    .deadline-label-text {
+      font-size: 10px;
+      color: #666;
+      white-space: nowrap;
+    }
+    
+    .deadline-date-tag {
+      display: inline-block;
+      padding: 2px 6px;
+      background: #e3f2fd;
+      color: #1976d2;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .add-site-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .site-list-section {
+      margin-top: 20px;
+    }
+
+    .site-list-title {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .task-card.overdue {
+      border-left: 4px solid #f44336;
+      background: #ffebee;
+    }
+
+    .task-card.overdue .task-title {
+      color: #d32f2f;
+      font-weight: 600;
+    }
+
+    .deadline-date-tag.overdue {
+      background: #f44336;
+      color: white;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.7;
+      }
+    }
+
+    .overdue-warning {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 2px 6px;
+      background: #f44336;
+      color: white;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 600;
+      animation: pulse 1.5s infinite;
+    }
+
+    .date-label {
+      font-size: 11px;
+      color: #666;
+      margin-right: 4px;
+    }
+
+    .test-date-label {
+      display: inline-block;
+      padding: 2px 6px;
+      background: #fff3e0;
+      color: #f57c00;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 20000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loading-overlay.active {
+      display: flex;
+    }
+
+    .loading-content {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #2a459c;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-text {
+      font-size: 14px;
+      color: #666;
+    }
+
+    /* 메뉴 시스템 */
+    .menu-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      z-index: 1000;
+    }
+    
+    .menu-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      border: none;
+      transform: scale(1.05);
+    }
+    
+    .menu-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.4s, height 0.4s;
+    }
+    
+    .menu-btn:hover::before {
+      width: 100px;
+      height: 100px;
+    }
+        
+    .menu-btn:active {
+      transform: scale(0.95);
+    }
+    
+    .menu-hamburger {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .menu-line {
+      width: 24px;
+      height: 3px;
+      background: white;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+    
+    .menu-btn:hover .menu-line:nth-child(1) {
+      transform: translateX(-3px);
+    }
+    
+    .menu-btn:hover .menu-line:nth-child(2) {
+      transform: translateX(0);
+    }
+    
+    .menu-btn:hover .menu-line:nth-child(3) {
+      transform: translateX(3px);
+    }
+    
+    .menu-btn.active .menu-line:nth-child(1) {
+      transform: translateY(8px) rotate(45deg);
+    }
+    
+    .menu-btn.active .menu-line:nth-child(2) {
+      opacity: 0;
+    }
+    
+    .menu-btn.active .menu-line:nth-child(3) {
+      transform: translateY(-8px) rotate(-45deg);
+    }
+    
+    .menu-dropdown {
+      position: fixed;
+      top: 70px;
+      right: 16px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      min-width: 200px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-20px) scale(0.9);
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      z-index: 10001 !important;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    
+    .menu-dropdown.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    
+    .menu-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, rgba(42, 69, 156, 0.08), transparent);
+      transition: width 0.3s ease;
+    }
+    
+    .menu-item:hover::before {
+      width: 100%;
+    }
+    
+    .menu-item:hover {
+      background: #f8f9fa;
+    }
+    
+    .menu-item:active {
+      background: #e9ecef;
+    }
+    
+    .menu-item-icon {
+      font-size: 22px;
+      width: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+    
+    .menu-item:hover .menu-item-icon {
+      transform: scale(1.1);
+    }
+    
+    .menu-item-text {
+      font-size: 15px;
+      font-weight: 500;
+      color: #333;
+      flex: 1;
+    }
+    
+    .menu-divider {
+      height: 1px;
+      background: #e0e0e0;
+      margin: 4px 0;
+    }
+    
+    .menu-item-danger {
+      color: #d32f2f;
+    }
+    
+    .menu-item-danger .menu-item-text {
+      color: #d32f2f;
+    }
+    
+    .menu-item-danger::before {
+      background: linear-gradient(90deg, rgba(211, 47, 47, 0.08), transparent);
+    }
+    
+    .menu-item-danger:hover {
+      background: #ffebee;
+    }
+    
+    .menu-item-danger:active {
+      background: #ffcdd2;
+    }
+    
+    .menu-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.2);
+      z-index: 10000;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .menu-overlay.active {
+      display: block;
+      opacity: 1;
+    }
+    
+    /* 사용 설명서 모달 */
+    .guide-modal-content {
+      max-width: 700px;
+      max-height: 85vh;
+    }
+    
+    .guide-content {
+      padding: 8px 0;
+    }
+    
+    .guide-section {
+      margin-bottom: 32px;
+    }
+    
+    .guide-section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2a459c;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e3f2fd;
+    }
+    
+    .guide-step {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+      align-items: flex-start;
+    }
+    
+    .guide-step-number {
+      background: #2a459c;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    
+    .guide-step-content {
+      flex: 1;
+    }
+    
+    .guide-step-content h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+    
+    .guide-step-content p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    
+    .guide-list {
+      margin: 12px 0;
+      padding-left: 20px;
+    }
+    
+    .guide-list li {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+    
+    .guide-tip {
+      background: #e3f2fd;
+      border-left: 4px solid #2196F3;
+      padding: 10px 12px;
+      margin-top: 12px;
+      font-size: 13px;
+      color: #1565C0;
+      border-radius: 4px;
+    }
+    
+    .guide-warning {
+      background: #fff3e0;
+      border-left: 4px solid #ff9800;
+      padding: 10px 12px;
+      margin-top: 12px;
+      font-size: 13px;
+      color: #e65100;
+      border-radius: 4px;
+    }
+    
+    .guide-tips-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .guide-tip-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      background: #f5f7fa;
+      padding: 12px;
+      border-radius: 8px;
+    }
+    
+    .tip-emoji {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    
+    .guide-tip-item span:last-child {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #666;
+    }
+    
+    .guide-contact {
+      background: #f5f7fa;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    
+    .guide-contact p {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #333;
+    }
+    
+    .contact-icon {
+      font-size: 18px;
+      width: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* 모바일 최적화 */
+    @media (max-width: 768px) {
+      .number-check-container {
+        gap: 4px;
+      }
+      
+      .task-checkbox {
+        width: 20px;
+        height: 20px;
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .task-card.completed .task-checkbox::after {
+        font-size: 14px;
+      }
+      
+      .task-container {
+        max-height: 400px;
+      }
+
+      .map-section {
+        min-height: 350px;
+        margin: 10px;
+        padding: 15px;
+      }
+
+      #map {
+        height: 300px;
+      }
+
+      .task-grid {
+        scrollbar-width: thin;
+        scrollbar-color: #2a459c #f5f7fa;
+      }
+
+      .task-grid::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .task-grid::-webkit-scrollbar-track {
+        background: #f5f7fa;
+        border-radius: 4px;
+      }
+
+      .task-grid::-webkit-scrollbar-thumb {
+        background: #2a459c;
+        border-radius: 4px;
+      }
+
+      .task-grid::-webkit-scrollbar-thumb:hover {
+        background: #5b7fd6;
+      }
+      
+      .menu-line {
+        width: 22px;
+        height: 2.5px;
+      }
+    
+      .menu-item {
+        padding: 14px 16px;
+      }
+    
+      .menu-item-icon {
+        font-size: 20px;
+        width: 26px;
+      }
+    
+      .menu-item-text {
+        font-size: 14px;
+      }
+
+      .guide-modal-content {
+        width: 95%;
+        max-height: 90vh;
+      }
+    
+      .guide-section-title {
+        font-size: 16px;
+      }
+    
+      .guide-step {
+        gap: 12px;
+      }
+    
+      .guide-step-number {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+      }
+    
+      .guide-step-content h4 {
+        font-size: 15px;
+      }
+    
+      .guide-step-content p {
+        font-size: 13px;
+      }
+
+      .task-card {
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+      }
+      
+      .task-card.swiped-left {
+        transform: translateX(-50px);
+      }
+      
+      .task-card.swiped-left .action-btn {
+        right: 0;
+      }
+      
+      .action-btn {
+        display: flex;
+      }
+    }
+    
+    /* PC에서 삭제 버튼 항상 표시 */
+    @media (min-width: 769px) {
+      .action-btn {
+        position: static;
+        display: flex;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 로딩 오버레이 -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">경로를 계산하는 중...</div>
+    </div>
+  </div>
+
+  <!-- 로그인 화면 -->
+  <div class="login-container" id="loginContainer">
+    <!-- Step 1: 회사 로그인 -->
+    <div class="login-box" id="companyLoginStep">
+      <h1 class="login-title">로그인</h1>
+      
+      <div class="input-group">
+        <label class="input-label">ID</label>
+        <input type="text" class="admin-input" id="companyIdInput" placeholder="ID 입력" autocomplete="username">
+        <div class="input-hint">회사 관리자에게 문의하세요</div>
+      </div>
+      
+      <div class="input-group">
+        <label class="input-label">비밀번호</label>
+        <input type="password" class="admin-input" id="companyPasswordInput" placeholder="비밀번호 입력" autocomplete="current-password">
+      </div>
+      
+      <div class="auto-login-container">
+        <label class="checkbox-label">
+          <input type="checkbox" class="auto-login-checkbox" id="autoLoginCheckbox">
+          <span class="checkbox-text">자동 로그인</span>
+        </label>
+      </div>
+      
+      <button class="admin-btn" onclick="loginCompany()">로그인</button>
+      
+      <div class="divider">
+        <span>또는</span>
+      </div>
+      
+      <button class="secondary-btn" onclick="showCreateCompanyStep()">가입하기</button>
+    </div>
+
+    <!-- Step 2: 계정 만들기 -->
+    <div class="login-box" id="createCompanyStep" style="display: none;">
+      <h1 class="login-title">🏢 계정 만들기</h1>
+      <button class="back-btn" onclick="backToCompanyLogin()">← 뒤로</button>
+
+      <div class="input-group">
+        <label class="input-label">이름</label>
+        <input type="text" class="admin-input" id="newAdminNameInput" placeholder="예: 홍길동" autocomplete="off">
+        <div class="input-hint">본인의 이름을 입력하세요</div>
+      </div>
+      
+      <div class="input-group">
+        <label class="input-label">ID</label>
+        <input type="text" class="admin-input" id="newCompanyIdInput" placeholder="영문+숫자 조합" autocomplete="off">
+        <div class="input-hint" id="companyIdHint">영문, 숫자 조합 (4-20자)</div>
+      </div>
+      
+      <div class="input-group">
+        <label class="input-label">비밀번호</label>
+        <input type="password" class="admin-input" id="newCompanyPasswordInput" placeholder="비밀번호 설정" autocomplete="new-password">
+        <div class="input-hint">최소 4자 이상</div>
+      </div>
+      
+      <div class="input-group">
+        <label class="input-label">비밀번호 확인</label>
+        <input type="password" class="admin-input" id="confirmPasswordInput" placeholder="비밀번호 재입력" autocomplete="new-password">
+      </div>
+      
+      <button class="admin-btn" onclick="createCompany()">가입하기</button>
+    </div>
+  </div>
+
+  <!-- 메인 앱 -->
+  <div class="app-container" id="appContainer">
+    <div class="app-header">
+      <div class="header-row-1">
+        <div class="header-left">
+          <div class="user-avatar" id="userAvatar"></div>
+          <div class="header-info">
+            <div class="app-title">작업 관리</div>
+            <div class="user-name" id="headerUserName"></div>
+          </div>
+        </div>
+        <div class="header-right">
+          <button class="menu-btn" type="button" id="mainMenuBtn" onclick="toggleMenu()">
+            <span class="menu-hamburger">
+              <span class="menu-line"></span>
+              <span class="menu-line"></span>
+              <span class="menu-line"></span>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <div class="header-row-2">
+        <div class="date-display" id="dateDisplay"></div>
+        <div class="nav-buttons">
+          <button class="nav-btn" onclick="goToToday()">오늘</button>
+          <button class="nav-btn" onclick="changeDate(-1)">◀</button>
+          <button class="nav-btn" onclick="changeDate(1)">▶</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="left-panel">
+        <div class="task-input-container">
+          <div class="task-form">
+            <div class="form-row">
+              <input type="text" class="task-input" id="siteInput" placeholder="현장명">
+              <button class="site-select-btn" onclick="toggleSiteSelectModal()">📋 선택</button>
+            </div>
+            <div class="form-row">
+              <input type="text" class="task-input" id="workInput" placeholder="작업 내용 입력">
+              <button class="add-btn" onclick="addWork()">+ 추가</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="task-container" id="taskContainer"></div>
+
+        <div class="map-section">
+          <div class="map-section-header">
+            <h3 class="map-section-title">
+              🚗 이동 경로
+              <span class="route-info" id="routeInfo" style="display: none;"></span>
+            </h3>
+            <div class="map-controls">
+              <button class="map-btn" id="routeBtn" onclick="showRouteFromCurrentLocation()">경로 표시</button>
+            </div>
+          </div>
+          <div id="map"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 메뉴 오버레이 & 드롭다운 -->
+  <div class="menu-overlay" id="menuOverlay"></div>
+  
+  <div class="menu-dropdown" id="menuDropdown">
+    <div class="menu-item" onclick="toggleSiteModal(); toggleMenu();">
+      <span class="menu-item-icon">📍</span>
+      <span class="menu-item-text">현장 추가/수정</span>
+    </div>
+    <div class="menu-item" onclick="toggleGuideModal(); toggleMenu();">
+      <span class="menu-item-icon">📖</span>
+      <span class="menu-item-text">사용 설명서</span>
+    </div>
+    
+    <div class="menu-divider"></div>
+    <div class="menu-item" onclick="toggleInvitationsModal(); toggleMenu();">
+      <span class="menu-item-icon">📬</span>
+      <span class="menu-item-text">팀 초대 <span id="invitationBadge" style="display: none; background: #f44336; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; margin-left: 5px;"></span></span>
+    </div>
+    <div class="menu-item" onclick="toggleTeamManagementModal(); toggleMenu();">
+      <span class="menu-item-icon">👥</span>
+      <span class="menu-item-text">팀 관리</span>
+    </div>
+
+    <div class="menu-divider"></div>
+    <div class="menu-item menu-item-danger" onclick="deleteCompany()">
+      <span class="menu-item-icon">⚠️</span>
+      <span class="menu-item-text">팀 나가기</span>
+    </div>
+    <div class="menu-item menu-item-danger" onclick="logout()">
+      <span class="menu-item-icon">🚪</span>
+      <span class="menu-item-text">로그아웃</span>
+    </div>
+  </div>
+
+  <!-- 작업 타임라인 모달 -->
+  <div class="modal-overlay" id="timelineModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="timelineTitle"></h3>
+        <button class="close-btn" onclick="closeTimelineModal()">×</button>
+      </div>
+      <div id="timelineContent"></div>
+    </div>
+  </div>
+
+  <!-- 현장 관리 모달 -->
+  <div class="modal-overlay" id="siteModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="siteModalTitle">현장 추가</h3>
+        <button class="close-btn" onclick="toggleSiteModal()">×</button>
+      </div>
+  
+      <div class="add-site-form">
+        <input type="text" class="task-input" id="newSiteName" placeholder="현장명 입력">
+        <input type="text" class="task-input" id="newSiteAddress" placeholder="주소 입력">
+        <button class="add-btn" id="saveSiteBtn" onclick="saveSite()">저장</button>
+        <button class="secondary-btn" id="cancelEditBtn" onclick="cancelEditSite()" style="display: none;">취소</button>
+      </div>
+  
+      <div class="site-list-section">
+        <h4 class="site-list-title">저장된 현장 목록</h4>
+        <ul class="site-list" id="siteList"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 완료 기한 선택 모달 -->
+  <div class="deadline-modal" id="deadlineModal">
+    <div class="deadline-modal-content">
+      <div class="deadline-modal-header">완료 기한 선택</div>
+      <div class="deadline-options">
+        <div class="deadline-option" onclick="selectDeadline('today')">
+          <span class="deadline-option-label">오늘</span>
+          <span class="deadline-option-date" id="todayDate"></span>
+        </div>
+        <div class="deadline-option" onclick="selectDeadline('tomorrow')">
+          <span class="deadline-option-label">내일</span>
+          <span class="deadline-option-date" id="tomorrowDate"></span>
+        </div>
+        <div class="deadline-option" onclick="selectDeadline('thisWeek')">
+          <span class="deadline-option-label">이번주 중 (금요일)</span>
+          <span class="deadline-option-date" id="thisWeekDate"></span>
+        </div>
+        <div class="deadline-custom">
+          <input type="date" class="deadline-date-input" id="customDeadlineInput">
+          <button class="deadline-confirm-btn" onclick="selectDeadline('custom')">확인</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 현장 선택 모달 -->
+  <div class="modal-overlay" id="siteSelectModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">현장 선택</h3>
+        <button class="close-btn" onclick="toggleSiteSelectModal()">×</button>
+      </div>
+      <ul class="site-list" id="siteSelectList"></ul>
+    </div>
+  </div>
+
+  <!-- 팀코드 확인 모달 -->
+  <div class="modal-overlay" id="companyCodeModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">🔑 팀코드</h3>
+        <button class="close-btn" onclick="toggleCompanyCodeModal()">×</button>
+      </div>
+      
+      <div style="text-align: center; padding: 30px 20px;">
+        <p style="font-size: 14px; color: #666; margin-bottom: 20px;">
+          직원 초대 시 이 코드를 공유하세요
+        </p>
+        
+        <div style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%); border: 3px dashed #2a459c; border-radius: 12px; padding: 30px; margin-bottom: 20px;">
+          <div style="font-size: 36px; font-weight: 700; color: #2a459c; letter-spacing: 4px; font-family: 'Courier New', monospace;" id="displayCompanyCode">
+            ------
+          </div>
+        </div>
+        
+        <div style="display: flex; gap: 10px; justify-content: center;">
+          <button class="admin-btn" id="copyBtn" onclick="copyCompanyCode()" style="flex: 1; max-width: 200px;">
+            📋 복사하기
+          </button>
+          <button class="admin-btn" onclick="regenerateCompanyCode()" style="flex: 1; max-width: 200px; background: #ff9800;">
+            🔄 코드 재발급
+          </button>
+        </div>
+        
+        <p style="font-size: 12px; color: #999; margin-top: 20px;">
+          💡 코드를 재발급하면 기존 코드는 사용할 수 없습니다
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 팀 선택 모달 (팀이 없을 때) -->
+  <div class="modal-overlay" id="teamSelectionModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">👥 팀 관리</h3>
+        <button class="close-btn" onclick="toggleTeamSelectionModal()">×</button>
+      </div>
+
+      <div style="padding: 20px;">
+        <p style="text-align: center; color: #666; margin-bottom: 30px; font-size: 14px;">
+          현재 소속된 팀이 없습니다.<br>새 팀을 만들거나 기존 팀에 참여하세요.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+          <button class="admin-btn" onclick="toggleTeamSelectionModal(); toggleCreateTeamModal();" style="width: 100%; padding: 15px; font-size: 15px;">
+            ➕ 새 팀 만들기
+          </button>
+          <button class="admin-btn" onclick="toggleTeamSelectionModal(); toggleJoinTeamModal();" style="width: 100%; padding: 15px; font-size: 15px; background: #1976d2;">
+            🔗 기존 팀 참여하기
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 팀 만들기 모달 -->
+  <div class="modal-overlay" id="createTeamModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">➕ 팀 만들기</h3>
+        <button class="close-btn" onclick="toggleCreateTeamModal()">×</button>
+      </div>
+
+      <div style="padding: 20px;">
+        <div class="input-group">
+          <label class="input-label">팀명</label>
+          <input type="text" class="admin-input" id="newTeamNameInput" placeholder="예: 프로젝트 A팀" autocomplete="off">
+          <div class="input-hint">팀원들과 공유할 팀 이름을 입력하세요</div>
+        </div>
+
+        <button class="admin-btn" onclick="createTeam()" style="width: 100%; margin-top: 20px;">
+          팀 만들기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 팀 참여하기 모달 -->
+  <div class="modal-overlay" id="joinTeamModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">🔗 팀 참여하기</h3>
+        <button class="close-btn" onclick="toggleJoinTeamModal()">×</button>
+      </div>
+
+      <div style="padding: 20px;">
+        <p style="font-size: 14px; color: #666; margin-bottom: 20px; text-align: center;">
+          팀 관리자에게 받은 팀코드를 입력하세요
+        </p>
+
+        <div class="input-group">
+          <label class="input-label">팀코드</label>
+          <input type="text" class="admin-input" id="joinTeamCodeInput" placeholder="예: ABC123" autocomplete="off" style="text-transform: uppercase; letter-spacing: 2px; text-align: center; font-family: 'Courier New', monospace; font-size: 18px;">
+          <div class="input-hint">6자리 팀코드를 입력하세요</div>
+        </div>
+
+        <button class="admin-btn" onclick="joinTeam()" style="width: 100%; margin-top: 20px;">
+          참여하기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 팀원 초대 모달 -->
+  <div class="modal-overlay" id="inviteMemberModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">👥 팀원 초대</h3>
+        <button class="close-btn" onclick="toggleInviteMemberModal()">×</button>
+      </div>
+
+      <div style="padding: 20px;">
+        <div style="margin-bottom: 30px;">
+          <h4 style="font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 600;">
+            ① 팀코드 공유
+          </h4>
+          <div style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%); border: 2px dashed #1976d2; border-radius: 12px; padding: 20px; text-align: center;">
+            <div style="font-size: 24px; font-weight: 700; color: #1976d2; letter-spacing: 3px; font-family: 'Courier New', monospace; margin-bottom: 15px;" id="inviteTeamCode">
+              ------
+            </div>
+            <button class="admin-btn" id="copyInviteCodeBtn" onclick="copyTeamCodeForInvite()" style="max-width: 200px;">
+              📋 코드 복사하기
+            </button>
+          </div>
+          <p style="font-size: 12px; color: #999; margin-top: 10px; text-align: center;">
+            이 코드를 팀원에게 공유하세요
+          </p>
+        </div>
+
+        <div class="divider" style="margin: 30px 0;">
+          <span>또는</span>
+        </div>
+
+        <div>
+          <h4 style="font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 600;">
+            ② ID로 직접 초대
+          </h4>
+          <div class="input-group">
+            <label class="input-label">사용자 ID</label>
+            <input type="text" class="admin-input" id="inviteUserIdInput" placeholder="초대할 사용자의 ID 입력" autocomplete="off">
+            <div class="input-hint">초대하려는 사용자의 로그인 ID를 입력하세요</div>
+          </div>
+
+          <button class="admin-btn" onclick="inviteByUserId()" style="width: 100%; margin-top: 15px;">
+            초대 보내기
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 팀 설정 모달 -->
+  <div class="modal-overlay" id="teamSettingsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">⚙️ 팀 설정</h3>
+        <button class="close-btn" onclick="toggleTeamSettingsModal()">×</button>
+      </div>
+
+      <div style="padding: 20px;">
+        <!-- 팀명 수정 -->
+        <div class="input-group" style="margin-bottom: 30px;">
+          <label class="input-label">팀명</label>
+          <input type="text" class="admin-input" id="editTeamNameInput" placeholder="팀 이름" autocomplete="off">
+        </div>
+
+        <!-- 팀코드 표시 -->
+        <div style="margin-bottom: 30px;">
+          <h4 style="font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 600;">
+            팀코드
+          </h4>
+          <div style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%); border: 2px dashed #1976d2; border-radius: 12px; padding: 20px; text-align: center;">
+            <div style="font-size: 24px; font-weight: 700; color: #1976d2; letter-spacing: 3px; font-family: 'Courier New', monospace; margin-bottom: 15px;" id="settingsTeamCode">
+              ------
+            </div>
+            <button class="admin-btn" id="copySettingsCodeBtn" onclick="copyTeamCodeFromSettings()" style="max-width: 200px;">
+              📋 코드 복사하기
+            </button>
+          </div>
+          <p style="font-size: 12px; color: #999; margin-top: 10px; text-align: center;">
+            이 코드를 팀원에게 공유하세요
+          </p>
+        </div>
+
+        <!-- 팀원 초대 -->
+        <div style="margin-bottom: 30px;">
+          <h4 style="font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 600;">
+            ID로 팀원 초대
+          </h4>
+          <div class="input-group">
+            <label class="input-label">사용자 ID</label>
+            <input type="text" class="admin-input" id="settingsInviteUserIdInput" placeholder="초대할 사용자의 ID 입력" autocomplete="off">
+            <div class="input-hint">초대하려는 사용자의 로그인 ID를 입력하세요</div>
+          </div>
+          <button class="admin-btn" onclick="inviteByUserIdFromSettings()" style="width: 100%; margin-top: 15px;">
+            초대 보내기
+          </button>
+        </div>
+
+        <!-- 팀원 목록 -->
+        <div style="margin-bottom: 30px;">
+          <h4 style="font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 600;">
+            팀원 목록 (<span id="teamMemberCount">0</span>명)
+          </h4>
+          <ul class="site-list" id="teamMemberList"></ul>
+        </div>
+
+        <!-- 버튼들 -->
+        <div style="display: flex; gap: 10px;">
+          <button class="admin-btn" onclick="saveTeamSettings()" style="flex: 1;">
+            저장
+          </button>
+          <button class="admin-btn" onclick="leaveTeam()" style="flex: 1; background: #f44336;">
+            팀 나가기
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 팀 초대 목록 모달 -->
+  <div class="modal-overlay" id="invitationsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">📬 팀 초대</h3>
+        <button class="close-btn" onclick="toggleInvitationsModal()">×</button>
+      </div>
+
+      <div style="padding: 20px;">
+        <div id="invitationsList">
+          <p style="text-align: center; color: #999; padding: 40px 20px;">
+            받은 초대가 없습니다
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 직원 관리 모달 -->
+  <div class="modal-overlay" id="staffManageModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">👥 직원 관리</h3>
+        <button class="close-btn" onclick="toggleStaffManageModal()">×</button>
+      </div>
+      
+      <div style="padding: 10px 0;">
+        <div style="margin-bottom: 20px;">
+          <h4 style="font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 600;">
+            현재 직원 목록 (<span id="staffCount">0</span>명)
+          </h4>
+          <ul class="site-list" id="staffList"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 회사 정보 수정 모달 -->
+  <div class="modal-overlay" id="companyInfoModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">🏢 회사 정보 수정</h3>
+        <button class="close-btn" onclick="toggleCompanyInfoModal()">×</button>
+      </div>
+      
+      <div style="padding: 10px 0;">
+        <div class="input-group">
+          <label class="input-label">회사명</label>
+          <input type="text" class="admin-input" id="editCompanyName" placeholder="회사명">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">현재 비밀번호</label>
+          <input type="password" class="admin-input" id="currentPasswordForEdit" placeholder="현재 비밀번호">
+          <div class="input-hint">변경하려면 현재 비밀번호를 입력하세요</div>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">새 비밀번호 (선택)</label>
+          <input type="password" class="admin-input" id="newPasswordForEdit" placeholder="변경할 비밀번호">
+          <div class="input-hint">변경하지 않으려면 비워두세요</div>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">새 비밀번호 확인</label>
+          <input type="password" class="admin-input" id="confirmNewPassword" placeholder="비밀번호 재입력">
+        </div>
+        
+        <button class="admin-btn" onclick="saveCompanyInfo()">💾 저장</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 관리자 권한 이전 모달 -->
+  <div class="modal-overlay" id="transferAdminModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">🔄 관리자 권한 이전</h3>
+        <button class="close-btn" onclick="toggleTransferAdminModal()">×</button>
+      </div>
+      
+      <div style="padding: 10px 0;">
+        <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 12px; margin-bottom: 20px; border-radius: 4px;">
+          <p style="font-size: 13px; color: #e65100; line-height: 1.6;">
+            ⚠️ <strong>주의:</strong> 관리자 권한을 이전하면 본인은 일반 직원이 됩니다. 이 작업은 되돌릴 수 없습니다.
+          </p>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">새 관리자 선택</label>
+          <select class="admin-input" id="newAdminSelect">
+            <option value="">선택하세요</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">비밀번호 확인</label>
+          <input type="password" class="admin-input" id="passwordForTransfer" placeholder="현재 비밀번호">
+          <div class="input-hint">권한 이전을 확인하기 위해 비밀번호를 입력하세요</div>
+        </div>
+        
+        <button class="admin-btn" onclick="transferAdmin()" style="background: #ff9800;">
+          🔄 권한 이전
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 사용 설명서 모달 -->
+  <div class="modal-overlay" id="guideModal">
+    <div class="modal-content guide-modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">📖 사용 설명서</h3>
+        <button class="close-btn" onclick="toggleGuideModal()">×</button>
+      </div>
+      
+      <div class="guide-content">
+        <!-- 1. 시작하기 -->
+        <div class="guide-section">
+          <h3 class="guide-section-title">🚀 1. 시작하기</h3>
+          <div class="guide-step">
+            <div class="guide-step-number">1</div>
+            <div class="guide-step-content">
+              <h4>사용자 선택</h4>
+              <p>로그인 화면에서 본인의 이름을 선택하세요. 새 사용자는 하단에서 추가할 수 있습니다.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. 현장 관리 -->
+        <div class="guide-section">
+          <h3 class="guide-section-title">🏗️ 2. 현장 관리</h3>
+          <div class="guide-step">
+            <div class="guide-step-number">2</div>
+            <div class="guide-step-content">
+              <h4>현장 추가하기</h4>
+              <p>① 우측 상단 메뉴(☰) → "현장 추가" 클릭<br>
+                 ② 현장명과 주소 입력<br>
+                 ③ 저장 버튼 클릭</p>
+              <div class="guide-tip">💡 주소는 경로 표시 기능에 사용되므로 정확히 입력하세요.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. 작업 추가 -->
+        <div class="guide-section">
+          <h3 class="guide-section-title">✍️ 3. 작업 추가</h3>
+          <div class="guide-step">
+            <div class="guide-step-number">3</div>
+            <div class="guide-step-content">
+              <h4>일반 작업 추가</h4>
+              <p>① 현장명 입력 (또는 "선택" 버튼으로 등록된 현장 선택)<br>
+                 ② 작업 내용 입력 (예: 배근, 거푸집, 콘크리트 타설 등)<br>
+                 ③ "추가" 버튼 클릭</p>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-number">4</div>
+            <div class="guide-step-content">
+              <h4>시험 작업 추가 (자동 일정 생성)</h4>
+              <p>작업 내용에 "시험"을 입력하면 자동으로 관련 일정이 생성됩니다:</p>
+              <ul class="guide-list">
+                <li>시험 당일</li>
+                <li>캡핑 (영업일 +1일)</li>
+                <li>탈형 (영업일 +2일)</li>
+                <li>7일 강도 시험 (+7일)</li>
+                <li>28일 강도 시험 (+28일)</li>
+              </ul>
+              <div class="guide-tip">💡 시험 관련 작업은 작업등록일자를 클릭하면 전체 타임라인을 볼 수 있습니다.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. 작업 관리 -->
+        <div class="guide-section">
+          <h3 class="guide-section-title">📋 4. 작업 관리</h3>
+          <div class="guide-step">
+            <div class="guide-step-number">5</div>
+            <div class="guide-step-content">
+              <h4>작업 순서 변경</h4>
+              <p><strong>PC:</strong> 작업 카드를 드래그하여 위아래로 이동<br>
+                 <strong>모바일:</strong> 작업 카드를 길게 누르고 상하로 드래그</p>
+              <div class="guide-tip">💡 "내 작업 진행 중" 섹션에서만 순서 변경 가능</div>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-number">6</div>
+            <div class="guide-step-content">
+              <h4>작업 완료 체크</h4>
+              <p>작업 카드 왼쪽의 체크박스를 클릭하면 완료 처리됩니다.<br>
+                 완료된 작업의 체크박스를 다시 클릭하면 진행중으로 되돌아갑니다.</p>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-number">7</div>
+            <div class="guide-step-content">
+              <h4>작업 삭제</h4>
+              <p><strong>PC:</strong> 작업 카드 우측의 🗑️ 버튼 클릭<br>
+                 <strong>모바일:</strong> 작업 카드를 왼쪽으로 슬라이드하면 삭제 버튼 표시</p>
+              <div class="guide-warning">⚠️ 시험 작업 삭제 시 관련된 모든 작업(캡핑, 탈형 등)이 함께 삭제됩니다.</div>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-number">8</div>
+            <div class="guide-step-content">
+              <h4>담당자 지정</h4>
+              <p>작업 카드의 담당자 선택 드롭다운에서 담당자를 변경할 수 있습니다.</p>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-number">9</div>
+            <div class="guide-step-content">
+              <h4>완료 기한 설정</h4>
+              <p>작업 카드의 "완료 기한" 날짜를 클릭하면 기한을 변경할 수 있습니다:<br>
+                 • 오늘<br>
+                 • 내일<br>
+                 • 이번주 중 (금요일)<br>
+                 • 직접 날짜 선택</p>
+              <div class="guide-warning">⚠️ 기한이 지난 작업은 빨간색으로 표시되며 "기한초과" 뱃지가 표시됩니다.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. 날짜 네비게이션 -->
+        <div class="guide-section">
+          <h3 class="guide-section-title">📅 5. 날짜 네비게이션</h3>
+          <div class="guide-step">
+            <div class="guide-step-number">10</div>
+            <div class="guide-step-content">
+              <h4>날짜 이동</h4>
+              <p>헤더의 날짜 표시 옆 버튼으로 날짜를 이동할 수 있습니다:<br>
+                 • <strong>오늘:</strong> 오늘 날짜로 이동<br>
+                 • <strong>◀:</strong> 하루 전으로<br>
+                 • <strong>▶:</strong> 하루 후로</p>
+              <div class="guide-tip">💡 선택한 날짜 이전의 미완료 작업도 함께 표시됩니다.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. 경로 표시 -->
+        <div class="guide-section">
+          <h3 class="guide-section-title">🗺️ 6. 이동 경로 표시</h3>
+          <div class="guide-step">
+            <div class="guide-step-number">11</div>
+            <div class="guide-step-content">
+              <h4>경로 확인하기</h4>
+              <p>① 지도 섹션의 "경로 표시" 버튼 클릭<br>
+                 ② 위치 권한 허용<br>
+                 ③ 현재 위치에서 출발하여 작업 순서대로 현장을 방문하는 최적 경로가 표시됩니다.</p>
+              <div class="guide-tip">💡 경로는 작업 순서에 따라 자동으로 계산되며, 총 거리와 소요 시간이 표시됩니다.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. 팁과 요령 -->
+        <div class="guide-section">
+          <h3 class="guide-section-title">💡 7. 유용한 팁</h3>
+          <div class="guide-tips-list">
+            <div class="guide-tip-item">
+              <span class="tip-emoji">✅</span>
+              <span>아침에 출근하면 작업 순서를 먼저 정리하세요. 이동 경로가 자동으로 최적화됩니다.</span>
+            </div>
+            <div class="guide-tip-item">
+              <span class="tip-emoji">📍</span>
+              <span>자주 방문하는 현장은 미리 등록해두면 빠르게 선택할 수 있습니다.</span>
+            </div>
+            <div class="guide-tip-item">
+              <span class="tip-emoji">📋</span>
+              <span>섹션 헤더를 클릭하면 접거나 펼칠 수 있어 화면을 효율적으로 사용할 수 있습니다.</span>
+            </div>
+            <div class="guide-tip-item">
+              <span class="tip-emoji">🔔</span>
+              <span>시험 작업은 자동으로 일정이 생성되므로 일일이 입력할 필요가 없습니다.</span>
+            </div>
+            <div class="guide-tip-item">
+              <span class="tip-emoji">👥</span>
+              <span>팀 작업도 한눈에 볼 수 있어 업무 분담과 협업이 쉽습니다.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8. 문의하기 -->
+        <div class="guide-section">
+          <h3 class="guide-section-title">📞 8. 문의하기</h3>
+          <div class="guide-contact">
+            <p>사용 중 문의사항이나 개선 제안이 있으시면 언제든 연락주세요.</p>
+            <div class="contact-info">
+              <div class="contact-item">
+                <span class="contact-icon">📧</span>
+                <span>이메일: support@example.com</span>
+              </div>
+              <div class="contact-item">
+                <span class="contact-icon">💬</span>
+                <span>카카오톡: @작업관리앱</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kakao Map API -->
+  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=edfe0792f24f219880fc608009d59a0f&libraries=services">
+    
+  </script>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import {
+      initializeApp
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import {
+      getDatabase,
+      ref,
+      set,
+      push,
+      onValue,
+      update,
+      remove
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyAMv0BmH24fyd0F8CUTkSYSXMlvbcnUXU4",
+      authDomain: "work-todo-6ab7f.firebaseapp.com",
+      databaseURL: "https://work-todo-6ab7f-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "work-todo-6ab7f",
+      storageBucket: "work-todo-6ab7f.firebasestorage.app",
+      messagingSenderId: "263893669261",
+      appId: "1:263893669261:web:bdce10bec177ff1f67d9c4"
+    };
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    window.db = database;
+    window.dbRef = ref;
+    window.dbSet = set;
+    window.dbPush = push;
+    window.dbOnValue = onValue;
+    window.dbUpdate = update;
+    window.dbRemove = remove;
+    window.firebaseReady = true;
+    console.log('✅ Firebase initialized');
+  </script>
+  
+  <script>
     // ========================================
     // ⭐ 모달 토글 함수들 - 가장 먼저 정의!
     // ========================================
@@ -4179,4 +6701,8 @@
 
     // 기존의 모달 외부 클릭 이벤트는 삭제해도 됩니다 (중복이므로)
     console.log('✅ 모든 모달 이벤트 리스너 등록 완료');
+
+  </script>
+</body>
+</html>              
 
