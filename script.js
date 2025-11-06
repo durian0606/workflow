@@ -1399,6 +1399,125 @@
       }
     }
     
+    // 자동 지도 업데이트 함수
+    function updateMapAutomatically(myActiveWorks) {
+      if (!map) {
+        console.log('⚠️ 지도가 초기화되지 않음');
+        return;
+      }
+
+      console.log('🗺️ 지도 자동 업데이트:', myActiveWorks.length, '개 작업');
+
+      // 내 작업이 있으면 경로 표시
+      if (myActiveWorks.length > 0) {
+        // 현재 위치 가져오기 (자동, 조용하게)
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            function(position) {
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
+              currentPosition = new kakao.maps.LatLng(lat, lng);
+              drawRouteFromCurrentLocation(currentPosition, myActiveWorks);
+            },
+            function(error) {
+              // 위치 실패 시 첫 번째 현장 중심으로 표시
+              console.log('⚠️ 위치 가져오기 실패, 첫 번째 현장으로 표시');
+              showFirstSiteOnMap(myActiveWorks);
+            },
+            {
+              enableHighAccuracy: false,
+              timeout: 5000,
+              maximumAge: 300000 // 5분 캐시
+            }
+          );
+        } else {
+          // Geolocation 미지원 시 첫 번째 현장 표시
+          showFirstSiteOnMap(myActiveWorks);
+        }
+      } else {
+        // 내 작업이 없으면 현재 위치 중심으로 표시
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            function(position) {
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
+              const myPosition = new kakao.maps.LatLng(lat, lng);
+
+              // 기존 마커 제거
+              if (currentLocationMarker) {
+                currentLocationMarker.setMap(null);
+              }
+              routeMarkers.forEach(marker => marker.setMap(null));
+              routeMarkers = [];
+              if (routeLine) {
+                if (Array.isArray(routeLine)) {
+                  routeLine.forEach(line => line.setMap(null));
+                } else {
+                  routeLine.setMap(null);
+                }
+                routeLine = null;
+              }
+
+              // 내 위치 마커 표시
+              currentLocationMarker = new kakao.maps.Marker({
+                position: myPosition,
+                map: map,
+                image: new kakao.maps.MarkerImage(
+                  'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',
+                  new kakao.maps.Size(24, 35)
+                )
+              });
+
+              map.setCenter(myPosition);
+              map.setLevel(3);
+            },
+            function(error) {
+              console.log('⚠️ 위치 가져오기 실패');
+            },
+            {
+              enableHighAccuracy: false,
+              timeout: 5000,
+              maximumAge: 300000
+            }
+          );
+        }
+      }
+    }
+
+    // 첫 번째 현장을 지도에 표시
+    function showFirstSiteOnMap(myActiveWorks) {
+      if (myActiveWorks.length === 0) return;
+
+      const firstSiteName = myActiveWorks[0].site;
+      const site = Object.values(sites).find(s => s.name === firstSiteName);
+
+      if (!site || !site.address) {
+        console.warn('⚠️ 첫 번째 현장 주소 없음');
+        return;
+      }
+
+      const geocoder = new kakao.maps.services.Geocoder();
+      geocoder.addressSearch(site.address, function(result, status) {
+        if (status === kakao.maps.services.Status.OK) {
+          const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+          // 기존 마커 제거
+          routeMarkers.forEach(marker => marker.setMap(null));
+          routeMarkers = [];
+
+          // 첫 번째 현장 마커 표시
+          const marker = new kakao.maps.Marker({
+            position: coords,
+            map: map
+          });
+          routeMarkers.push(marker);
+
+          map.setCenter(coords);
+          map.setLevel(3);
+        }
+      });
+    }
+
     window.showRouteFromCurrentLocation = function() {
       console.log('🚀 경로 표시 시작');
       if (!map) {
@@ -2558,6 +2677,9 @@
         `;
         container.appendChild(emptyState);
       }
+
+      // 작업 렌더링 후 자동으로 경로 표시
+      updateMapAutomatically(myActiveWorks);
     }
     
     function toggleSection(sectionKey) {
