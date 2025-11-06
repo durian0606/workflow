@@ -5452,18 +5452,27 @@
     function deleteWork(workId) {
       const work = works[workId];
       if (!work) return;
+
+      // 팀이 있으면 팀 작업, 없으면 개인 작업
+      let worksPath;
+      if (currentTeamId) {
+        worksPath = `teams/${currentTeamId}/worklists`;
+      } else {
+        worksPath = `companies/${currentCompanyId}/works`;
+      }
+
       if (work.work === '시험') {
         if (!confirm('이 시험 작업과 관련된 모든 작업(캡핑, 탈형, 7일강도, 28일강도)을 삭제하시겠습니까?')) return;
         Object.keys(works).forEach(id => {
           if (works[id].parentWorkId === workId) {
-            const childWorkRef = window.dbRef(window.db, `companies/${currentCompanyId}/works/${id}`);
+            const childWorkRef = window.dbRef(window.db, `${worksPath}/${id}`);
             window.dbRemove(childWorkRef);
           }
         });
       } else {
         if (!confirm('이 작업을 삭제하시겠습니까?')) return;
       }
-      const workRef = window.dbRef(window.db, `companies/${currentCompanyId}/works/${workId}`);
+      const workRef = window.dbRef(window.db, `${worksPath}/${workId}`);
       window.dbRemove(workRef);
     }
     
