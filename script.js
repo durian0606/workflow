@@ -254,9 +254,54 @@
           role: 'creator'
         });
 
-        // 4. 팀 작업 목록 초기화
-        const worklistsRef = window.dbRef(window.db, `teams/${teamId}/worklists`);
-        await window.dbSet(worklistsRef, {});
+        // 4. 기존 개인 작업을 팀 작업으로 이전
+        const personalWorksRef = window.dbRef(window.db, `companies/${currentUserId}/works`);
+        const personalWorksSnapshot = await new Promise((resolve, reject) => {
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          window.dbOnValue(personalWorksRef, (snapshot) => {
+            clearTimeout(timeoutId);
+            resolve(snapshot);
+          }, { onlyOnce: true });
+        });
+
+        const teamWorklistsRef = window.dbRef(window.db, `teams/${teamId}/worklists`);
+
+        if (personalWorksSnapshot.exists()) {
+          const personalWorks = personalWorksSnapshot.val();
+          console.log('📦 개인 작업 이전 중:', Object.keys(personalWorks).length, '개');
+
+          // 개인 작업을 팀 작업으로 복사
+          await window.dbSet(teamWorklistsRef, personalWorks);
+
+          // 기존 개인 작업 삭제 (선택사항 - 필요시 주석 해제)
+          // await window.dbRemove(personalWorksRef);
+        } else {
+          // 개인 작업이 없으면 빈 객체로 초기화
+          await window.dbSet(teamWorklistsRef, {});
+        }
+
+        // 4-1. 기존 개인 현장도 팀 현장으로 이전
+        const personalSitesRef = window.dbRef(window.db, `companies/${currentUserId}/sites`);
+        const personalSitesSnapshot = await new Promise((resolve, reject) => {
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          window.dbOnValue(personalSitesRef, (snapshot) => {
+            clearTimeout(timeoutId);
+            resolve(snapshot);
+          }, { onlyOnce: true });
+        });
+
+        const teamSitesRef = window.dbRef(window.db, `teams/${teamId}/sites`);
+
+        if (personalSitesSnapshot.exists()) {
+          const personalSites = personalSitesSnapshot.val();
+          console.log('📦 개인 현장 이전 중:', Object.keys(personalSites).length, '개');
+
+          // 개인 현장을 팀 현장으로 복사
+          await window.dbSet(teamSitesRef, personalSites);
+        } else {
+          // 개인 현장이 없으면 빈 객체로 초기화
+          await window.dbSet(teamSitesRef, {});
+        }
 
         // 5. 사용자의 currentTeamId 업데이트
         const userInfoRef = window.dbRef(window.db, `users/${currentUserId}/info`);
