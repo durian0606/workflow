@@ -1862,11 +1862,15 @@
     </div>
     
     <div class="menu-divider"></div>
+    <div class="menu-item" onclick="toggleInvitationsModal(); toggleMenu();">
+      <span class="menu-item-icon">📬</span>
+      <span class="menu-item-text">팀 초대 <span id="invitationBadge" style="display: none; background: #f44336; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; margin-left: 5px;"></span></span>
+    </div>
     <div class="menu-item" onclick="toggleTeamManagementModal(); toggleMenu();">
       <span class="menu-item-icon">👥</span>
       <span class="menu-item-text">팀 관리</span>
     </div>
-    
+
     <div class="menu-divider"></div>
     <div class="menu-item menu-item-danger" onclick="deleteCompany()">
       <span class="menu-item-icon">⚠️</span>
@@ -2167,6 +2171,24 @@
           <button class="admin-btn" onclick="leaveTeam()" style="flex: 1; background: #f44336;">
             팀 나가기
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 팀 초대 목록 모달 -->
+  <div class="modal-overlay" id="invitationsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">📬 팀 초대</h3>
+        <button class="close-btn" onclick="toggleInvitationsModal()">×</button>
+      </div>
+
+      <div style="padding: 20px;">
+        <div id="invitationsList">
+          <p style="text-align: center; color: #999; padding: 40px 20px;">
+            받은 초대가 없습니다
+          </p>
         </div>
       </div>
     </div>
@@ -2583,14 +2605,33 @@
       }
     };
 
-    window.toggleInviteMemberModal = function() {
+    window.toggleInviteMemberModal = async function() {
       console.log('👥 팀원 초대 모달 토글');
       const modal = document.getElementById('inviteMemberModal');
       if (modal) {
-        // 팀코드 표시
-        if (companyInfo && companyInfo.companyCode) {
-          document.getElementById('inviteTeamCode').textContent = companyInfo.companyCode;
+        const isOpening = !modal.classList.contains('active');
+
+        // 모달을 열 때 팀 정보 로드
+        if (isOpening && currentTeamId) {
+          try {
+            const teamInfoRef = window.dbRef(window.db, `teams/${currentTeamId}/info`);
+            const teamInfoSnapshot = await new Promise((resolve, reject) => {
+              const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+              window.dbOnValue(teamInfoRef, (snapshot) => {
+                clearTimeout(timeoutId);
+                resolve(snapshot);
+              }, { onlyOnce: true });
+            });
+
+            if (teamInfoSnapshot.exists()) {
+              teamInfo = teamInfoSnapshot.val();
+              document.getElementById('inviteTeamCode').textContent = teamInfo.teamCode || '------';
+            }
+          } catch (error) {
+            console.error('팀 정보 로드 실패:', error);
+          }
         }
+
         modal.classList.toggle('active');
       }
     };
@@ -2614,7 +2655,7 @@
             });
 
             if (teamInfoSnapshot.exists()) {
-              const teamInfo = teamInfoSnapshot.val();
+              teamInfo = teamInfoSnapshot.val();
 
               // 팀명 표시
               const nameInput = document.getElementById('editTeamNameInput');
@@ -2853,12 +2894,12 @@
     };
 
     window.copyTeamCodeForInvite = function() {
-      if (!companyInfo || !companyInfo.companyCode) {
+      if (!teamInfo || !teamInfo.teamCode) {
         alert('팀코드를 불러올 수 없습니다.');
         return;
       }
 
-      const code = companyInfo.companyCode;
+      const code = teamInfo.teamCode;
       const btn = document.getElementById('copyInviteCodeBtn');
 
       if (navigator.clipboard) {
@@ -2884,7 +2925,7 @@
       }
     };
 
-    window.inviteByUserId = function() {
+    window.inviteByUserId = async function() {
       const userId = document.getElementById('inviteUserIdInput').value.trim();
 
       if (!userId) {
@@ -2892,19 +2933,250 @@
         return;
       }
 
-      // TODO: Phase 2에서 구현
-      console.log('ID로 초대:', userId);
-      alert('ID 초대 기능은 Phase 2에서 구현됩니다.\n\n초대할 ID: ' + userId);
+      if (!currentTeamId || !teamInfo) {
+        alert('팀 정보를 불러올 수 없습니다.');
+        return;
+      }
+
+      try {
+        // 1. 해당 사용자가 존재하는지 확인
+        const userRef = window.dbRef(window.db, `users/${userId}/info`);
+        const userSnapshot = await new Promise((resolve, reject) => {
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          window.dbOnValue(userRef, (snapshot) => {
+            clearTimeout(timeoutId);
+            resolve(snapshot);
+          }, { onlyOnce: true });
+        });
+
+        if (!userSnapshot.exists()) {
+          alert('존재하지 않는 사용자 ID입니다.');
+          return;
+        }
+
+        const targetUser = userSnapshot.val();
+
+        // 2. 이미 팀원인지 확인
+        const memberRef = window.dbRef(window.db, `teams/${currentTeamId}/members/${userId}`);
+        const memberSnapshot = await new Promise((resolve, reject) => {
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          window.dbOnValue(memberRef, (snapshot) => {
+            clearTimeout(timeoutId);
+            resolve(snapshot);
+          }, { onlyOnce: true });
+        });
+
+        if (memberSnapshot.exists()) {
+          alert('이미 팀에 소속된 사용자입니다.');
+          return;
+        }
+
+        // 3. 초대 생성
+        const invitationsRef = window.dbRef(window.db, `users/${userId}/invitations`);
+        const newInvitationRef = window.dbPush(invitationsRef);
+        await window.dbSet(newInvitationRef, {
+          teamId: currentTeamId,
+          teamName: teamInfo.name,
+          invitedBy: currentUserId,
+          inviterName: userInfo.name,
+          createdAt: new Date().toISOString(),
+          status: 'pending'
+        });
+
+        alert(`${targetUser.name}님에게 초대를 보냈습니다.`);
+        document.getElementById('inviteUserIdInput').value = '';
+      } catch (error) {
+        console.error('초대 실패:', error);
+        alert('초대 중 오류가 발생했습니다: ' + error.message);
+      }
     };
+
+    // 팀 설정에서 ID로 초대 (동일 기능)
+    window.inviteByUserIdFromSettings = function() {
+      const input = document.getElementById('settingsInviteUserIdInput');
+      // inviteUserIdInput에 값 복사
+      document.getElementById('inviteUserIdInput').value = input.value;
+      // 초대 실행
+      window.inviteByUserId();
+      // 입력 필드 초기화
+      input.value = '';
+    };
+
+    // 초대 목록 모달 토글
+    window.toggleInvitationsModal = async function() {
+      const modal = document.getElementById('invitationsModal');
+      if (modal) {
+        const isOpening = !modal.classList.contains('active');
+
+        if (isOpening && currentUserId) {
+          await loadInvitations();
+        }
+
+        modal.classList.toggle('active');
+      }
+    };
+
+    // 초대 목록 로드
+    async function loadInvitations() {
+      try {
+        const invitationsRef = window.dbRef(window.db, `users/${currentUserId}/invitations`);
+        const snapshot = await new Promise((resolve, reject) => {
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          window.dbOnValue(invitationsRef, (snapshot) => {
+            clearTimeout(timeoutId);
+            resolve(snapshot);
+          }, { onlyOnce: true });
+        });
+
+        const invitationsList = document.getElementById('invitationsList');
+        invitationsList.innerHTML = '';
+
+        if (!snapshot.exists()) {
+          invitationsList.innerHTML = '<p style="text-align: center; color: #999; padding: 40px 20px;">받은 초대가 없습니다</p>';
+          updateInvitationBadge(0);
+          return;
+        }
+
+        const invitations = snapshot.val();
+        const pendingInvitations = Object.entries(invitations).filter(([id, inv]) => inv.status === 'pending');
+
+        if (pendingInvitations.length === 0) {
+          invitationsList.innerHTML = '<p style="text-align: center; color: #999; padding: 40px 20px;">받은 초대가 없습니다</p>';
+          updateInvitationBadge(0);
+          return;
+        }
+
+        updateInvitationBadge(pendingInvitations.length);
+
+        pendingInvitations.forEach(([invitationId, invitation]) => {
+          const invitationCard = document.createElement('div');
+          invitationCard.style.cssText = 'border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 15px; background: white;';
+
+          const date = new Date(invitation.createdAt).toLocaleString('ko-KR');
+
+          invitationCard.innerHTML = `
+            <div style="margin-bottom: 12px;">
+              <div style="font-size: 16px; font-weight: 600; color: #333; margin-bottom: 5px;">
+                ${invitation.teamName}
+              </div>
+              <div style="font-size: 13px; color: #666;">
+                <strong>${invitation.inviterName}</strong>님이 초대했습니다
+              </div>
+              <div style="font-size: 12px; color: #999; margin-top: 5px;">
+                ${date}
+              </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button class="admin-btn" onclick="acceptInvitation('${invitationId}', '${invitation.teamId}')" style="flex: 1; background: #4caf50;">
+                ✓ 수락
+              </button>
+              <button class="admin-btn" onclick="rejectInvitation('${invitationId}')" style="flex: 1; background: #f44336;">
+                ✗ 거절
+              </button>
+            </div>
+          `;
+
+          invitationsList.appendChild(invitationCard);
+        });
+      } catch (error) {
+        console.error('초대 목록 로드 실패:', error);
+      }
+    }
+
+    // 초대 배지 업데이트
+    function updateInvitationBadge(count) {
+      const badge = document.getElementById('invitationBadge');
+      if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'inline';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    // 초대 수락
+    window.acceptInvitation = async function(invitationId, teamId) {
+      try {
+        // 1. 현재 팀이 있는지 확인
+        if (currentTeamId) {
+          if (!confirm('다른 팀에 소속되어 있습니다. 현재 팀을 나가고 새 팀에 참여하시겠습니까?')) {
+            return;
+          }
+          // 현재 팀 나가기
+          await leaveCurrentTeam();
+        }
+
+        // 2. 새 팀에 참여
+        const memberRef = window.dbRef(window.db, `teams/${teamId}/members/${currentUserId}`);
+        await window.dbSet(memberRef, {
+          name: userInfo.name,
+          joinedAt: new Date().toISOString(),
+          role: 'member'
+        });
+
+        // 3. 사용자 정보 업데이트
+        const userInfoRef = window.dbRef(window.db, `users/${currentUserId}/info`);
+        await window.dbUpdate(userInfoRef, {
+          currentTeamId: teamId
+        });
+
+        // 4. 초대 상태 업데이트
+        const invitationRef = window.dbRef(window.db, `users/${currentUserId}/invitations/${invitationId}`);
+        await window.dbUpdate(invitationRef, {
+          status: 'accepted',
+          acceptedAt: new Date().toISOString()
+        });
+
+        // 5. 전역 변수 업데이트
+        currentTeamId = teamId;
+        teamInfo = null;
+
+        alert('팀 초대를 수락했습니다!');
+        toggleInvitationsModal();
+
+        // 페이지 새로고침하여 팀 데이터 로드
+        location.reload();
+      } catch (error) {
+        console.error('초대 수락 실패:', error);
+        alert('초대 수락 중 오류가 발생했습니다: ' + error.message);
+      }
+    };
+
+    // 초대 거절
+    window.rejectInvitation = async function(invitationId) {
+      if (!confirm('이 초대를 거절하시겠습니까?')) {
+        return;
+      }
+
+      try {
+        const invitationRef = window.dbRef(window.db, `users/${currentUserId}/invitations/${invitationId}`);
+        await window.dbUpdate(invitationRef, {
+          status: 'rejected',
+          rejectedAt: new Date().toISOString()
+        });
+
+        alert('초대를 거절했습니다.');
+        await loadInvitations();
+      } catch (error) {
+        console.error('초대 거절 실패:', error);
+        alert('초대 거절 중 오류가 발생했습니다: ' + error.message);
+      }
+    };
+
+    // 현재 팀 나가기 (초대 수락 시 사용)
+    async function leaveCurrentTeam() {
+      const memberRef = window.dbRef(window.db, `teams/${currentTeamId}/members/${currentUserId}`);
+      await window.dbRemove(memberRef);
+    }
 
     // 팀 설정 모달에서 팀코드 복사
     window.copyTeamCodeFromSettings = function() {
-      if (!companyInfo || !companyInfo.companyCode) {
+      if (!teamInfo || !teamInfo.teamCode) {
         alert('팀코드를 불러올 수 없습니다.');
         return;
       }
 
-      const code = companyInfo.companyCode;
+      const code = teamInfo.teamCode;
       const btn = document.getElementById('copySettingsCodeBtn');
 
       if (navigator.clipboard) {
@@ -3212,6 +3484,7 @@
     let companyInfo = null;
     let userInfo = null;
     let currentTeamId = null;
+    let teamInfo = null;
     let map = null;
     let currentMarker = null;
     let currentLocationMarker = null;
@@ -4190,7 +4463,8 @@
   loadSites();
   loadAllCompaniesWorks();
   renderMenu();
-  
+  loadInvitations(); // 초대 배지 로드
+
   setTimeout(() => {
     initMenuEventListeners();
   }, 100);
