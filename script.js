@@ -1860,38 +1860,53 @@
     
     function loadAssignees() {
       console.log('👥 사용자 목록 로드 중...');
-      
-      if (!currentCompanyId) {
-        console.error('❌ currentCompanyId가 없습니다!');
+
+      // 팀이 있으면 팀 멤버, 없으면 개인만
+      let assigneesPath;
+      if (currentTeamId) {
+        assigneesPath = `teams/${currentTeamId}/members`;
+        console.log('✅ 팀 멤버 로드:', currentTeamId);
+      } else if (currentUserId) {
+        // 팀이 없으면 본인만 담당자 목록에 추가
+        assignees = [{
+          id: currentUserId,
+          name: userInfo?.name || currentUser,
+          role: 'member'
+        }];
+        console.log('✅ 개인 사용자 로드 (팀 없음)');
+        return;
+      } else {
+        console.error('❌ currentTeamId와 currentUserId 모두 없습니다!');
         return;
       }
-      
-      const assigneesRef = window.dbRef(window.db, `companies/${currentCompanyId}/assignees`);
-      
+
+      const assigneesRef = window.dbRef(window.db, assigneesPath);
+
       window.dbOnValue(assigneesRef, (snapshot) => {
         assignees = [];
         const data = snapshot.val();
-        
+
         console.log('📊 사용자 데이터:', data);
-        
+
         if (data) {
           Object.keys(data).forEach(key => {
             assignees.push({
               id: key,
               name: data[key].name,
-              isAdmin: data[key].isAdmin || false
+              role: data[key].role || 'member'
             });
           });
         }
-        
+
+        // 역할별 정렬 (생성자 > 멤버), 이름순
         assignees.sort((a, b) => {
-          if (a.isAdmin && !b.isAdmin) return -1;
-          if (!a.isAdmin && b.isAdmin) return 1;
+          if (a.role === 'creator' && b.role !== 'creator') return -1;
+          if (a.role !== 'creator' && b.role === 'creator') return 1;
           return a.name.localeCompare(b.name);
         });
-        
+
         console.log('✅ 사용자 목록 로드 완료:', assignees.length, '명');
-  
+
       }, (error) => {
         console.error('❌ 사용자 목록 로드 실패:', error);
         alert('사용자 목록을 불러오는데 실패했습니다.');
