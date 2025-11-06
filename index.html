@@ -161,13 +161,9 @@
     </div>
     
     <div class="menu-divider"></div>
-    <div class="menu-item" onclick="toggleInvitationsModal(); toggleMenu();">
-      <span class="menu-item-icon">📬</span>
-      <span class="menu-item-text">팀 초대 <span id="invitationBadge" style="display: none; background: #f44336; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; margin-left: 5px;"></span></span>
-    </div>
     <div class="menu-item" onclick="toggleTeamManagementModal(); toggleMenu();">
       <span class="menu-item-icon">👥</span>
-      <span class="menu-item-text">팀 관리</span>
+      <span class="menu-item-text">팀 관리 <span id="invitationBadge" style="display: none; background: #f44336; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; margin-left: 5px;"></span></span>
     </div>
 
     <div class="menu-divider"></div>
@@ -454,6 +450,16 @@
           </button>
         </div>
 
+        <!-- 받은 초대 목록 -->
+        <div style="margin-bottom: 30px;">
+          <h4 style="font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 600;">
+            📬 받은 초대
+          </h4>
+          <div id="teamSettingsInvitationsList">
+            <p style="text-align: center; color: #999; padding: 20px;">받은 초대가 없습니다</p>
+          </div>
+        </div>
+
         <!-- 팀원 목록 -->
         <div style="margin-bottom: 30px;">
           <h4 style="font-size: 14px; color: #666; margin-bottom: 12px; font-weight: 600;">
@@ -714,11 +720,67 @@
           </div>
         </div>
 
-        <!-- 6. 경로 표시 -->
+        <!-- 6. 팀 관리 -->
         <div class="guide-section">
-          <h3 class="guide-section-title">🗺️ 6. 이동 경로 표시</h3>
+          <h3 class="guide-section-title">👥 6. 팀 관리</h3>
           <div class="guide-step">
             <div class="guide-step-number">11</div>
+            <div class="guide-step-content">
+              <h4>팀 만들기</h4>
+              <p>① 우측 상단 메뉴(☰) → "팀 관리" 클릭<br>
+                 ② "새 팀 만들기" 선택<br>
+                 ③ 팀명 입력 후 "팀 만들기" 클릭<br>
+                 ④ 생성된 6자리 팀코드를 팀원들과 공유</p>
+              <div class="guide-tip">💡 팀을 만들면 기존 개인 작업과 현장이 자동으로 팀으로 이전됩니다.</div>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-number">12</div>
+            <div class="guide-step-content">
+              <h4>팀 참여하기</h4>
+              <p>① 우측 상단 메뉴(☰) → "팀 관리" 클릭<br>
+                 ② "기존 팀 참여하기" 선택<br>
+                 ③ 팀 관리자에게 받은 6자리 팀코드 입력<br>
+                 ④ "참여하기" 클릭</p>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-number">13</div>
+            <div class="guide-step-content">
+              <h4>팀원 초대하기</h4>
+              <p><strong>방법 1: 팀코드 공유</strong><br>
+                 팀 관리 → 팀코드를 복사하여 팀원에게 전달</p>
+              <p style="margin-top: 10px;"><strong>방법 2: ID로 직접 초대</strong><br>
+                 팀 관리 → ID로 팀원 초대 → 상대방의 로그인 ID 입력 → 초대 보내기</p>
+              <div class="guide-tip">💡 초대받은 사람은 팀 관리 메뉴에서 승인/거절할 수 있습니다.</div>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-number">14</div>
+            <div class="guide-step-content">
+              <h4>팀 초대 수락/거절</h4>
+              <p>① 우측 상단 메뉴(☰) → "팀 관리" 클릭 (빨간 알림 배지 확인)<br>
+                 ② "받은 초대" 섹션에서 초대 내용 확인<br>
+                 ③ "✓ 수락" 또는 "✗ 거절" 버튼 클릭</p>
+              <div class="guide-warning">⚠️ 다른 팀에 소속된 상태에서 새 팀 초대를 수락하면 현재 팀에서 자동으로 나가게 됩니다.</div>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-number">15</div>
+            <div class="guide-step-content">
+              <h4>팀원 관리</h4>
+              <p>팀 관리 → 팀원 목록에서 현재 팀원 확인<br>
+                 • 👑 표시: 팀 생성자<br>
+                 • 👤 표시: 일반 팀원</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. 경로 표시 -->
+        <div class="guide-section">
+          <h3 class="guide-section-title">🗺️ 7. 이동 경로 표시</h3>
+          <div class="guide-step">
+            <div class="guide-step-number">16</div>
             <div class="guide-step-content">
               <h4>경로 확인하기</h4>
               <p>① 지도 섹션의 "경로 표시" 버튼 클릭<br>
@@ -729,9 +791,9 @@
           </div>
         </div>
 
-        <!-- 7. 팁과 요령 -->
+        <!-- 8. 팁과 요령 -->
         <div class="guide-section">
-          <h3 class="guide-section-title">💡 7. 유용한 팁</h3>
+          <h3 class="guide-section-title">💡 8. 유용한 팁</h3>
           <div class="guide-tips-list">
             <div class="guide-tip-item">
               <span class="tip-emoji">✅</span>
@@ -756,9 +818,9 @@
           </div>
         </div>
 
-        <!-- 8. 문의하기 -->
+        <!-- 9. 문의하기 -->
         <div class="guide-section">
-          <h3 class="guide-section-title">📞 8. 문의하기</h3>
+          <h3 class="guide-section-title">📞 9. 문의하기</h3>
           <div class="guide-contact">
             <p>사용 중 문의사항이나 개선 제안이 있으시면 언제든 연락주세요.</p>
             <div class="contact-info">

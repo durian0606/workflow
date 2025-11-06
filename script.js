@@ -192,6 +192,9 @@
               if (memberList) memberList.innerHTML = '<li class="site-item" style="text-align: center; color: #999;">팀원이 없습니다</li>';
             }
 
+            // 받은 초대 목록 로드
+            await loadInvitationsInSettings();
+
           } catch (error) {
             console.error('팀 정보 로드 실패:', error);
           }
@@ -200,6 +203,73 @@
         modal.classList.toggle('active');
       }
     };
+
+    // 팀 설정 모달에서 초대 목록 로드
+    async function loadInvitationsInSettings() {
+      try {
+        const invitationsRef = window.dbRef(window.db, `users/${currentUserId}/invitations`);
+        const snapshot = await new Promise((resolve, reject) => {
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          window.dbOnValue(invitationsRef, (snapshot) => {
+            clearTimeout(timeoutId);
+            resolve(snapshot);
+          }, { onlyOnce: true });
+        });
+
+        const invitationsList = document.getElementById('teamSettingsInvitationsList');
+        invitationsList.innerHTML = '';
+
+        if (!snapshot.exists()) {
+          invitationsList.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">받은 초대가 없습니다</p>';
+          updateInvitationBadge(0);
+          return;
+        }
+
+        const invitations = snapshot.val();
+        const pendingInvitations = Object.entries(invitations).filter(([id, inv]) => inv.status === 'pending');
+
+        if (pendingInvitations.length === 0) {
+          invitationsList.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">받은 초대가 없습니다</p>';
+          updateInvitationBadge(0);
+          return;
+        }
+
+        updateInvitationBadge(pendingInvitations.length);
+
+        pendingInvitations.forEach(([invitationId, invitation]) => {
+          const invitationCard = document.createElement('div');
+          invitationCard.style.cssText = 'border: 2px solid #2a459c; border-radius: 8px; padding: 15px; margin-bottom: 12px; background: linear-gradient(135deg, #e3f2fd 0%, white 100%);';
+
+          const date = new Date(invitation.createdAt).toLocaleString('ko-KR');
+
+          invitationCard.innerHTML = `
+            <div style="margin-bottom: 12px;">
+              <div style="font-size: 15px; font-weight: 600; color: #333; margin-bottom: 5px;">
+                ${invitation.teamName}
+              </div>
+              <div style="font-size: 13px; color: #666;">
+                <strong>${invitation.inviterName}</strong>님이 초대했습니다
+              </div>
+              <div style="font-size: 11px; color: #999; margin-top: 5px;">
+                ${date}
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="admin-btn" onclick="acceptInvitation('${invitationId}', '${invitation.teamId}')" style="flex: 1; background: #4caf50; padding: 10px;">
+                ✓ 수락
+              </button>
+              <button class="admin-btn" onclick="rejectInvitation('${invitationId}')" style="flex: 1; background: #f44336; padding: 10px;">
+                ✗ 거절
+              </button>
+            </div>
+          `;
+
+          invitationsList.appendChild(invitationCard);
+        });
+      } catch (error) {
+        console.error('초대 목록 로드 실패:', error);
+      }
+    }
 
     // 팀 코드 생성 함수 (6자리 영문+숫자)
     function generateTeamCode() {
