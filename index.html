@@ -4561,7 +4561,15 @@
     }
     
     function loadSites() {
-      const sitesRef = window.dbRef(window.db, `companies/${currentCompanyId}/sites`);
+      // 팀이 있으면 팀 현장, 없으면 개인 현장
+      let sitesPath;
+      if (currentTeamId) {
+        sitesPath = `teams/${currentTeamId}/sites`;
+      } else {
+        sitesPath = `companies/${currentCompanyId}/sites`;
+      }
+
+      const sitesRef = window.dbRef(window.db, sitesPath);
       window.dbOnValue(sitesRef, (snapshot) => {
         sites = snapshot.val() || {};
         renderSiteList();
@@ -4918,11 +4926,16 @@
             cards.forEach((c, index) => {
               const workId = c.dataset.workId;
               if (workId && works[workId]) {
-                updates[`works/${workId}/order`] = index;
+                // 팀이 있으면 팀 작업, 없으면 개인 작업
+                if (currentTeamId) {
+                  updates[`teams/${currentTeamId}/worklists/${workId}/order`] = index;
+                } else {
+                  updates[`companies/${currentCompanyId}/works/${workId}/order`] = index;
+                }
                 works[workId].order = index;
               }
             });
-            
+
             window.dbUpdate(window.dbRef(window.db), updates).then(() => {
               renderWorks();
               
@@ -5403,30 +5416,38 @@
     function toggleComplete(workId) {
       const work = works[workId];
       if (!work) return;
-      
-      const workRef = window.dbRef(window.db, `companies/${currentCompanyId}/works/${workId}`);
+
+      // 팀이 있으면 팀 작업, 없으면 개인 작업
+      let worksPath;
+      if (currentTeamId) {
+        worksPath = `teams/${currentTeamId}/worklists/${workId}`;
+      } else {
+        worksPath = `companies/${currentCompanyId}/works/${workId}`;
+      }
+
+      const workRef = window.dbRef(window.db, worksPath);
       const isCompleting = !work.completed;
-      
+
       const updateData = {
         completed: isCompleting
       };
-      
+
       if (isCompleting) {
         updateData.completedDate = new Date().toISOString().split('T')[0];
-        
+
         if (navigator.vibrate) {
           navigator.vibrate(50);
         }
       } else {
         updateData.completedDate = null;
-        
+
         if (navigator.vibrate) {
           navigator.vibrate([30, 50, 30]);
         }
-        
+
         updateData.order = Date.now();
       }
-      
+
       window.dbUpdate(workRef, updateData);
     }
     
@@ -5579,13 +5600,21 @@
       
       if (currentEditingSiteId) {
         console.log('✅ 현장 수정:', currentEditingSiteId);
-        
+
         const oldSite = sites[currentEditingSiteId];
         const oldSiteName = oldSite ? oldSite.name : '';
-        
+
         console.log(`🔄 현장명 변경: "${oldSiteName}" → "${name}"`);
-        
-        const siteRef = window.dbRef(window.db, `companies/${currentCompanyId}/sites/${currentEditingSiteId}`);
+
+        // 팀이 있으면 팀 현장, 없으면 개인 현장
+        let sitePath;
+        if (currentTeamId) {
+          sitePath = `teams/${currentTeamId}/sites/${currentEditingSiteId}`;
+        } else {
+          sitePath = `companies/${currentCompanyId}/sites/${currentEditingSiteId}`;
+        }
+
+        const siteRef = window.dbRef(window.db, sitePath);
         window.dbUpdate(siteRef, {
           name: name,
           address: address,
@@ -5608,7 +5637,12 @@
               const workSiteAddress = workSiteObj ? workSiteObj.address : '';
               
               if (areSitesSimilar(oldSiteName, oldSiteAddress, work.site, workSiteAddress)) {
-                updates[`companies/${currentCompanyId}/works/${workId}/site`] = name;
+                // 팀이 있으면 팀 작업, 없으면 개인 작업
+                if (currentTeamId) {
+                  updates[`teams/${currentTeamId}/worklists/${workId}/site`] = name;
+                } else {
+                  updates[`companies/${currentCompanyId}/works/${workId}/site`] = name;
+                }
                 works[workId].site = name;
                 updatedCount++;
                 console.log(`  ✅ 작업 업데이트: ${workId} - "${work.work}"`);
@@ -5639,8 +5673,15 @@
         
       } else {
         console.log('✅ 현장 추가');
-        
-        const sitesRef = window.dbRef(window.db, `companies/${currentCompanyId}/sites`);
+
+        // 팀이 있으면 팀 현장, 없으면 개인 현장
+        let sitesPath;
+        if (currentTeamId) {
+          sitesPath = `teams/${currentTeamId}/sites`;
+        } else {
+          sitesPath = `companies/${currentCompanyId}/sites`;
+        }
+        const sitesRef = window.dbRef(window.db, sitesPath);
         const newSiteRef = window.dbPush(sitesRef);
         window.dbSet(newSiteRef, {
           name: name,
@@ -5658,7 +5699,15 @@
 
     function deleteSite(id) {
       if (!confirm('이 현장을 삭제하시겠습니까?')) return;
-      const siteRef = window.dbRef(window.db, `companies/${currentCompanyId}/sites/${id}`);
+
+      // 팀이 있으면 팀 현장, 없으면 개인 현장
+      let sitePath;
+      if (currentTeamId) {
+        sitePath = `teams/${currentTeamId}/sites/${id}`;
+      } else {
+        sitePath = `companies/${currentCompanyId}/sites/${id}`;
+      }
+      const siteRef = window.dbRef(window.db, sitePath);
       window.dbRemove(siteRef);
     }
 
@@ -5838,7 +5887,16 @@
           }
           break;
       }
-      const workRef = window.dbRef(window.db, `companies/${currentCompanyId}/works/${currentEditingWorkId}`);
+
+      // 팀이 있으면 팀 작업, 없으면 개인 작업
+      let worksPath;
+      if (currentTeamId) {
+        worksPath = `teams/${currentTeamId}/worklists/${currentEditingWorkId}`;
+      } else {
+        worksPath = `companies/${currentCompanyId}/works/${currentEditingWorkId}`;
+      }
+
+      const workRef = window.dbRef(window.db, worksPath);
       window.dbUpdate(workRef, {
         deadline: selectedDate
       });
