@@ -1,15 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "WebSearch",
+      "Bash(git commit:*)",
       "Bash(git add:*)",
-      "Bash(git commit -m \"$(cat <<''EOF''\n회원가입 폼 라벨 간소화\n\n- \"관리자 이름\" → \"이름\"으로 변경\n- \"회사 ID\" → \"ID\"로 변경\n- 관련 알림 메시지도 함께 수정\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git config:*)",
-      "Bash(git push:*)",
-      "Bash(git pull:*)",
-      "Bash(git commit -m \"$(cat <<''EOF''\nPhase 1: 팀 관리 UI 추가\n\n- \"관리 메뉴\"를 \"팀 관리\"로 변경 (모든 사용자 접근 가능)\n- 새로운 메뉴 항목 추가:\n  • 팀 만들기\n  • 팀 참여하기\n  • 팀코드 확인\n  • 팀원 초대\n  • 팀 설정\n\n- 새로운 모달 4개 추가:\n  • 팀 만들기 모달\n  • 팀 참여하기 모달 (팀코드 입력)\n  • 팀원 초대 모달 (코드 공유 + ID 초대)\n  • 팀 설정 모달\n\n- JavaScript 함수들 추가 (Phase 2에서 구현 예정)\n- UI 텍스트 개선: \"회사\" → \"팀\" 용어 통일\n- 복사 버튼 시각적 피드백 개선\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git commit -m \"$(cat <<''EOF''\nPhase 2-1: 회원가입 시스템 개편 (개인 계정 기반)\n\n데이터베이스 구조 변경:\n- companies/{companyId} → users/{userId} \n- 개인 계정 중심 구조로 전환\n\n회원가입 변경사항:\n- 회사명 입력란 제거 (개인 계정이므로 불필요)\n- users/{userId}/info 에 사용자 정보 저장\n  • userId, name, password, currentTeamId, createdAt\n- users/{userId}/personalWorklists 초기화\n- ID 중복 체크를 users/ 기준으로 변경\n\n주요 개선:\n- 가입 후 로그인 화면으로 자동 이동\n- 가입한 ID 자동 입력\n- 전역 변수 구조 개선 (userInfo, currentUserId)\n\n⚠️ 주의: 로그인 함수는 아직 미완성\n- 다음 커밋에서 로그인 로직 업데이트 예정\n- 현재는 회원가입만 작동\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git commit -m \"$(cat <<''EOF''\nPhase 2-2: 로그인 시스템 개편 (개인 계정 기반)\n\n로그인 로직 변경:\n- companies/{companyId} → users/{userId} 구조로 전환\n- 관리자 찾기 로직 제거 (개인 계정이므로 불필요)\n- 비밀번호 직접 확인\n\n자동 로그인 개선:\n- localStorage: savedCompanyId → savedUserId\n- users/{userId}/info 에서 사용자 정보 로드\n- 간소화된 인증 프로세스\n\n전역 변수 구조:\n- currentCompanyId, isAdmin, companyInfo 제거\n- currentUserId, userInfo, currentTeamId 추가\n- 개인 계정 중심 구조로 정리\n\n주요 개선:\n- 로그인 코드 126줄 → 56줄 (간소화)\n- 자동 로그인 70줄 감소\n- 더 빠르고 직관적인 인증 흐름\n\n⚠️ 주의: 작업 목록 로딩은 아직 미완성\n- showMainApp() 호출 시 오류 발생 가능\n- 다음 커밋에서 작업 목록 로직 업데이트 예정\n- 현재는 회원가입 + 로그인까지만 작동\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
+      "Bash(git remote add:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
