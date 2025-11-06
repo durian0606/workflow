@@ -5431,10 +5431,22 @@
     }
     
     function saveAssignee(workId, assignee) {
-      const workRef = window.dbRef(window.db, `companies/${currentCompanyId}/works/${workId}`);
+      // 팀이 있으면 팀 작업, 없으면 개인 작업
+      let worksPath;
+      if (currentTeamId) {
+        worksPath = `teams/${currentTeamId}/worklists/${workId}`;
+      } else {
+        worksPath = `companies/${currentCompanyId}/works/${workId}`;
+      }
+
+      const workRef = window.dbRef(window.db, worksPath);
       window.dbUpdate(workRef, {
         assignee: assignee
       });
+
+      // 작업 목록 다시 렌더링 (내 작업/팀 작업 구분 반영)
+      works[workId].assignee = assignee;
+      renderWorks();
     }
     
     function deleteWork(workId) {
