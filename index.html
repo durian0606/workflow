@@ -1873,24 +1873,10 @@
       <span class="menu-item-text">사용 설명서</span>
     </div>
     
-    <div id="teamMenuSection">
-      <div class="menu-divider"></div>
-      <div class="menu-item" style="background: #e3f2fd; pointer-events: none;">
-        <span class="menu-item-icon">🌟</span>
-        <span class="menu-item-text" style="font-weight: 600; color: #1976d2;">팀 관리</span>
-      </div>
-      <div class="menu-item" onclick="toggleCreateTeamModal(); toggleMenu();">
-        <span class="menu-item-icon">➕</span>
-        <span class="menu-item-text">팀 만들기</span>
-      </div>
-      <div class="menu-item" onclick="toggleJoinTeamModal(); toggleMenu();">
-        <span class="menu-item-icon">🔗</span>
-        <span class="menu-item-text">팀 참여하기</span>
-      </div>
-      <div class="menu-item" onclick="toggleTeamSettingsModal(); toggleMenu();">
-        <span class="menu-item-icon">⚙️</span>
-        <span class="menu-item-text">팀 설정</span>
-      </div>
+    <div class="menu-divider"></div>
+    <div class="menu-item" onclick="toggleTeamManagementModal(); toggleMenu();">
+      <span class="menu-item-icon">👥</span>
+      <span class="menu-item-text">팀 관리</span>
     </div>
     
     <div class="menu-divider"></div>
@@ -2004,6 +1990,31 @@
         <p style="font-size: 12px; color: #999; margin-top: 20px;">
           💡 코드를 재발급하면 기존 코드는 사용할 수 없습니다
         </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 팀 선택 모달 (팀이 없을 때) -->
+  <div class="modal-overlay" id="teamSelectionModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">👥 팀 관리</h3>
+        <button class="close-btn" onclick="toggleTeamSelectionModal()">×</button>
+      </div>
+
+      <div style="padding: 20px;">
+        <p style="text-align: center; color: #666; margin-bottom: 30px; font-size: 14px;">
+          현재 소속된 팀이 없습니다.<br>새 팀을 만들거나 기존 팀에 참여하세요.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+          <button class="admin-btn" onclick="toggleTeamSelectionModal(); toggleCreateTeamModal();" style="width: 100%; padding: 15px; font-size: 15px;">
+            ➕ 새 팀 만들기
+          </button>
+          <button class="admin-btn" onclick="toggleTeamSelectionModal(); toggleJoinTeamModal();" style="width: 100%; padding: 15px; font-size: 15px; background: #1976d2;">
+            🔗 기존 팀 참여하기
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -2565,6 +2576,25 @@
       }
     };
 
+    window.toggleTeamSelectionModal = function() {
+      console.log('👥 팀 선택 모달 토글');
+      const modal = document.getElementById('teamSelectionModal');
+      if (modal) {
+        modal.classList.toggle('active');
+      }
+    };
+
+    window.toggleTeamManagementModal = function() {
+      console.log('👥 팀 관리 메인 진입');
+
+      // 팀이 있으면 팀 설정 모달, 없으면 팀 선택 모달
+      if (currentTeamId) {
+        toggleTeamSettingsModal();
+      } else {
+        toggleTeamSelectionModal();
+      }
+    };
+
     window.toggleInviteMemberModal = function() {
       console.log('👥 팀원 초대 모달 토글');
       const modal = document.getElementById('inviteMemberModal');
@@ -2738,7 +2768,12 @@
 
         toggleCreateTeamModal();
 
-        // TODO: 메인 화면 새로고침하여 팀 정보 표시
+        // 작업 타입 선택 UI 표시
+        const workTypeSelector = document.getElementById('workTypeSelector');
+        if (workTypeSelector) {
+          workTypeSelector.style.display = 'flex';
+        }
+
         console.log('팀 생성 완료:', teamId, teamCode);
 
       } catch (error) {
@@ -2827,7 +2862,12 @@
 
         toggleJoinTeamModal();
 
-        // TODO: 메인 화면 새로고침하여 팀 정보 표시
+        // 작업 타입 선택 UI 표시
+        const workTypeSelector = document.getElementById('workTypeSelector');
+        if (workTypeSelector) {
+          workTypeSelector.style.display = 'flex';
+        }
+
         console.log('팀 참여 완료:', foundTeamId);
 
       } catch (error) {
@@ -3053,7 +3093,12 @@
           modal.classList.remove('active');
         }
 
-        // TODO: 메인 화면 새로고침하여 변경사항 반영
+        // 작업 타입 선택 UI 숨기기
+        const workTypeSelector = document.getElementById('workTypeSelector');
+        if (workTypeSelector) {
+          workTypeSelector.style.display = 'none';
+        }
+
         console.log('팀 나가기 완료:', oldTeamId);
 
       } catch (error) {
