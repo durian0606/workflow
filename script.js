@@ -2073,19 +2073,21 @@
     }
 
     function loadAllCompaniesWorks() {
-      const companiesRef = window.dbRef(window.db, 'companies');
-      window.dbOnValue(companiesRef, (snapshot) => {
-        const companies = snapshot.val() || {};
+      const teamsRef = window.dbRef(window.db, 'teams');
+      window.dbOnValue(teamsRef, (snapshot) => {
+        const teams = snapshot.val() || {};
         allCompaniesWorks = {};
-        
-        Object.keys(companies).forEach(companyId => {
-          allCompaniesWorks[companyId] = {
-            name: companies[companyId].info?.name || companyId,
-            works: companies[companyId].works || {},
-            sites: companies[companyId].sites || {}
+
+        Object.keys(teams).forEach(teamId => {
+          allCompaniesWorks[teamId] = {
+            name: teams[teamId].info?.name || teamId,
+            works: teams[teamId].worklists || {},
+            sites: teams[teamId].sites || {}
           };
         });
-        
+
+        console.log('✅ 모든 팀 데이터 로드 완료:', Object.keys(allCompaniesWorks).length, '개 팀');
+
         if (currentUser) {
           renderWorks();
         }
@@ -2609,19 +2611,22 @@
           
           const otherCompanyInfo = [];
           if (work.site) {
-            Object.keys(allCompaniesWorks).forEach(companyId => {
-              if (companyId === currentCompanyId) return;
-              
-              const companyWorks = allCompaniesWorks[companyId].works || {};
-              const companyName = allCompaniesWorks[companyId].name || companyId;
+            Object.keys(allCompaniesWorks).forEach(teamId => {
+              // 현재 팀이면 건너뛰기
+              if (currentTeamId && teamId === currentTeamId) return;
+              // 팀이 없는 경우(개인 작업) 자신의 회사면 건너뛰기
+              if (!currentTeamId && teamId === currentCompanyId) return;
+
+              const companyWorks = allCompaniesWorks[teamId].works || {};
+              const companyName = allCompaniesWorks[teamId].name || teamId;
               
               Object.values(companyWorks).forEach(otherWork => {
                 if (otherWork.completed) return;
                 
                 const mySite = Object.values(sites).find(s => s.name === work.site);
                 const mySiteAddress = mySite ? mySite.address : '';
-                
-                const otherCompanySites = allCompaniesWorks[companyId].sites || {};
+
+                const otherCompanySites = allCompaniesWorks[teamId].sites || {};
                 const otherSite = Object.values(otherCompanySites).find(s => s.name === otherWork.site);
                 const otherSiteAddress = otherSite ? otherSite.address : '';
                 
