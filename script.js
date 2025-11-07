@@ -3168,36 +3168,27 @@
       
       card.appendChild(cardBody);
 
+      const personContainer = document.createElement('div');
+      personContainer.className = 'person-select-container';
+
+      // 다른 팀 정보를 담당자 왼쪽에 표시
       if (work.otherCompanyInfo && work.otherCompanyInfo.length > 0) {
         const otherCompaniesSection = document.createElement('div');
         otherCompaniesSection.className = 'other-companies-section';
-        
+
         work.otherCompanyInfo.forEach(info => {
           const badge = document.createElement('div');
           badge.className = 'other-company-badge';
-          
-          const nameLine = document.createElement('div');
-          nameLine.className = 'other-company-name-line';
-          nameLine.innerHTML = `
-            <span class="other-company-name">${info.companyName}</span>
+          badge.innerHTML = `
+            <div class="other-company-name">${info.companyName}</div>
+            <div class="other-company-assignee">${info.assignee}</div>
           `;
-          
-          const assigneeLine = document.createElement('div');
-          assigneeLine.className = 'other-company-assignee-line';
-          assigneeLine.innerHTML = `
-            <span class="other-company-assignee">${info.assignee}</span>
-          `;
-          
-          badge.appendChild(nameLine);
-          badge.appendChild(assigneeLine);
           otherCompaniesSection.appendChild(badge);
         });
-        
-        card.appendChild(otherCompaniesSection);
+
+        personContainer.appendChild(otherCompaniesSection);
       }
-      
-      const personContainer = document.createElement('div');
-      personContainer.className = 'person-select-container';
+
       const assigneeWrapper = document.createElement('div');
       assigneeWrapper.className = 'select-wrapper';
       const assigneeLabel = document.createElement('label');

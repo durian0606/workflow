@@ -465,46 +465,37 @@
 
     .other-companies-section {
       display: flex;
-      flex-direction: column;
-      gap: 3px;
+      flex-direction: row;
+      gap: 4px;
       flex-shrink: 0;
-      margin: 0 4px;
+      margin-right: 8px;
       align-self: center;
     }
-    
+
     .other-company-badge {
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      gap: 2px;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
       background: #fff3e0;
       border: 1px solid #ffb74d;
-      padding: 3px 6px;
+      padding: 4px 6px;
       border-radius: 4px;
-      font-size: 9px;
+      font-size: 10px;
       color: #f57c00;
       font-weight: 500;
+      line-height: 1.2;
     }
-    
-    .other-company-name-line {
-      display: flex;
-      align-items: center;
-    }
-       
+
     .other-company-name {
       font-weight: 600;
       white-space: nowrap;
     }
-    
-    .other-company-assignee-line {
-      display: flex;
-      align-items: center;
-      padding-left: 8px;
-    }
-    
+
     .other-company-assignee {
-      font-size: 10px;
-      opacity: 0.9;
+      font-size: 9px;
+      opacity: 0.85;
       white-space: nowrap;
     }
     
