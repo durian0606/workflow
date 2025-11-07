@@ -462,6 +462,7 @@
       gap: 4px;
       margin-right: 8px;
       flex-shrink: 0;
+      border: 2px solid red; /* 디버깅용 */
     }
 
     .task-card-body {
@@ -552,6 +553,7 @@
       font-weight: 600;
       font-size: 10px;
       flex-shrink: 0;
+      box-shadow: 0 0 0 2px red; /* 디버깅용 - border-radius가 있어서 box-shadow 사용 */
     }
     
     .task-checkbox {
@@ -566,6 +568,7 @@
       justify-content: center;
       flex-shrink: 0;
       position: relative;
+      border: 2px solid red; /* 디버깅용 */
     }
 
     /* 실제 보이는 원은 작게 */
