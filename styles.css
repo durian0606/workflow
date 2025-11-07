@@ -459,10 +459,11 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 2px;
       margin-right: 8px;
       flex-shrink: 0;
       border: 2px solid red; /* 디버깅용 */
+      align-self: flex-start;
     }
 
     .task-card-body {
@@ -560,10 +561,10 @@
     
     .task-checkbox {
       /* 터치 영역은 크게 */
-      min-width: 44px;
-      min-height: 44px;
-      width: 44px;
-      height: 44px;
+      min-width: 32px;
+      min-height: 32px;
+      width: 32px;
+      height: 32px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -1069,11 +1070,12 @@
     .deadline-label-container {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      margin-top: 4px;
+      gap: 3px;
+      margin-top: 2px;
       cursor: pointer;
       width: fit-content;
       border: 2px solid cyan; /* 디버깅용 - 완료기한 */
+      line-height: 1;
     }
     
     .deadline-label-text {
@@ -1084,13 +1086,14 @@
     
     .deadline-date-tag {
       display: inline-block;
-      padding: 2px 6px;
+      padding: 1px 4px;
       background: #e3f2fd;
       color: #1976d2;
       border-radius: 3px;
       font-size: 10px;
       font-weight: 500;
       white-space: nowrap;
+      line-height: 1.2;
     }
 
     .add-site-form {
