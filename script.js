@@ -2073,13 +2073,25 @@
     }
 
     function loadAllCompaniesWorks() {
+      // 팀 데이터 로드
       const teamsRef = window.dbRef(window.db, 'teams');
       window.dbOnValue(teamsRef, (snapshot) => {
         const teams = snapshot.val() || {};
         allCompaniesWorks = {};
 
+        // 1. 팀 데이터 로드
         Object.keys(teams).forEach(teamId => {
-          const teamName = teams[teamId].info?.name || teamId;
+          const teamInfo = teams[teamId].info;
+          let teamName;
+
+          if (teamInfo && teamInfo.name) {
+            teamName = teamInfo.name;
+          } else {
+            // fallback: teamId를 보기 좋게 변환
+            teamName = `팀 ${teamId.substring(0, 8)}`;
+            console.warn(`⚠️ 팀명 없음: ${teamId}, fallback: "${teamName}"`);
+          }
+
           allCompaniesWorks[teamId] = {
             name: teamName,
             works: teams[teamId].worklists || {},
@@ -2088,11 +2100,39 @@
           console.log(`📊 팀 로드: ${teamId} → 팀명: "${teamName}"`);
         });
 
-        console.log('✅ 모든 팀 데이터 로드 완료:', Object.keys(allCompaniesWorks).length, '개 팀');
+        // 2. 개인 작업자(팀 없는 사용자) 데이터도 로드
+        const companiesRef = window.dbRef(window.db, 'companies');
+        window.dbOnValue(companiesRef, (companiesSnapshot) => {
+          const companies = companiesSnapshot.val() || {};
 
-        if (currentUser) {
-          renderWorks();
-        }
+          Object.keys(companies).forEach(companyId => {
+            // 이미 팀으로 로드된 경우 건너뛰기
+            if (allCompaniesWorks[companyId]) return;
+
+            const companyInfo = companies[companyId].info;
+            let companyName;
+
+            if (companyInfo && companyInfo.name) {
+              companyName = companyInfo.name;
+            } else {
+              companyName = `개인 ${companyId.substring(0, 8)}`;
+              console.warn(`⚠️ 개인 사용자명 없음: ${companyId}, fallback: "${companyName}"`);
+            }
+
+            allCompaniesWorks[companyId] = {
+              name: companyName,
+              works: companies[companyId].works || {},
+              sites: companies[companyId].sites || {}
+            };
+            console.log(`📊 개인 작업자 로드: ${companyId} → 이름: "${companyName}"`);
+          });
+
+          console.log('✅ 모든 팀/개인 데이터 로드 완료:', Object.keys(allCompaniesWorks).length, '개');
+
+          if (currentUser) {
+            renderWorks();
+          }
+        }, { onlyOnce: true });
       });
     }
     
