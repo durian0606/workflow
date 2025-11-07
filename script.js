@@ -3108,44 +3108,19 @@
         
         card.addEventListener('dragstart', handleDragStart);
         card.addEventListener('dragend', handleDragEnd);
-        
-        const numberCheckContainer = document.createElement('div');
-        numberCheckContainer.className = 'number-check-container';
-        
-        if (work.orderNumber) {
-          const orderNum = document.createElement('div');
-          orderNum.className = 'order-number';
-          orderNum.textContent = work.orderNumber;
-          numberCheckContainer.appendChild(orderNum);
-        }
-        
-        const checkbox = document.createElement('div');
-        checkbox.className = 'task-checkbox';
-        checkbox.onclick = (e) => {
-          e.stopPropagation();
-          toggleComplete(work.id);
-        };
-        numberCheckContainer.appendChild(checkbox);
-        
-        card.appendChild(numberCheckContainer);
-      } else {
-        const completedCheckContainer = document.createElement('div');
-        completedCheckContainer.className = 'number-check-container';
-        
-        const checkbox = document.createElement('div');
-        checkbox.className = 'task-checkbox';
-        checkbox.style.cursor = 'pointer';
-        checkbox.onclick = (e) => {
-          e.stopPropagation();
-          if (confirm('이 작업을 다시 진행중으로 되돌리시겠습니까?')) {
-            toggleComplete(work.id);
-          }
-        };
-        completedCheckContainer.appendChild(checkbox);
-        
-        card.appendChild(completedCheckContainer);
       }
-      
+
+      // Left section (번호 + 작업 내용)
+      const leftSection = document.createElement('div');
+      leftSection.className = 'task-left-section';
+
+      if (!isCompleted && work.orderNumber) {
+        const orderNum = document.createElement('div');
+        orderNum.className = 'order-number';
+        orderNum.textContent = work.orderNumber;
+        leftSection.appendChild(orderNum);
+      }
+
       const cardBody = document.createElement('div');
       cardBody.className = 'task-card-body';
       
@@ -3223,8 +3198,28 @@
         completedInfo.appendChild(completedBy);
         cardBody.appendChild(completedInfo);
       }
-      
-      card.appendChild(cardBody);
+
+      leftSection.appendChild(cardBody);
+      card.appendChild(leftSection);
+
+      // 체크박스 (독립적으로 배치)
+      const checkbox = document.createElement('div');
+      checkbox.className = 'task-checkbox';
+      if (isCompleted) {
+        checkbox.style.cursor = 'pointer';
+        checkbox.onclick = (e) => {
+          e.stopPropagation();
+          if (confirm('이 작업을 다시 진행중으로 되돌리시겠습니까?')) {
+            toggleComplete(work.id);
+          }
+        };
+      } else {
+        checkbox.onclick = (e) => {
+          e.stopPropagation();
+          toggleComplete(work.id);
+        };
+      }
+      card.appendChild(checkbox);
 
       const personContainer = document.createElement('div');
       personContainer.className = 'person-select-container';
