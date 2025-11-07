@@ -455,12 +455,13 @@
       overflow: hidden;
     }
 
-    .task-left-section {
-      flex: 1;
+    .number-check-container {
       display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      min-width: 0;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin-right: 8px;
+      flex-shrink: 0;
     }
 
     .task-card-body {
@@ -543,15 +544,14 @@
       background: #2a459c;
       color: white;
       border-radius: 50%;
-      width: 24px;
-      height: 24px;
+      width: 20px;
+      height: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      font-size: 11px;
+      font-size: 10px;
       flex-shrink: 0;
-      margin-top: 2px;
     }
     
     .task-checkbox {
@@ -566,7 +566,6 @@
       justify-content: center;
       flex-shrink: 0;
       position: relative;
-      align-self: center;
     }
 
     /* 실제 보이는 원은 작게 */
