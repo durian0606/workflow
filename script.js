@@ -2079,11 +2079,13 @@
         allCompaniesWorks = {};
 
         Object.keys(teams).forEach(teamId => {
+          const teamName = teams[teamId].info?.name || teamId;
           allCompaniesWorks[teamId] = {
-            name: teams[teamId].info?.name || teamId,
+            name: teamName,
             works: teams[teamId].worklists || {},
             sites: teams[teamId].sites || {}
           };
+          console.log(`📊 팀 로드: ${teamId} → 팀명: "${teamName}"`);
         });
 
         console.log('✅ 모든 팀 데이터 로드 완료:', Object.keys(allCompaniesWorks).length, '개 팀');
@@ -2646,6 +2648,7 @@
                     companyName: companyName,
                     assignee: otherWork.assignee || '미정'
                   });
+                  console.log(`🔔 겹치는 현장 발견: ${work.site} | 다른팀: "${companyName}" (${teamId}) | 담당자: ${otherWork.assignee || '미정'}`);
                 }
               });
             });
