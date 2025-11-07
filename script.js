@@ -1,5 +1,49 @@
     // ========================================
-    // ⭐ 모달 토글 함수들 - 가장 먼저 정의!
+    // ⭐ Toast 알림 시스템 - 가장 먼저 정의!
+    // ========================================
+
+    /**
+     * Toast 알림 표시
+     * @param {string} message - 표시할 메시지
+     * @param {string} type - 'success'|'error'|'warning'|'info'
+     * @param {number} duration - 표시 시간 (ms, 기본 3000)
+     */
+    window.showToast = function(message, type = 'info', duration = 3000) {
+      const container = document.getElementById('toastContainer');
+      if (!container) {
+        console.error('Toast 컨테이너를 찾을 수 없습니다');
+        return;
+      }
+
+      // Toast 요소 생성
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+
+      // 아이콘 선택
+      const icons = {
+        success: '✓',
+        error: '✕',
+        warning: '⚠',
+        info: 'ℹ'
+      };
+
+      toast.innerHTML = `
+        <span class="toast-icon">${icons[type] || icons.info}</span>
+        <span class="toast-message">${message}</span>
+        <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+      `;
+
+      container.appendChild(toast);
+
+      // 자동 제거
+      setTimeout(() => {
+        toast.classList.add('toast-hiding');
+        setTimeout(() => toast.remove(), 300);
+      }, duration);
+    };
+
+    // ========================================
+    // ⭐ 모달 토글 함수들
     // ========================================
     
     window.toggleGuideModal = function() {
