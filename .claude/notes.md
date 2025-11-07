@@ -4,11 +4,11 @@
 
 ### 1. 버전 관리 (캐시 버스팅)
 - **중요:** CSS/JS 파일 수정 시 반드시 버전 업데이트 필수!
-- 현재 버전: **v=0.61**
+- 현재 버전: **v=0.62**
 - 위치: `index.html`의 `<link>` 및 `<script>` 태그
   ```html
-  <link rel="stylesheet" href="styles.css?v=0.61">
-  <script src="script.js?v=0.61"></script>
+  <link rel="stylesheet" href="styles.css?v=0.62">
+  <script src="script.js?v=0.62"></script>
   ```
 - 버전 형식: `v=0.XX` (소수점 둘째 자리까지)
 
@@ -31,18 +31,18 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - `debug`: 디버깅용 코드 (임시)
 - `chore`: 빌드/설정 관련
 
-### 3. 디버깅용 색상 경계선 (현재 적용 중)
-레이아웃 조정을 위한 임시 색상 경계선:
-- **파란색**: `task-card` (전체 카드)
-- **빨간색**: `number-check-container`, `order-number`, `task-checkbox`
-- **초록색**: `task-card-body` (작업 내용 영역)
-- **보라색**: `task-title` (제목)
-- **청록색**: `deadline-label-container` (완료기한)
-- **주황색**: `person-select-container` (담당자 영역)
-- **노란색**: `assignee-select` (담당자 선택)
-- **마젠타색**: `action-btn` (삭제 버튼)
+### 3. 디버깅용 색상 경계선 ~~(현재 적용 중)~~ ✅ 제거 완료 (v0.62)
+레이아웃 조정을 위한 임시 색상 경계선 (이미 제거됨):
+- ~~**파란색**: `task-card` (전체 카드)~~
+- ~~**빨간색**: `number-check-container`, `order-number`, `task-checkbox`~~
+- ~~**초록색**: `task-card-body` (작업 내용 영역)~~
+- ~~**보라색**: `task-title` (제목)~~
+- ~~**청록색**: `deadline-label-container` (완료기한)~~
+- ~~**주황색**: `person-select-container` (담당자 영역)~~
+- ~~**노란색**: `assignee-select` (담당자 선택)~~
+- ~~**마젠타색**: `action-btn` (삭제 버튼)~~
 
-**제거 방법:** 완료 후 `/* 디버깅용 */` 주석이 있는 border 속성 삭제
+**필요 시 재적용:** 각 클래스에 `border: 2px solid [색상]` 추가
 
 ---
 
@@ -88,9 +88,9 @@ worklist/
 ---
 
 ## 🔧 주요 수정 이력
+- **v0.62**: 디버깅용 색상 경계선 제거, 레이아웃 최종 완료
 - v0.61: 체크박스 크기 조정, 모바일 하단 여백 개선
 - v0.6: Toast 알림 시스템, 터치 영역 개선
-- 최근: 레이아웃 밸런스 조정 (디버깅 색상 경계선 적용 중)
 
 ---
 
