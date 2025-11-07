@@ -577,8 +577,8 @@
     /* 실제 보이는 원은 작게 */
     .task-checkbox::before {
       content: '';
-      width: 20px;
-      height: 20px;
+      width: 16px;
+      height: 16px;
       border: 2px solid #2a459c;
       border-radius: 50%;
       transition: all 0.2s;
