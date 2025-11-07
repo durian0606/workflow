@@ -555,30 +555,38 @@
     }
     
     .task-checkbox {
+      /* 터치 영역은 크게 */
       min-width: 44px;
       min-height: 44px;
       width: 44px;
       height: 44px;
-      border: 2px solid #2a459c;
-      border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s;
       flex-shrink: 0;
+      position: relative;
     }
 
-    .task-checkbox:hover {
+    /* 실제 보이는 원은 작게 */
+    .task-checkbox::before {
+      content: '';
+      width: 20px;
+      height: 20px;
+      border: 2px solid #2a459c;
+      border-radius: 50%;
+      transition: all 0.2s;
+      background: transparent;
+    }
+
+    .task-checkbox:hover::before {
       background: #e8f4f5;
       border-width: 3px;
     }
 
-    .task-card.completed .task-checkbox {
+    .task-card.completed .task-checkbox::before {
       background: #2a459c;
-      position: relative;
-      cursor: pointer;
-      transition: all 0.2s;
+      border-color: #2a459c;
     }
     
     .task-card.completed .task-checkbox::after {
@@ -1567,21 +1575,7 @@
       .number-check-container {
         gap: 4px;
       }
-      
-      .task-checkbox {
-        width: 20px;
-        height: 20px;
-        min-width: 44px;
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      
-      .task-card.completed .task-checkbox::after {
-        font-size: 14px;
-      }
-      
+
       .task-container {
         max-height: 400px;
       }
@@ -1589,6 +1583,7 @@
       .map-section {
         min-height: 350px;
         margin: 10px;
+        margin-bottom: 80px; /* 모바일 하단 주소창 여백 */
         padding: 15px;
       }
 
