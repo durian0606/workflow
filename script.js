@@ -839,6 +839,47 @@
       }
     };
 
+    // 팀코드 변경하기
+    window.changeTeamCode = async function() {
+      if (!currentTeamId || !teamInfo) {
+        showToast('팀 정보를 불러올 수 없습니다.', 'error');
+        return;
+      }
+
+      const confirmed = confirm('⚠️ 팀코드를 변경하시겠습니까?\n\n새로운 코드가 생성되며, 기존 코드로는 더 이상 팀에 가입할 수 없습니다.\n\n※ 기존 팀원은 영향받지 않습니다.');
+
+      if (!confirmed) return;
+
+      try {
+        // 새 팀코드 생성
+        const newTeamCode = generateTeamCode();
+
+        // Firebase에 업데이트
+        const updates = {};
+        updates[`teams/${currentTeamId}/teamCode`] = newTeamCode;
+
+        await window.dbUpdate(window.dbRef(window.db), updates);
+
+        // 로컬 teamInfo 업데이트
+        teamInfo.teamCode = newTeamCode;
+
+        // 화면에 표시
+        const codeElement = document.getElementById('settingsTeamCode');
+        if (codeElement) {
+          codeElement.textContent = newTeamCode;
+        }
+
+        showToast('✅ 팀코드가 변경되었습니다!', 'success');
+
+        if (navigator.vibrate) {
+          navigator.vibrate([50, 100, 50]);
+        }
+      } catch (error) {
+        console.error('팀코드 변경 실패:', error);
+        showToast('팀코드 변경에 실패했습니다.', 'error');
+      }
+    };
+
     // 팀 설정 모달에서 ID로 초대
     window.inviteByUserIdFromSettings = async function() {
       const userId = document.getElementById('settingsInviteUserIdInput').value.trim();
