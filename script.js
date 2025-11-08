@@ -4423,7 +4423,7 @@
     }
 
     // 네비게이션 실행 (카카오맵)
-    window.launchNavigation = function() {
+    window.launchNavigation = async function() {
       console.log('🧭 카카오맵 네비 실행 시작');
 
       const searchDate = currentDate.toISOString().split('T')[0];
@@ -4465,7 +4465,7 @@
       // 현재 위치 가져오기
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          function(position) {
+          async function(position) {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
             console.log('✅ 현재 위치:', lat, lng);
@@ -4473,28 +4473,78 @@
             // 출발지 (현재 위치)
             const sp = `${lat},${lng}`;
 
-            // 목적지 (마지막 작업지)
-            const lastWork = myActiveWorks[myActiveWorks.length - 1];
-            const ep = `${lastWork.lat},${lastWork.lng}`;
+            try {
+              // 카카오 Geocoder로 각 현장의 주소를 좌표로 변환
+              const geocoder = new kakao.maps.services.Geocoder();
+              const workCoords = [];
 
-            // 경유지 (중간 작업지들)
-            let viaList = '';
-            if (myActiveWorks.length > 1) {
-              const waypoints = myActiveWorks.slice(0, -1).map(work => `${work.lat},${work.lng}`);
-              viaList = `&viaList=${waypoints.join('|')}`;
-            }
+              console.log('🔍 주소를 좌표로 변환 중...');
 
-            const url = `kakaomap://route?sp=${sp}&ep=${ep}&by=CAR${viaList}`;
-            console.log('카카오맵 URL:', url);
+              for (const work of myActiveWorks) {
+                // 현장 이름으로 sites에서 현장 정보 찾기
+                let siteInfo = null;
+                for (const siteId in sites) {
+                  if (sites[siteId].name === work.site) {
+                    siteInfo = sites[siteId];
+                    break;
+                  }
+                }
 
-            window.location.href = url;
+                if (!siteInfo || !siteInfo.address) {
+                  console.warn(`⚠️ 현장 "${work.site}"의 주소를 찾을 수 없습니다`);
+                  alert(`현장 "${work.site}"의 주소 정보가 없습니다.\n현장 관리에서 주소를 등록해주세요.`);
+                  return;
+                }
 
-            // 앱이 설치되어 있지 않은 경우를 대비
-            setTimeout(() => {
-              if (confirm('카카오맵 앱이 설치되어 있지 않습니다.\n앱 스토어로 이동하시겠습니까?')) {
-                window.location.href = 'https://play.google.com/store/apps/details?id=net.daum.android.map';
+                // 주소를 좌표로 변환
+                const coord = await new Promise((resolve, reject) => {
+                  geocoder.addressSearch(siteInfo.address, function(result, status) {
+                    if (status === kakao.maps.services.Status.OK) {
+                      console.log(`✅ ${work.site}: ${result[0].y}, ${result[0].x}`);
+                      resolve({ y: result[0].y, x: result[0].x });
+                    } else {
+                      console.error(`❌ 주소 변환 실패: ${siteInfo.address}`);
+                      reject(new Error(`주소 변환 실패: ${siteInfo.address}`));
+                    }
+                  });
+                });
+
+                workCoords.push({
+                  siteName: work.site,
+                  lat: coord.y,
+                  lng: coord.x
+                });
               }
-            }, 1500);
+
+              console.log('✅ 모든 좌표 변환 완료:', workCoords);
+
+              // 목적지 (마지막 작업지)
+              const lastCoord = workCoords[workCoords.length - 1];
+              const ep = `${lastCoord.lat},${lastCoord.lng}`;
+
+              // 경유지 (중간 작업지들)
+              let viaList = '';
+              if (workCoords.length > 1) {
+                const waypoints = workCoords.slice(0, -1).map(coord => `${coord.lat},${coord.lng}`);
+                viaList = `&viaList=${waypoints.join('|')}`;
+              }
+
+              const url = `kakaomap://route?sp=${sp}&ep=${ep}&by=CAR${viaList}`;
+              console.log('🗺️ 카카오맵 URL:', url);
+
+              window.location.href = url;
+
+              // 앱이 설치되어 있지 않은 경우를 대비
+              setTimeout(() => {
+                if (confirm('카카오맵 앱이 설치되어 있지 않습니다.\n앱 스토어로 이동하시겠습니까?')) {
+                  window.location.href = 'https://play.google.com/store/apps/details?id=net.daum.android.map';
+                }
+              }, 1500);
+
+            } catch (error) {
+              console.error('❌ 좌표 변환 오류:', error);
+              alert('주소를 좌표로 변환하는 중 오류가 발생했습니다.\n' + error.message);
+            }
           },
           function(error) {
             let errorMsg = '위치 정보를 가져올 수 없습니다.\n\n';
