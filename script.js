@@ -4520,8 +4520,174 @@
       console.log('✅ 모든 모달 이벤트 리스너 등록 완료');
     }
 
+    // 네비게이션 앱 설정 저장
+    window.saveNaviAppPreference = function() {
+      const select = document.getElementById('naviAppSelect');
+      if (select) {
+        localStorage.setItem('naviApp', select.value);
+        console.log('네비 앱 설정 저장:', select.value);
+      }
+    };
+
+    // 네비게이션 앱 설정 로드
+    function loadNaviAppPreference() {
+      const savedApp = localStorage.getItem('naviApp') || 'kakao';
+      const select = document.getElementById('naviAppSelect');
+      if (select) {
+        select.value = savedApp;
+      }
+      console.log('네비 앱 설정 로드:', savedApp);
+    }
+
+    // 네비게이션 실행
+    window.launchNavigation = function() {
+      console.log('🧭 네비게이션 실행 시작');
+
+      const searchDate = currentDate.toISOString().split('T')[0];
+      const myActiveWorks = [];
+
+      // 내 작업 리스트 가져오기
+      Object.keys(works).forEach(workId => {
+        const work = works[workId];
+        if (work.completed) return;
+        if (work.assignee !== currentUser) return;
+        let shouldShow = false;
+        if (work.work === '시험' || work.parentWorkId) {
+          shouldShow = work.date === searchDate;
+        } else {
+          shouldShow = work.date <= searchDate;
+        }
+        if (shouldShow) {
+          myActiveWorks.push(work);
+        }
+      });
+
+      // 순서대로 정렬
+      myActiveWorks.sort((a, b) => {
+        const orderA = typeof a.order === 'number' ? a.order : 999;
+        const orderB = typeof b.order === 'number' ? b.order : 999;
+        if (orderA === orderB) {
+          return a.id.localeCompare(b.id);
+        }
+        return orderA - orderB;
+      });
+
+      console.log('📋 내 작업:', myActiveWorks.length, '개');
+
+      if (myActiveWorks.length === 0) {
+        alert('실행할 작업이 없습니다.');
+        return;
+      }
+
+      // 현재 위치 가져오기
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            console.log('✅ 현재 위치:', lat, lng);
+
+            const naviApp = localStorage.getItem('naviApp') || 'kakao';
+
+            if (naviApp === 'kakao') {
+              launchKakaoNavi(lat, lng, myActiveWorks);
+            } else if (naviApp === 'tmap') {
+              launchTmapNavi(lat, lng, myActiveWorks);
+            }
+          },
+          function(error) {
+            let errorMsg = '위치 정보를 가져올 수 없습니다.\n\n';
+            switch (error.code) {
+              case error.PERMISSION_DENIED:
+                errorMsg += '위치 권한이 거부되었습니다.\n브라우저 설정에서 위치 권한을 허용해주세요.';
+                break;
+              case error.POSITION_UNAVAILABLE:
+                errorMsg += '위치 정보를 사용할 수 없습니다.';
+                break;
+              case error.TIMEOUT:
+                errorMsg += '위치 정보 요청 시간이 초과되었습니다.';
+                break;
+              default:
+                errorMsg += '알 수 없는 오류가 발생했습니다.';
+            }
+            alert(errorMsg);
+            console.error('❌ 위치 정보 에러:', error);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          }
+        );
+      } else {
+        alert('이 브라우저는 위치 서비스를 지원하지 않습니다.');
+      }
+    };
+
+    // 카카오맵 네비 실행
+    function launchKakaoNavi(currentLat, currentLng, works) {
+      console.log('🗺️ 카카오맵 네비 실행');
+
+      // 출발지 (현재 위치)
+      const sp = `${currentLat},${currentLng}`;
+
+      // 목적지 (마지막 작업지)
+      const lastWork = works[works.length - 1];
+      const ep = `${lastWork.lat},${lastWork.lng}`;
+
+      // 경유지 (중간 작업지들)
+      let viaList = '';
+      if (works.length > 1) {
+        const waypoints = works.slice(0, -1).map(work => `${work.lat},${work.lng}`);
+        viaList = `&viaList=${waypoints.join('|')}`;
+      }
+
+      const url = `kakaomap://route?sp=${sp}&ep=${ep}&by=CAR${viaList}`;
+      console.log('카카오맵 URL:', url);
+
+      window.location.href = url;
+
+      // 앱이 설치되어 있지 않은 경우를 대비
+      setTimeout(() => {
+        if (confirm('카카오맵 앱이 설치되어 있지 않습니다.\n앱 스토어로 이동하시겠습니까?')) {
+          window.location.href = 'https://play.google.com/store/apps/details?id=net.daum.android.map';
+        }
+      }, 1500);
+    }
+
+    // 티맵 네비 실행
+    function launchTmapNavi(currentLat, currentLng, works) {
+      console.log('🗺️ 티맵 네비 실행');
+
+      // 목적지 (마지막 작업지)
+      const lastWork = works[works.length - 1];
+      let url = `tmap://route?rGoName=${encodeURIComponent(lastWork.site)}&rGoX=${lastWork.lng}&rGoY=${lastWork.lat}`;
+
+      // 경유지 추가 (티맵은 최대 5개까지 지원)
+      const waypoints = works.slice(0, -1);
+      const maxWaypoints = Math.min(waypoints.length, 5);
+
+      for (let i = 0; i < maxWaypoints; i++) {
+        const work = waypoints[i];
+        const idx = i + 1;
+        url += `&rV${idx}Name=${encodeURIComponent(work.site)}&rV${idx}X=${work.lng}&rV${idx}Y=${work.lat}`;
+      }
+
+      console.log('티맵 URL:', url);
+
+      window.location.href = url;
+
+      // 앱이 설치되어 있지 않은 경우를 대비
+      setTimeout(() => {
+        if (confirm('티맵 앱이 설치되어 있지 않습니다.\n앱 스토어로 이동하시겠습니까?')) {
+          window.location.href = 'https://play.google.com/store/apps/details?id=com.skt.tmap.ku';
+        }
+      }, 1500);
+    }
+
     window.onload = function() {
       waitForFirebase();
+      loadNaviAppPreference();
     };
 
     // 기존의 모달 외부 클릭 이벤트는 삭제해도 됩니다 (중복이므로)
