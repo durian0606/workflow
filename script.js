@@ -4423,64 +4423,85 @@
     }
 
     // 네비게이션 실행 (카카오맵)
-    window.launchNavigation = async function() {
-      console.log('🧭 카카오맵 네비 실행 시작');
+    window.launchNavigation = function() {
+      console.log('🧭 [네비] 카카오맵 네비 실행 시작');
 
-      const searchDate = currentDate.toISOString().split('T')[0];
-      const myActiveWorks = [];
+      try {
+        const searchDate = currentDate.toISOString().split('T')[0];
+        const myActiveWorks = [];
 
-      // 내 작업 리스트 가져오기
-      Object.keys(works).forEach(workId => {
-        const work = works[workId];
-        if (work.completed) return;
-        if (work.assignee !== currentUser) return;
-        let shouldShow = false;
-        if (work.work === '시험' || work.parentWorkId) {
-          shouldShow = work.date === searchDate;
-        } else {
-          shouldShow = work.date <= searchDate;
+        // 내 작업 리스트 가져오기
+        Object.keys(works).forEach(workId => {
+          const work = works[workId];
+          if (work.completed) return;
+          if (work.assignee !== currentUser) return;
+          let shouldShow = false;
+          if (work.work === '시험' || work.parentWorkId) {
+            shouldShow = work.date === searchDate;
+          } else {
+            shouldShow = work.date <= searchDate;
+          }
+          if (shouldShow) {
+            myActiveWorks.push(work);
+          }
+        });
+
+        // 순서대로 정렬
+        myActiveWorks.sort((a, b) => {
+          const orderA = typeof a.order === 'number' ? a.order : 999;
+          const orderB = typeof b.order === 'number' ? b.order : 999;
+          if (orderA === orderB) {
+            return a.id.localeCompare(b.id);
+          }
+          return orderA - orderB;
+        });
+
+        console.log('📋 [네비] 내 작업:', myActiveWorks.length, '개');
+
+        if (myActiveWorks.length === 0) {
+          alert('실행할 작업이 없습니다.');
+          return;
         }
-        if (shouldShow) {
-          myActiveWorks.push(work);
+
+        // 로딩 표시
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        if (loadingOverlay) {
+          loadingOverlay.classList.add('active');
+          const loadingText = loadingOverlay.querySelector('.loading-text');
+          if (loadingText) {
+            loadingText.textContent = '네비게이션 준비 중...';
+          }
         }
-      });
 
-      // 순서대로 정렬
-      myActiveWorks.sort((a, b) => {
-        const orderA = typeof a.order === 'number' ? a.order : 999;
-        const orderB = typeof b.order === 'number' ? b.order : 999;
-        if (orderA === orderB) {
-          return a.id.localeCompare(b.id);
+        console.log('📍 [네비] 위치 정보 요청 중...');
+
+        // 현재 위치 가져오기
+        if (!navigator.geolocation) {
+          if (loadingOverlay) loadingOverlay.classList.remove('active');
+          alert('이 브라우저는 위치 서비스를 지원하지 않습니다.');
+          return;
         }
-        return orderA - orderB;
-      });
 
-      console.log('📋 내 작업:', myActiveWorks.length, '개');
-
-      if (myActiveWorks.length === 0) {
-        alert('실행할 작업이 없습니다.');
-        return;
-      }
-
-      // 현재 위치 가져오기
-      if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           async function(position) {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            console.log('✅ 현재 위치:', lat, lng);
-
-            // 출발지 (현재 위치)
-            const sp = `${lat},${lng}`;
-
             try {
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
+              console.log('✅ [네비] 현재 위치:', lat, lng);
+
+              // 출발지 (현재 위치)
+              const sp = `${lat},${lng}`;
+
               // 카카오 Geocoder로 각 현장의 주소를 좌표로 변환
               const geocoder = new kakao.maps.services.Geocoder();
               const workCoords = [];
 
-              console.log('🔍 주소를 좌표로 변환 중...');
+              console.log('🔍 [네비] 주소를 좌표로 변환 중...');
+              console.log('🔍 [네비] sites 객체:', sites);
 
               for (const work of myActiveWorks) {
+                console.log(`🔍 [네비] 처리 중인 작업: ${work.site}`);
+
                 // 현장 이름으로 sites에서 현장 정보 찾기
                 let siteInfo = null;
                 for (const siteId in sites) {
@@ -4490,8 +4511,11 @@
                   }
                 }
 
+                console.log(`🔍 [네비] 현장 정보:`, siteInfo);
+
                 if (!siteInfo || !siteInfo.address) {
-                  console.warn(`⚠️ 현장 "${work.site}"의 주소를 찾을 수 없습니다`);
+                  if (loadingOverlay) loadingOverlay.classList.remove('active');
+                  console.warn(`⚠️ [네비] 현장 "${work.site}"의 주소를 찾을 수 없습니다`);
                   alert(`현장 "${work.site}"의 주소 정보가 없습니다.\n현장 관리에서 주소를 등록해주세요.`);
                   return;
                 }
@@ -4500,10 +4524,10 @@
                 const coord = await new Promise((resolve, reject) => {
                   geocoder.addressSearch(siteInfo.address, function(result, status) {
                     if (status === kakao.maps.services.Status.OK) {
-                      console.log(`✅ ${work.site}: ${result[0].y}, ${result[0].x}`);
+                      console.log(`✅ [네비] ${work.site}: ${result[0].y}, ${result[0].x}`);
                       resolve({ y: result[0].y, x: result[0].x });
                     } else {
-                      console.error(`❌ 주소 변환 실패: ${siteInfo.address}`);
+                      console.error(`❌ [네비] 주소 변환 실패: ${siteInfo.address}, 상태:`, status);
                       reject(new Error(`주소 변환 실패: ${siteInfo.address}`));
                     }
                   });
@@ -4516,7 +4540,7 @@
                 });
               }
 
-              console.log('✅ 모든 좌표 변환 완료:', workCoords);
+              console.log('✅ [네비] 모든 좌표 변환 완료:', workCoords);
 
               // 목적지 (마지막 작업지)
               const lastCoord = workCoords[workCoords.length - 1];
@@ -4530,7 +4554,9 @@
               }
 
               const url = `kakaomap://route?sp=${sp}&ep=${ep}&by=CAR${viaList}`;
-              console.log('🗺️ 카카오맵 URL:', url);
+              console.log('🗺️ [네비] 카카오맵 URL:', url);
+
+              if (loadingOverlay) loadingOverlay.classList.remove('active');
 
               window.location.href = url;
 
@@ -4542,11 +4568,15 @@
               }, 1500);
 
             } catch (error) {
-              console.error('❌ 좌표 변환 오류:', error);
+              if (loadingOverlay) loadingOverlay.classList.remove('active');
+              console.error('❌ [네비] 좌표 변환 오류:', error);
               alert('주소를 좌표로 변환하는 중 오류가 발생했습니다.\n' + error.message);
             }
           },
           function(error) {
+            if (loadingOverlay) loadingOverlay.classList.remove('active');
+            console.error('❌ [네비] 위치 정보 에러:', error);
+
             let errorMsg = '위치 정보를 가져올 수 없습니다.\n\n';
             switch (error.code) {
               case error.PERMISSION_DENIED:
@@ -4562,7 +4592,6 @@
                 errorMsg += '알 수 없는 오류가 발생했습니다.';
             }
             alert(errorMsg);
-            console.error('❌ 위치 정보 에러:', error);
           },
           {
             enableHighAccuracy: true,
@@ -4570,8 +4599,11 @@
             maximumAge: 0
           }
         );
-      } else {
-        alert('이 브라우저는 위치 서비스를 지원하지 않습니다.');
+      } catch (error) {
+        console.error('❌ [네비] 전체 오류:', error);
+        alert('네비게이션 실행 중 오류가 발생했습니다.\n' + error.message);
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        if (loadingOverlay) loadingOverlay.classList.remove('active');
       }
     };
 
