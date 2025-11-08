@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>작업 관리</title>
-  <link rel="stylesheet" href="styles.css?v=0.64">
+  <link rel="stylesheet" href="styles.css?v=0.65">
 </head>
 
 <body>
@@ -141,10 +141,6 @@
               <span class="route-info" id="routeInfo" style="display: none;"></span>
             </h3>
             <div class="map-controls">
-              <select id="naviAppSelect" class="navi-select" onchange="saveNaviAppPreference()">
-                <option value="kakao">카카오맵</option>
-                <option value="tmap">티맵</option>
-              </select>
               <button class="map-btn" id="naviBtn" onclick="launchNavigation()">🧭 네비 실행</button>
             </div>
           </div>
@@ -885,7 +881,7 @@
     console.log('✅ Firebase initialized');
   </script>
 
-  <script src="script.js?v=0.64"></script>
+  <script src="script.js?v=0.65"></script>
 </body>
 </html>              
 

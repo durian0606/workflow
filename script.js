@@ -2053,108 +2053,10 @@
     }
 
     function drawStraightRoute(positions) {
-      console.log('⚠️ 백업: 직선 경로로 표시');
-
-      const startMarkerContent = `
-        <div style="position: relative;">
-          <div style="
-            background: #ff5722;
-            color: white;
-            border: 3px solid white;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 18px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.4);
-          ">📍</div>
-          <div style="
-            position: absolute;
-            top: -35px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: white;
-            padding: 8px 12px;
-            border-radius: 4px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            white-space: nowrap;
-            font-size: 13px;
-            font-weight: 600;
-            color: #ff5722;
-          ">🚩 출발</div>
-        </div>
-      `;
-      currentLocationMarker = new kakao.maps.CustomOverlay({
-        position: positions[0].coords,
-        content: startMarkerContent,
-        yAnchor: 1
-      });
-      currentLocationMarker.setMap(map);
-
-      for (let i = 1; i < positions.length; i++) {
-        const pos = positions[i];
-        const markerContent = `
-          <div style="position: relative;">
-            <div style="
-              background: #2a459c;
-              color: white;
-              border: 3px solid white;
-              border-radius: 50%;
-              width: 35px;
-              height: 35px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-weight: bold;
-              font-size: 14px;
-              box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            ">${i}</div>
-            <div style="
-              position: absolute;
-              top: -35px;
-              left: 50%;
-              transform: translateX(-50%);
-              background: white;
-              padding: 8px 12px;
-              border-radius: 4px;
-              box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-              white-space: nowrap;
-              font-size: 13px;
-              font-weight: 600;
-            ">${i}. ${pos.siteName}</div>
-          </div>
-        `;
-        const marker = new kakao.maps.CustomOverlay({
-          position: pos.coords,
-          content: markerContent,
-          yAnchor: 1
-        });
-        marker.setMap(map);
-        routeMarkers.push(marker);
-      }
-
-      const linePath = positions.map(pos => pos.coords);
-      routeLine = new kakao.maps.Polyline({
-        path: linePath,
-        strokeWeight: 5,
-        strokeColor: '#2a459c',
-        strokeOpacity: 0.9,
-        strokeStyle: 'solid'
-      });
-      routeLine.setMap(map);
-
-      const bounds = new kakao.maps.LatLngBounds();
-      positions.forEach(pos => bounds.extend(pos.coords));
-      map.setBounds(bounds);
-
+      // 직선거리 표시 기능 제거됨
+      console.log('⚠️ 직선 경로 표시 기능이 제거되었습니다');
       document.getElementById('loadingOverlay').classList.remove('active');
       document.getElementById('routeBtn').disabled = false;
-      isRouteDisplayed = true;
-
-      console.log(`✅ 직선 경로 표시 완료`);
     }
 
     function loadAllCompaniesWorks() {
@@ -4520,28 +4422,9 @@
       console.log('✅ 모든 모달 이벤트 리스너 등록 완료');
     }
 
-    // 네비게이션 앱 설정 저장
-    window.saveNaviAppPreference = function() {
-      const select = document.getElementById('naviAppSelect');
-      if (select) {
-        localStorage.setItem('naviApp', select.value);
-        console.log('네비 앱 설정 저장:', select.value);
-      }
-    };
-
-    // 네비게이션 앱 설정 로드
-    function loadNaviAppPreference() {
-      const savedApp = localStorage.getItem('naviApp') || 'kakao';
-      const select = document.getElementById('naviAppSelect');
-      if (select) {
-        select.value = savedApp;
-      }
-      console.log('네비 앱 설정 로드:', savedApp);
-    }
-
-    // 네비게이션 실행
+    // 네비게이션 실행 (카카오맵)
     window.launchNavigation = function() {
-      console.log('🧭 네비게이션 실행 시작');
+      console.log('🧭 카카오맵 네비 실행 시작');
 
       const searchDate = currentDate.toISOString().split('T')[0];
       const myActiveWorks = [];
@@ -4587,13 +4470,31 @@
             const lng = position.coords.longitude;
             console.log('✅ 현재 위치:', lat, lng);
 
-            const naviApp = localStorage.getItem('naviApp') || 'kakao';
+            // 출발지 (현재 위치)
+            const sp = `${lat},${lng}`;
 
-            if (naviApp === 'kakao') {
-              launchKakaoNavi(lat, lng, myActiveWorks);
-            } else if (naviApp === 'tmap') {
-              launchTmapNavi(lat, lng, myActiveWorks);
+            // 목적지 (마지막 작업지)
+            const lastWork = myActiveWorks[myActiveWorks.length - 1];
+            const ep = `${lastWork.lat},${lastWork.lng}`;
+
+            // 경유지 (중간 작업지들)
+            let viaList = '';
+            if (myActiveWorks.length > 1) {
+              const waypoints = myActiveWorks.slice(0, -1).map(work => `${work.lat},${work.lng}`);
+              viaList = `&viaList=${waypoints.join('|')}`;
             }
+
+            const url = `kakaomap://route?sp=${sp}&ep=${ep}&by=CAR${viaList}`;
+            console.log('카카오맵 URL:', url);
+
+            window.location.href = url;
+
+            // 앱이 설치되어 있지 않은 경우를 대비
+            setTimeout(() => {
+              if (confirm('카카오맵 앱이 설치되어 있지 않습니다.\n앱 스토어로 이동하시겠습니까?')) {
+                window.location.href = 'https://play.google.com/store/apps/details?id=net.daum.android.map';
+              }
+            }, 1500);
           },
           function(error) {
             let errorMsg = '위치 정보를 가져올 수 없습니다.\n\n';
@@ -4624,70 +4525,8 @@
       }
     };
 
-    // 카카오맵 네비 실행
-    function launchKakaoNavi(currentLat, currentLng, works) {
-      console.log('🗺️ 카카오맵 네비 실행');
-
-      // 출발지 (현재 위치)
-      const sp = `${currentLat},${currentLng}`;
-
-      // 목적지 (마지막 작업지)
-      const lastWork = works[works.length - 1];
-      const ep = `${lastWork.lat},${lastWork.lng}`;
-
-      // 경유지 (중간 작업지들)
-      let viaList = '';
-      if (works.length > 1) {
-        const waypoints = works.slice(0, -1).map(work => `${work.lat},${work.lng}`);
-        viaList = `&viaList=${waypoints.join('|')}`;
-      }
-
-      const url = `kakaomap://route?sp=${sp}&ep=${ep}&by=CAR${viaList}`;
-      console.log('카카오맵 URL:', url);
-
-      window.location.href = url;
-
-      // 앱이 설치되어 있지 않은 경우를 대비
-      setTimeout(() => {
-        if (confirm('카카오맵 앱이 설치되어 있지 않습니다.\n앱 스토어로 이동하시겠습니까?')) {
-          window.location.href = 'https://play.google.com/store/apps/details?id=net.daum.android.map';
-        }
-      }, 1500);
-    }
-
-    // 티맵 네비 실행
-    function launchTmapNavi(currentLat, currentLng, works) {
-      console.log('🗺️ 티맵 네비 실행');
-
-      // 목적지 (마지막 작업지)
-      const lastWork = works[works.length - 1];
-      let url = `tmap://route?rGoName=${encodeURIComponent(lastWork.site)}&rGoX=${lastWork.lng}&rGoY=${lastWork.lat}`;
-
-      // 경유지 추가 (티맵은 최대 5개까지 지원)
-      const waypoints = works.slice(0, -1);
-      const maxWaypoints = Math.min(waypoints.length, 5);
-
-      for (let i = 0; i < maxWaypoints; i++) {
-        const work = waypoints[i];
-        const idx = i + 1;
-        url += `&rV${idx}Name=${encodeURIComponent(work.site)}&rV${idx}X=${work.lng}&rV${idx}Y=${work.lat}`;
-      }
-
-      console.log('티맵 URL:', url);
-
-      window.location.href = url;
-
-      // 앱이 설치되어 있지 않은 경우를 대비
-      setTimeout(() => {
-        if (confirm('티맵 앱이 설치되어 있지 않습니다.\n앱 스토어로 이동하시겠습니까?')) {
-          window.location.href = 'https://play.google.com/store/apps/details?id=com.skt.tmap.ku';
-        }
-      }, 1500);
-    }
-
     window.onload = function() {
       waitForFirebase();
-      loadNaviAppPreference();
     };
 
     // 기존의 모달 외부 클릭 이벤트는 삭제해도 됩니다 (중복이므로)

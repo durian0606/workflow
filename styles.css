@@ -788,27 +788,6 @@
       align-items: center;
     }
 
-    .navi-select {
-      padding: 10px 12px;
-      border: 2px solid #2a459c;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 500;
-      color: #2a459c;
-      background: white;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .navi-select:hover {
-      background: #f0f4ff;
-    }
-
-    .navi-select:focus {
-      outline: none;
-      border-color: #5b7fd6;
-    }
-
     .map-btn {
       background: #2a459c;
       color: white;
