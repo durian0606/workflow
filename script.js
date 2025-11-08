@@ -3838,7 +3838,7 @@
     
     let currentEditingWorkId = null;
 
-    function openDeadlineModal(workId, currentDeadline) {
+    window.openDeadlineModal = function(workId, currentDeadline) {
       currentEditingWorkId = workId;
       const modal = document.getElementById('deadlineModal');
       const today = new Date();
@@ -3853,7 +3853,7 @@
       document.getElementById('thisWeekDate').textContent = friday.toISOString().split('T')[0];
       document.getElementById('customDeadlineInput').value = currentDeadline;
       modal.classList.add('active');
-    }
+    };
     
     window.selectDeadline = function(option) {
       if (!currentEditingWorkId) return;
