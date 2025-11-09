@@ -1714,12 +1714,14 @@
       
       if (navigator.geolocation) {
         document.getElementById('loadingOverlay').classList.add('active');
-        document.getElementById('routeBtn').disabled = true;
+        const routeBtn = document.getElementById('routeBtn');
+        if (routeBtn) routeBtn.disabled = true;
         console.log('📍 현재 위치 요청 중...');
         
         const timeout = setTimeout(() => {
           document.getElementById('loadingOverlay').classList.remove('active');
-          document.getElementById('routeBtn').disabled = false;
+          const routeBtn = document.getElementById('routeBtn');
+          if (routeBtn) routeBtn.disabled = false;
           alert('위치 정보를 가져오는데 시간이 너무 오래 걸립니다. 다시 시도해주세요.');
           console.error('❌ 위치 요청 타임아웃');
         }, 10000);
@@ -1736,7 +1738,8 @@
           function(error) {
             clearTimeout(timeout);
             document.getElementById('loadingOverlay').classList.remove('active');
-            document.getElementById('routeBtn').disabled = false;
+            const routeBtn = document.getElementById('routeBtn');
+            if (routeBtn) routeBtn.disabled = false;
             let errorMsg = '위치 정보를 가져올 수 없습니다.\n\n';
             switch (error.code) {
               case error.PERMISSION_DENIED:
@@ -1953,13 +1956,14 @@
           map.setBounds(bounds);
 
           document.getElementById('loadingOverlay').classList.remove('active');
-          document.getElementById('routeBtn').disabled = false;
+          const routeBtn = document.getElementById('routeBtn');
+          if (routeBtn) routeBtn.disabled = false;
           isRouteDisplayed = true;
 
           const totalDistance = (routeData.totalDistance / 1000).toFixed(1);
           const totalTime = Math.round(routeData.totalTime / 60);
           console.log(`✅ 경로 표시 완료 - 총 ${totalDistance}km, 약 ${totalTime}분`);
-          
+
           const routeInfo = document.getElementById('routeInfo');
           routeInfo.textContent = `${totalDistance}km · ${totalTime}분`;
           routeInfo.style.display = 'inline-block';
@@ -1971,7 +1975,8 @@
       }).catch(error => {
         console.error('❌ 경로 표시 중 에러:', error);
         document.getElementById('loadingOverlay').classList.remove('active');
-        document.getElementById('routeBtn').disabled = false;
+        const routeBtn = document.getElementById('routeBtn');
+        if (routeBtn) routeBtn.disabled = false;
         isRouteDisplayed = false;
         alert('경로를 표시하는 중 오류가 발생했습니다.');
       });
