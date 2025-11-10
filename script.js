@@ -4664,14 +4664,33 @@
 
               if (loadingOverlay) loadingOverlay.classList.remove('active');
 
+              // 앱 실행 성공 여부 체크
+              let appLaunched = false;
+
+              const checkAppLaunched = () => {
+                appLaunched = true;
+              };
+
+              // 페이지가 백그라운드로 가면 앱이 실행된 것으로 간주
+              window.addEventListener('blur', checkAppLaunched, { once: true });
+              document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                  appLaunched = true;
+                }
+              }, { once: true });
+
               window.location.href = url;
 
-              // 앱이 설치되어 있지 않은 경우를 대비
+              // 2초 후에도 앱이 실행되지 않았으면 설치 확인
               setTimeout(() => {
-                if (confirm('카카오맵 앱이 설치되어 있지 않습니다.\n앱 스토어로 이동하시겠습니까?')) {
-                  window.location.href = 'https://play.google.com/store/apps/details?id=net.daum.android.map';
+                window.removeEventListener('blur', checkAppLaunched);
+
+                if (!appLaunched) {
+                  if (confirm('카카오맵 앱이 설치되어 있지 않습니다.\n앱 스토어로 이동하시겠습니까?')) {
+                    window.location.href = 'https://play.google.com/store/apps/details?id=net.daum.android.map';
+                  }
                 }
-              }, 1500);
+              }, 2000);
 
             } catch (error) {
               if (loadingOverlay) loadingOverlay.classList.remove('active');
