@@ -3839,9 +3839,14 @@
     document.getElementById('workInput').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') addWork();
     });
-    document.getElementById('newUserInput').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') addNewUser();
-    });
+
+    const newUserInput = document.getElementById('newUserInput');
+    if (newUserInput) {
+      newUserInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addNewUser();
+      });
+    }
+
     document.getElementById('newSiteName').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') saveSite();
     });
