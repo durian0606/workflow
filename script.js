@@ -1548,10 +1548,55 @@
           map.relayout();
         }, 100);
         console.log('✅ 지도 초기화 성공!');
+
+        // 지도 초기화 완료 후 경로 다시 그리기
+        setTimeout(() => {
+          console.log('🗺️ 지도 초기화 완료 - 경로 업데이트 시작');
+          triggerMapUpdate();
+        }, 200);
       } catch (error) {
         console.error('❌ 지도 초기화 실패:', error);
         document.getElementById('map').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;text-align:center;padding:20px;">지도를 불러올 수 없습니다.<br>페이지를 새로고침 해주세요.</div>';
       }
+    }
+
+    // 지도 초기화 후 경로 업데이트를 위한 헬퍼 함수
+    function triggerMapUpdate() {
+      if (!map) {
+        console.log('⚠️ 지도가 아직 초기화되지 않음');
+        return;
+      }
+
+      const searchDate = currentDate.toISOString().split('T')[0];
+      const myActiveWorks = [];
+
+      Object.keys(works).forEach(workId => {
+        const work = works[workId];
+        if (work.completed) return;
+        if (work.assignee !== currentUser) return;
+        let shouldShow = false;
+        if (work.work === '시험' || work.parentWorkId) {
+          shouldShow = work.date === searchDate;
+        } else {
+          shouldShow = work.date <= searchDate;
+        }
+        if (shouldShow) {
+          myActiveWorks.push({ ...work, id: workId });
+        }
+      });
+
+      // 순서대로 정렬
+      myActiveWorks.sort((a, b) => {
+        const orderA = typeof a.order === 'number' ? a.order : 999;
+        const orderB = typeof b.order === 'number' ? b.order : 999;
+        if (orderA === orderB) {
+          return a.id.localeCompare(b.id);
+        }
+        return orderA - orderB;
+      });
+
+      console.log('🗺️ 경로 업데이트:', myActiveWorks.length, '개 작업');
+      updateMapAutomatically(myActiveWorks);
     }
     
     // 자동 지도 업데이트 함수
