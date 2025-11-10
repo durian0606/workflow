@@ -3502,6 +3502,8 @@
     }
     
     function saveAssignee(workId, assignee) {
+      console.log('👤 담당자 변경:', workId, '→', assignee);
+
       // 팀이 있으면 팀 작업, 없으면 개인 작업
       let worksPath;
       if (currentTeamId) {
@@ -3513,11 +3515,12 @@
       const workRef = window.dbRef(window.db, worksPath);
       window.dbUpdate(workRef, {
         assignee: assignee
+      }).then(() => {
+        console.log('✅ 담당자 변경 완료 - Firebase 리스너가 자동으로 업데이트합니다');
       });
 
-      // 작업 목록 다시 렌더링 (내 작업/팀 작업 구분 반영)
-      works[workId].assignee = assignee;
-      renderWorks();
+      // Firebase 리스너(loadWorks의 dbOnValue)가 자동으로 renderWorks()를 호출함
+      // 로컬 데이터는 Firebase 업데이트 후 자동으로 동기화됨
     }
     
     function deleteWork(workId) {
