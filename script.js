@@ -158,6 +158,9 @@
       }
     };
 
+    // 팀 정보 실시간 리스너
+    let teamInfoListener = null;
+
     window.toggleTeamSettingsModal = async function() {
       console.log('⚙️ 팀 설정 모달 토글');
       const modal = document.getElementById('teamSettingsModal');
@@ -165,32 +168,40 @@
         const isOpening = !modal.classList.contains('active');
 
         if (isOpening && currentTeamId) {
-          // 팀 정보 로드
-          try {
-            const teamInfoRef = window.dbRef(window.db, `teams/${currentTeamId}/info`);
-            const teamInfoSnapshot = await new Promise((resolve, reject) => {
-              const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
-              window.dbOnValue(teamInfoRef, (snapshot) => {
-                clearTimeout(timeoutId);
-                resolve(snapshot);
-              }, { onlyOnce: true });
-            });
+          // 팀 정보 실시간 리스너 등록
+          const teamInfoRef = window.dbRef(window.db, `teams/${currentTeamId}/info`);
 
-            if (teamInfoSnapshot.exists()) {
-              teamInfo = teamInfoSnapshot.val();
+          // 기존 리스너 제거
+          if (teamInfoListener) {
+            window.dbOff(teamInfoRef, 'value', teamInfoListener);
+          }
+
+          // 새 리스너 등록
+          teamInfoListener = (snapshot) => {
+            if (snapshot.exists()) {
+              teamInfo = snapshot.val();
+              console.log('🔄 팀 정보 업데이트됨:', teamInfo);
 
               // 팀명 표시
               const nameInput = document.getElementById('editTeamNameInput');
-              if (nameInput) {
+              if (nameInput && modal.classList.contains('active')) {
                 nameInput.value = teamInfo.name || '';
               }
 
               // 팀코드 표시
               const codeDisplay = document.getElementById('settingsTeamCode');
-              if (codeDisplay) {
+              if (codeDisplay && modal.classList.contains('active')) {
                 codeDisplay.textContent = teamInfo.teamCode || '------';
               }
+
+              // 코드 변경 버튼 활성화 상태 확인
+              updateChangeCodeButtonState();
             }
+          };
+
+          window.dbOnValue(teamInfoRef, teamInfoListener);
+
+          try {
 
             // 팀원 목록 로드
             const membersRef = window.dbRef(window.db, `teams/${currentTeamId}/members`);
@@ -840,10 +851,68 @@
     };
 
     // 팀코드 변경하기
+    // 팀 코드 변경 버튼 상태 업데이트
+    function updateChangeCodeButtonState() {
+      const btn = document.getElementById('changeTeamCodeBtn');
+      if (!btn || !teamInfo) return;
+
+      const lastUpdated = teamInfo.codeUpdatedAt;
+      if (!lastUpdated) {
+        // 변경 이력이 없으면 활성화
+        btn.disabled = false;
+        btn.textContent = '🔄 팀코드 변경';
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+        return;
+      }
+
+      const lastUpdatedTime = new Date(lastUpdated).getTime();
+      const now = Date.now();
+      const fiveMinutes = 5 * 60 * 1000; // 5분
+      const timeDiff = now - lastUpdatedTime;
+
+      if (timeDiff < fiveMinutes) {
+        // 5분 미만이면 비활성화
+        const remainingSeconds = Math.ceil((fiveMinutes - timeDiff) / 1000);
+        const minutes = Math.floor(remainingSeconds / 60);
+        const seconds = remainingSeconds % 60;
+        btn.disabled = true;
+        btn.textContent = `⏳ ${minutes}:${seconds.toString().padStart(2, '0')} 후 변경 가능`;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+
+        // 1초마다 업데이트
+        setTimeout(updateChangeCodeButtonState, 1000);
+      } else {
+        // 5분 이상 지났으면 활성화
+        btn.disabled = false;
+        btn.textContent = '🔄 팀코드 변경';
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+      }
+    }
+
     window.changeTeamCode = async function() {
       if (!currentTeamId || !teamInfo) {
         showToast('팀 정보를 불러올 수 없습니다.', 'error');
         return;
+      }
+
+      // 5분 제한 확인
+      const lastUpdated = teamInfo.codeUpdatedAt;
+      if (lastUpdated) {
+        const lastUpdatedTime = new Date(lastUpdated).getTime();
+        const now = Date.now();
+        const fiveMinutes = 5 * 60 * 1000;
+        const timeDiff = now - lastUpdatedTime;
+
+        if (timeDiff < fiveMinutes) {
+          const remainingSeconds = Math.ceil((fiveMinutes - timeDiff) / 1000);
+          const minutes = Math.floor(remainingSeconds / 60);
+          const seconds = remainingSeconds % 60;
+          showToast(`팀코드는 ${minutes}분 ${seconds}초 후에 변경할 수 있습니다.`, 'warning', 4000);
+          return;
+        }
       }
 
       const confirmed = confirm('⚠️ 팀코드를 변경하시겠습니까?\n\n새로운 코드가 생성되며, 기존 코드로는 더 이상 팀에 가입할 수 없습니다.\n\n※ 기존 팀원은 영향받지 않습니다.');
@@ -853,21 +922,14 @@
       try {
         // 새 팀코드 생성
         const newTeamCode = generateTeamCode();
+        const now = new Date().toISOString();
 
-        // Firebase에 업데이트
-        const updates = {};
-        updates[`teams/${currentTeamId}/teamCode`] = newTeamCode;
-
-        await window.dbUpdate(window.dbRef(window.db), updates);
-
-        // 로컬 teamInfo 업데이트
-        teamInfo.teamCode = newTeamCode;
-
-        // 화면에 표시
-        const codeElement = document.getElementById('settingsTeamCode');
-        if (codeElement) {
-          codeElement.textContent = newTeamCode;
-        }
+        // Firebase에 업데이트 (info 경로 수정)
+        const teamInfoRef = window.dbRef(window.db, `teams/${currentTeamId}/info`);
+        await window.dbUpdate(teamInfoRef, {
+          teamCode: newTeamCode,
+          codeUpdatedAt: now
+        });
 
         showToast('✅ 팀코드가 변경되었습니다!', 'success');
 
@@ -1011,7 +1073,7 @@
         currentTeamId = null;
         userInfo.currentTeamId = null;
 
-        showToast('팀에서 나갔습니다.', 'success');
+        showToast('팀에서 나갔습니다. 페이지를 새로고침합니다.', 'success', 2000);
 
         // 팀 설정 모달 닫기
         const modal = document.getElementById('teamSettingsModal');
@@ -1020,6 +1082,11 @@
         }
 
         console.log('팀 나가기 완료:', oldTeamId);
+
+        // 페이지 새로고침하여 이전 팀 작업 목록 제거
+        setTimeout(() => {
+          location.reload();
+        }, 2000);
 
       } catch (error) {
         console.error('팀 나가기 실패:', error);
