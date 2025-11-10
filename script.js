@@ -3848,7 +3848,8 @@
     
     let currentEditingWorkId = null;
 
-    window.openDeadlineModal = function(workId, currentDeadline) {
+    function openDeadlineModal(workId, currentDeadline) {
+      console.log('📅 [모달] openDeadlineModal 호출됨:', workId, currentDeadline);
       currentEditingWorkId = workId;
       const modal = document.getElementById('deadlineModal');
       const today = new Date();
@@ -3863,7 +3864,10 @@
       document.getElementById('thisWeekDate').textContent = friday.toISOString().split('T')[0];
       document.getElementById('customDeadlineInput').value = currentDeadline;
       modal.classList.add('active');
-    };
+      console.log('📅 [모달] 모달 활성화됨');
+    }
+
+    window.openDeadlineModal = openDeadlineModal;
     
     window.selectDeadline = function(option) {
       if (!currentEditingWorkId) return;
