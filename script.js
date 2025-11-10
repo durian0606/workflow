@@ -4612,14 +4612,22 @@
               const lastCoord = workCoords[workCoords.length - 1];
               const ep = `${lastCoord.lat},${lastCoord.lng}`;
 
-              // 경유지 (중간 작업지들)
-              let viaList = '';
+              // 경유지 (중간 작업지들) - 최대 5개까지 지원 (vp, vp2, vp3, vp4, vp5)
+              let waypointParams = '';
               if (workCoords.length > 1) {
-                const waypoints = workCoords.slice(0, -1).map(coord => `${coord.lat},${coord.lng}`);
-                viaList = `&viaList=${waypoints.join('|')}`;
+                const waypoints = workCoords.slice(0, -1); // 마지막 제외한 모든 작업지
+                waypoints.slice(0, 5).forEach((coord, index) => {
+                  if (index === 0) {
+                    waypointParams += `&vp=${coord.lat},${coord.lng}`;
+                  } else {
+                    waypointParams += `&vp${index + 1}=${coord.lat},${coord.lng}`;
+                  }
+                });
               }
 
-              const url = `kakaomap://route?sp=${sp}&ep=${ep}&by=CAR${viaList}`;
+              const url = `kakaomap://route?sp=${sp}&ep=${ep}&by=CAR${waypointParams}`;
+              console.log('🗺️ [네비] 경유지 개수:', workCoords.length - 1);
+              console.log('🗺️ [네비] 경유지 파라미터:', waypointParams);
               console.log('🗺️ [네비] 카카오맵 URL:', url);
 
               if (loadingOverlay) loadingOverlay.classList.remove('active');
