@@ -4,13 +4,13 @@
 
 ### 1. 버전 관리 (캐시 버스팅)
 - **중요:** CSS/JS 파일 수정 시 반드시 버전 업데이트 필수!
-- 현재 버전: **v=0.68**
+- 현재 버전: **Ver 0.6.9**
 - 위치: `index.html`의 `<link>` 및 `<script>` 태그
   ```html
-  <link rel="stylesheet" href="styles.css?v=0.68">
-  <script src="script.js?v=0.68"></script>
+  <link rel="stylesheet" href="styles.css?v=Ver.0.6.9">
+  <script src="script.js?v=Ver.0.6.9"></script>
   ```
-- 버전 형식: `v=0.XX` (소수점 둘째 자리까지)
+- 버전 형식: `Ver 0.X.X` (세 자리 형식)
 
 ### 2. 커밋 메시지 형식
 ```
