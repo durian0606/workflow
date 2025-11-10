@@ -1854,20 +1854,35 @@
       });
       routeMarkers = [];
 
-      // 기존 경로선 완전 제거
+      // 기존 경로선 완전 제거 (강화)
       if (routeLine) {
         if (Array.isArray(routeLine)) {
-          routeLine.forEach(line => {
-            if (line) line.setMap(null);
+          console.log(`🗑️ 배열 경로선 제거: ${routeLine.length}개`);
+          routeLine.forEach((line, index) => {
+            if (line) {
+              line.setMap(null);
+              console.log(`  ✓ 경로선 ${index + 1} 제거됨`);
+            }
           });
         } else {
+          console.log('🗑️ 단일 경로선 제거');
           routeLine.setMap(null);
         }
         routeLine = null;
       }
 
+      // 추가: 경로 정보 텍스트 숨기기
+      const routeInfo = document.getElementById('routeInfo');
+      if (routeInfo) {
+        routeInfo.style.display = 'none';
+        routeInfo.textContent = '';
+      }
+
       console.log('✅ 기존 경로 제거 완료');
-      
+
+      // 새 경로 배열 즉시 초기화 (타이밍 이슈 방지)
+      routeLine = [];
+
       const uniqueSites = [];
       const siteNames = new Set();
       myActiveWorks.forEach(work => {
@@ -2010,7 +2025,7 @@
           }
 
           console.log('✏️ 구간별 색상 경로선 그리기');
-            
+
           const routeColors = [
             '#FF5722',
             '#2196F3',
@@ -2019,9 +2034,14 @@
             '#FF9800',
             '#00BCD4',
           ];
-            
-          routeLine = [];
-            
+
+          // 경로선 배열 확인 (이미 초기화되어 있어야 함)
+          if (!Array.isArray(routeLine)) {
+            console.warn('⚠️ routeLine이 배열이 아님, 재초기화');
+            routeLine = [];
+          }
+          console.log(`📍 현재 routeLine 상태: ${routeLine.length}개`);
+
           routeData.segments.forEach((segment, index) => {
             const color = routeColors[index % routeColors.length];
             const segmentLine = new kakao.maps.Polyline({
@@ -2033,7 +2053,10 @@
             });
             segmentLine.setMap(map);
             routeLine.push(segmentLine);
+            console.log(`  ✓ 구간 ${index + 1} 추가 (색상: ${color})`);
           });
+
+          console.log(`✅ 총 ${routeLine.length}개 경로선이 지도에 표시됨`);
 
           const bounds = new kakao.maps.LatLngBounds();
           routeData.allPoints.forEach(point => bounds.extend(point));
