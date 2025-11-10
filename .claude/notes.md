@@ -4,11 +4,11 @@
 
 ### 1. 버전 관리 (캐시 버스팅)
 - **중요:** CSS/JS 파일 수정 시 반드시 버전 업데이트 필수!
-- 현재 버전: **Ver 0.7.1**
+- 현재 버전: **Ver 0.7.2**
 - 위치: `index.html`의 `<link>` 및 `<script>` 태그
   ```html
-  <link rel="stylesheet" href="styles.css?v=Ver.0.7.1">
-  <script src="script.js?v=Ver.0.7.1"></script>
+  <link rel="stylesheet" href="styles.css?v=Ver.0.7.2">
+  <script src="script.js?v=Ver.0.7.2"></script>
   ```
 - 버전 형식: `Ver 0.X.X` (세 자리 형식)
 
@@ -88,7 +88,8 @@ worklist/
 ---
 
 ## 🔧 주요 수정 이력
-- **Ver 0.7.1**: 지도 경로 중복 표시 해결, 디바운싱 적용, 기존 경로 완전 제거
+- **Ver 0.7.2**: 담당자 변경 시 지도 경로 자동 업데이트 수정 (Firebase 리스너 활용)
+- Ver 0.7.1: 지도 경로 중복 표시 해결, 디바운싱 적용, 기존 경로 완전 제거
 - Ver 0.7.0: newUserInput null 참조 오류 수정
 - Ver 0.6.9: 완료기한 모달 함수 정의 수정, 버전 형식 변경 (Ver 0.X.X)
 - v0.68: 완료기한 클릭 문제 해결 - pointer-events 명시, 디버깅 로그 추가
