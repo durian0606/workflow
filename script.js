@@ -1555,13 +1555,26 @@
     }
     
     // 자동 지도 업데이트 함수
+    let updateMapTimeout = null;
     function updateMapAutomatically(myActiveWorks) {
       if (!map) {
         console.log('⚠️ 지도가 초기화되지 않음');
         return;
       }
 
-      console.log('🗺️ 지도 자동 업데이트:', myActiveWorks.length, '개 작업');
+      // 이전 타이머 취소 (중복 호출 방지)
+      if (updateMapTimeout) {
+        clearTimeout(updateMapTimeout);
+      }
+
+      // 300ms 후에 실행 (디바운싱)
+      updateMapTimeout = setTimeout(() => {
+        console.log('🗺️ 지도 자동 업데이트:', myActiveWorks.length, '개 작업');
+        performMapUpdate(myActiveWorks);
+      }, 300);
+    }
+
+    function performMapUpdate(myActiveWorks) {
 
       // 내 작업이 있으면 경로 표시
       if (myActiveWorks.length > 0) {
@@ -1590,6 +1603,27 @@
           showFirstSiteOnMap(myActiveWorks);
         }
       } else {
+        console.log('📍 내 작업 없음 - 기존 경로 제거');
+        // 기존 경로 완전 제거
+        if (currentLocationMarker) {
+          currentLocationMarker.setMap(null);
+          currentLocationMarker = null;
+        }
+        routeMarkers.forEach(marker => {
+          if (marker) marker.setMap(null);
+        });
+        routeMarkers = [];
+        if (routeLine) {
+          if (Array.isArray(routeLine)) {
+            routeLine.forEach(line => {
+              if (line) line.setMap(null);
+            });
+          } else {
+            routeLine.setMap(null);
+          }
+          routeLine = null;
+        }
+
         // 내 작업이 없으면 현재 위치 중심으로 표시
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
@@ -1768,21 +1802,31 @@
     };
     
     function drawRouteFromCurrentLocation(currentPos, myActiveWorks) {
-      console.log('🗺️ 경로 그리기 시작');
-      
+      console.log('🗺️ 경로 그리기 시작 - 기존 경로 완전 제거');
+
+      // 기존 마커 완전 제거
       if (currentLocationMarker) {
         currentLocationMarker.setMap(null);
+        currentLocationMarker = null;
       }
-      routeMarkers.forEach(marker => marker.setMap(null));
+      routeMarkers.forEach(marker => {
+        if (marker) marker.setMap(null);
+      });
       routeMarkers = [];
+
+      // 기존 경로선 완전 제거
       if (routeLine) {
         if (Array.isArray(routeLine)) {
-          routeLine.forEach(line => line.setMap(null));
+          routeLine.forEach(line => {
+            if (line) line.setMap(null);
+          });
         } else {
           routeLine.setMap(null);
         }
         routeLine = null;
       }
+
+      console.log('✅ 기존 경로 제거 완료');
       
       const uniqueSites = [];
       const siteNames = new Set();
