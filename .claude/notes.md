@@ -4,11 +4,11 @@
 
 ### 1. 버전 관리 (캐시 버스팅)
 - **중요:** CSS/JS 파일 수정 시 반드시 버전 업데이트 필수!
-- 현재 버전: **Ver 0.6.9**
+- 현재 버전: **Ver 0.7.1**
 - 위치: `index.html`의 `<link>` 및 `<script>` 태그
   ```html
-  <link rel="stylesheet" href="styles.css?v=Ver.0.6.9">
-  <script src="script.js?v=Ver.0.6.9"></script>
+  <link rel="stylesheet" href="styles.css?v=Ver.0.7.1">
+  <script src="script.js?v=Ver.0.7.1"></script>
   ```
 - 버전 형식: `Ver 0.X.X` (세 자리 형식)
 
@@ -88,7 +88,9 @@ worklist/
 ---
 
 ## 🔧 주요 수정 이력
-- **Ver 0.6.9**: 완료기한 모달 함수 정의 수정, 버전 형식 변경 (Ver 0.X.X)
+- **Ver 0.7.1**: 지도 경로 중복 표시 해결, 디바운싱 적용, 기존 경로 완전 제거
+- Ver 0.7.0: newUserInput null 참조 오류 수정
+- Ver 0.6.9: 완료기한 모달 함수 정의 수정, 버전 형식 변경 (Ver 0.X.X)
 - v0.68: 완료기한 클릭 문제 해결 - pointer-events 명시, 디버깅 로그 추가
 - v0.67: 네비게이션 디버깅 개선 - 로딩 표시 추가, 상세 로그 추가, 에러 처리 강화
 - v0.66: 네비게이션 현장 주소 기반 좌표 변환 - Geocoder API로 주소→좌표 변환 후 네비 실행
