@@ -329,19 +329,19 @@
       const teamName = document.getElementById('newTeamNameInput').value.trim();
 
       if (!teamName) {
-        alert('팀명을 입력하세요.');
+        showToast('팀명을 입력하세요.', 'warning');
         return;
       }
 
       // 로그인 확인
       if (!currentUserId || !userInfo) {
-        alert('로그인이 필요합니다.');
+        showToast('로그인이 필요합니다.', 'warning');
         return;
       }
 
       // 이미 팀에 속해있는지 확인
       if (currentTeamId) {
-        alert('이미 팀에 속해 있습니다. 새 팀을 만들려면 먼저 현재 팀에서 나가야 합니다.');
+        showToast('이미 팀에 속해 있습니다. 새 팀을 만들려면 먼저 현재 팀에서 나가야 합니다.', 'warning', 4000);
         return;
       }
 
@@ -427,7 +427,7 @@
         currentTeamId = teamId;
         userInfo.currentTeamId = teamId;
 
-        alert(`팀이 성공적으로 생성되었습니다!\n\n팀명: ${teamName}\n팀코드: ${teamCode}\n\n팀코드를 팀원들과 공유하세요.`);
+        showToast(`팀이 생성되었습니다! (팀코드: ${teamCode})`, 'success', 4000);
 
         // 입력 필드 초기화
         document.getElementById('newTeamNameInput').value = '';
@@ -438,7 +438,7 @@
 
       } catch (error) {
         console.error('팀 생성 실패:', error);
-        alert('팀 생성에 실패했습니다: ' + error.message);
+        showToast('팀 생성에 실패했습니다: ' + error.message, 'error', 4000);
       }
     };
 
@@ -446,24 +446,24 @@
       const teamCode = document.getElementById('joinTeamCodeInput').value.trim().toUpperCase();
 
       if (!teamCode) {
-        alert('팀코드를 입력하세요.');
+        showToast('팀코드를 입력하세요.', 'warning');
         return;
       }
 
       if (teamCode.length !== 6) {
-        alert('팀코드는 6자리입니다.');
+        showToast('팀코드는 6자리입니다.', 'warning');
         return;
       }
 
       // 로그인 확인
       if (!currentUserId || !userInfo) {
-        alert('로그인이 필요합니다.');
+        showToast('로그인이 필요합니다.', 'warning');
         return;
       }
 
       // 이미 팀에 속해있는지 확인
       if (currentTeamId) {
-        alert('이미 팀에 속해 있습니다. 새 팀에 참여하려면 먼저 현재 팀에서 나가야 합니다.');
+        showToast('이미 팀에 속해 있습니다. 새 팀에 참여하려면 먼저 현재 팀에서 나가야 합니다.', 'warning', 4000);
         return;
       }
 
@@ -493,7 +493,7 @@
         }
 
         if (!foundTeamId) {
-          alert('존재하지 않는 팀코드입니다.');
+          showToast('존재하지 않는 팀코드입니다.', 'error');
           return;
         }
 
@@ -515,7 +515,7 @@
         currentTeamId = foundTeamId;
         userInfo.currentTeamId = foundTeamId;
 
-        alert(`팀에 성공적으로 참여했습니다!\n\n팀명: ${foundTeamInfo.name}`);
+        showToast(`팀에 참여했습니다! (${foundTeamInfo.name})`, 'success', 4000);
 
         // 입력 필드 초기화
         document.getElementById('joinTeamCodeInput').value = '';
@@ -526,13 +526,13 @@
 
       } catch (error) {
         console.error('팀 참여 실패:', error);
-        alert('팀 참여에 실패했습니다: ' + error.message);
+        showToast('팀 참여에 실패했습니다: ' + error.message, 'error', 4000);
       }
     };
 
     window.copyTeamCodeForInvite = function() {
       if (!teamInfo || !teamInfo.teamCode) {
-        alert('팀코드를 불러올 수 없습니다.');
+        showToast('팀코드를 불러올 수 없습니다.', 'error');
         return;
       }
 
@@ -555,10 +555,10 @@
             navigator.vibrate(50);
           }
         }).catch(err => {
-          alert('복사 실패: ' + err.message);
+          showToast('복사 실패: ' + err.message, 'error');
         });
       } else {
-        alert('클립보드 기능을 사용할 수 없습니다.');
+        showToast('클립보드 기능을 사용할 수 없습니다.', 'error');
       }
     };
 
@@ -566,12 +566,12 @@
       const userId = document.getElementById('inviteUserIdInput').value.trim();
 
       if (!userId) {
-        alert('사용자 ID를 입력하세요.');
+        showToast('사용자 ID를 입력하세요.', 'warning');
         return;
       }
 
       if (!currentTeamId || !teamInfo) {
-        alert('팀 정보를 불러올 수 없습니다.');
+        showToast('팀 정보를 불러올 수 없습니다.', 'error');
         return;
       }
 
@@ -587,7 +587,7 @@
         });
 
         if (!userSnapshot.exists()) {
-          alert('존재하지 않는 사용자 ID입니다.');
+          showToast('존재하지 않는 사용자 ID입니다.', 'error');
           return;
         }
 
@@ -604,7 +604,7 @@
         });
 
         if (memberSnapshot.exists()) {
-          alert('이미 팀에 소속된 사용자입니다.');
+          showToast('이미 팀에 소속된 사용자입니다.', 'warning');
           return;
         }
 
@@ -620,11 +620,11 @@
           status: 'pending'
         });
 
-        alert(`${targetUser.name}님에게 초대를 보냈습니다.`);
+        showToast(`${targetUser.name}님에게 초대를 보냈습니다.`, 'success');
         document.getElementById('inviteUserIdInput').value = '';
       } catch (error) {
         console.error('초대 실패:', error);
-        alert('초대 중 오류가 발생했습니다: ' + error.message);
+        showToast('초대 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
       }
     };
 
@@ -768,14 +768,14 @@
         currentTeamId = teamId;
         teamInfo = null;
 
-        alert('팀 초대를 수락했습니다!');
+        showToast('팀 초대를 수락했습니다!', 'success');
         toggleInvitationsModal();
 
         // 페이지 새로고침하여 팀 데이터 로드
         location.reload();
       } catch (error) {
         console.error('초대 수락 실패:', error);
-        alert('초대 수락 중 오류가 발생했습니다: ' + error.message);
+        showToast('초대 수락 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
       }
     };
 
@@ -792,11 +792,11 @@
           rejectedAt: new Date().toISOString()
         });
 
-        alert('초대를 거절했습니다.');
+        showToast('초대를 거절했습니다.', 'info');
         await loadInvitations();
       } catch (error) {
         console.error('초대 거절 실패:', error);
-        alert('초대 거절 중 오류가 발생했습니다: ' + error.message);
+        showToast('초대 거절 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
       }
     };
 
@@ -809,7 +809,7 @@
     // 팀 설정 모달에서 팀코드 복사
     window.copyTeamCodeFromSettings = function() {
       if (!teamInfo || !teamInfo.teamCode) {
-        alert('팀코드를 불러올 수 없습니다.');
+        showToast('팀코드를 불러올 수 없습니다.', 'error');
         return;
       }
 
@@ -832,10 +832,10 @@
             navigator.vibrate(50);
           }
         }).catch(err => {
-          alert('복사 실패: ' + err.message);
+          showToast('복사 실패: ' + err.message, 'error');
         });
       } else {
-        alert('클립보드 기능을 사용할 수 없습니다.');
+        showToast('클립보드 기능을 사용할 수 없습니다.', 'error');
       }
     };
 
@@ -885,19 +885,19 @@
       const userId = document.getElementById('settingsInviteUserIdInput').value.trim();
 
       if (!userId) {
-        alert('사용자 ID를 입력하세요.');
+        showToast('사용자 ID를 입력하세요.', 'warning');
         return;
       }
 
       // 로그인 및 팀 확인
       if (!currentUserId || !currentTeamId) {
-        alert('팀에 속해 있지 않습니다.');
+        showToast('팀에 속해 있지 않습니다.', 'warning');
         return;
       }
 
       // 자기 자신 초대 방지
       if (userId === currentUserId) {
-        alert('자기 자신은 초대할 수 없습니다.');
+        showToast('자기 자신은 초대할 수 없습니다.', 'warning');
         return;
       }
 
@@ -913,7 +913,7 @@
         });
 
         if (!targetUserSnapshot.exists()) {
-          alert('존재하지 않는 사용자 ID입니다.');
+          showToast('존재하지 않는 사용자 ID입니다.', 'error');
           return;
         }
 
@@ -921,7 +921,7 @@
 
         // 2. 대상 사용자가 이미 다른 팀에 속해 있는지 확인
         if (targetUserInfo.currentTeamId) {
-          alert(`${targetUserInfo.name}님은 이미 다른 팀에 속해 있습니다.`);
+          showToast(`${targetUserInfo.name}님은 이미 다른 팀에 속해 있습니다.`, 'warning');
           return;
         }
 
@@ -938,7 +938,7 @@
           currentTeamId: currentTeamId
         });
 
-        alert(`${targetUserInfo.name}님을 팀에 초대했습니다.`);
+        showToast(`${targetUserInfo.name}님을 팀에 초대했습니다.`, 'success');
 
         // 입력 필드 초기화
         document.getElementById('settingsInviteUserIdInput').value = '';
@@ -948,7 +948,7 @@
 
       } catch (error) {
         console.error('초대 실패:', error);
-        alert('초대에 실패했습니다: ' + error.message);
+        showToast('초대에 실패했습니다: ' + error.message, 'error', 4000);
       }
     };
 
@@ -956,13 +956,13 @@
       const teamName = document.getElementById('editTeamNameInput').value.trim();
 
       if (!teamName) {
-        alert('팀명을 입력하세요.');
+        showToast('팀명을 입력하세요.', 'warning');
         return;
       }
 
       // 로그인 및 팀 확인
       if (!currentUserId || !currentTeamId) {
-        alert('팀에 속해 있지 않습니다.');
+        showToast('팀에 속해 있지 않습니다.', 'warning');
         return;
       }
 
@@ -973,14 +973,14 @@
           name: teamName
         });
 
-        alert('팀 설정이 저장되었습니다.');
+        showToast('팀 설정이 저장되었습니다.', 'success');
 
         // TODO: 메인 화면 새로고침하여 변경사항 반영
         console.log('팀 설정 저장 완료:', teamName);
 
       } catch (error) {
         console.error('팀 설정 저장 실패:', error);
-        alert('팀 설정 저장에 실패했습니다: ' + error.message);
+        showToast('팀 설정 저장에 실패했습니다: ' + error.message, 'error', 4000);
       }
     };
 
@@ -991,7 +991,7 @@
 
       // 로그인 및 팀 확인
       if (!currentUserId || !currentTeamId) {
-        alert('팀에 속해 있지 않습니다.');
+        showToast('팀에 속해 있지 않습니다.', 'warning');
         return;
       }
 
@@ -1011,7 +1011,7 @@
         currentTeamId = null;
         userInfo.currentTeamId = null;
 
-        alert('팀에서 나갔습니다.');
+        showToast('팀에서 나갔습니다.', 'success');
 
         // 팀 설정 모달 닫기
         const modal = document.getElementById('teamSettingsModal');
@@ -1023,7 +1023,7 @@
 
       } catch (error) {
         console.error('팀 나가기 실패:', error);
-        alert('팀 나가기에 실패했습니다: ' + error.message);
+        showToast('팀 나가기에 실패했습니다: ' + error.message, 'error', 4000);
       }
     };
 
@@ -1282,12 +1282,12 @@
       const autoLogin = document.getElementById('autoLoginCheckbox').checked;
 
       if (!userId) {
-        alert('ID를 입력하세요.');
+        showToast('ID를 입력하세요.', 'warning');
         return;
       }
 
       if (!password) {
-        alert('비밀번호를 입력하세요.');
+        showToast('비밀번호를 입력하세요.', 'warning');
         return;
       }
 
@@ -1305,12 +1305,12 @@
         });
 
         if (!userData) {
-          alert('존재하지 않는 ID입니다.');
+          showToast('존재하지 않는 ID입니다.', 'error');
           return;
         }
 
         if (userData.password !== password) {
-          alert('비밀번호가 일치하지 않습니다.');
+          showToast('비밀번호가 일치하지 않습니다.', 'error');
           return;
         }
 
@@ -1343,7 +1343,7 @@
 
       } catch (error) {
         console.error('❌ 로그인 오류:', error);
-        alert('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+        showToast('로그인 중 오류가 발생했습니다. 다시 시도해주세요.', 'error', 4000);
       }
     };
     
@@ -1411,39 +1411,39 @@
       const userName = document.getElementById('newAdminNameInput').value.trim();
 
       if (!userName) {
-        alert('이름을 입력하세요.');
+        showToast('이름을 입력하세요.', 'warning');
         return;
       }
 
       if (!userId) {
-        alert('ID를 입력하세요.');
+        showToast('ID를 입력하세요.', 'warning');
         return;
       }
 
       const regex = /^[a-zA-Z0-9]{4,20}$/;
       if (!regex.test(userId)) {
-        alert('ID는 영문과 숫자 조합으로 4-20자여야 합니다.');
+        showToast('ID는 영문과 숫자 조합으로 4-20자여야 합니다.', 'warning', 4000);
         return;
       }
 
       if (!password) {
-        alert('비밀번호를 입력하세요.');
+        showToast('비밀번호를 입력하세요.', 'warning');
         return;
       }
 
       if (password.length < 4) {
-        alert('비밀번호는 최소 4자 이상이어야 합니다.');
+        showToast('비밀번호는 최소 4자 이상이어야 합니다.', 'warning');
         return;
       }
 
       if (password !== confirmPassword) {
-        alert('비밀번호가 일치하지 않습니다.');
+        showToast('비밀번호가 일치하지 않습니다.', 'warning');
         return;
       }
 
       const available = await checkCompanyIdAvailability(userId);
       if (!available) {
-        alert('이미 사용 중인 ID입니다.');
+        showToast('이미 사용 중인 ID입니다.', 'error');
         return;
       }
 
@@ -1485,12 +1485,7 @@
 
         localStorage.setItem('currentUserId', userId);
 
-        alert(
-          `가입이 완료되었습니다!\n\n` +
-          `이름: ${userName}\n` +
-          `ID: ${userId}\n\n` +
-          `로그인하여 작업을 시작하세요.`
-        );
+        showToast(`가입 완료! (${userName})`, 'success', 4000);
 
         console.log('🎉 회원가입 완료! 로그인 화면으로 이동...');
 
@@ -1509,7 +1504,7 @@
 
       } catch (error) {
         console.error('❌ 회원가입 중 오류:', error);
-        alert('회원가입 중 오류가 발생했습니다.\n\n오류: ' + error.message);
+        showToast('회원가입 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
       }
     };
     
@@ -1755,7 +1750,7 @@
     window.showRouteFromCurrentLocation = function() {
       console.log('🚀 경로 표시 시작');
       if (!map) {
-        alert('지도가 초기화되지 않았습니다.');
+        showToast('지도가 초기화되지 않았습니다.', 'error');
         return;
       }
       
@@ -1787,7 +1782,7 @@
       
       console.log('📋 내 작업 진행 중:', myActiveWorks.length, '개');
       if (myActiveWorks.length === 0) {
-        alert('표시할 작업이 없습니다.');
+        showToast('표시할 작업이 없습니다.', 'info');
         return;
       }
       
@@ -1801,7 +1796,7 @@
           document.getElementById('loadingOverlay').classList.remove('active');
           const routeBtn = document.getElementById('routeBtn');
           if (routeBtn) routeBtn.disabled = false;
-          alert('위치 정보를 가져오는데 시간이 너무 오래 걸립니다. 다시 시도해주세요.');
+          showToast('위치 정보를 가져오는데 시간이 너무 오래 걸립니다. 다시 시도해주세요.', 'warning', 4000);
           console.error('❌ 위치 요청 타임아웃');
         }, 10000);
         
@@ -1833,7 +1828,7 @@
               default:
                 errorMsg += '알 수 없는 오류가 발생했습니다.';
             }
-            alert(errorMsg);
+            showToast(errorMsg, 'error', 4000);
             console.error('❌ 위치 정보 에러:', error);
           }, {
             enableHighAccuracy: true,
@@ -1842,7 +1837,7 @@
           }
         );
       } else {
-        alert('이 브라우저는 위치 서비스를 지원하지 않습니다.');
+        showToast('이 브라우저는 위치 서비스를 지원하지 않습니다.', 'error');
       }
     };
     
@@ -1924,7 +1919,7 @@
         if (positions.length < 2) {
           document.getElementById('loadingOverlay').classList.remove('active');
           document.getElementById('routeBtn').disabled = false;
-          alert('경로를 표시할 현장의 주소를 찾을 수 없습니다.\n현장 관리에서 주소를 확인해주세요.');
+          showToast('경로를 표시할 현장의 주소를 찾을 수 없습니다. 현장 관리에서 주소를 확인해주세요.', 'error', 4000);
           console.error('❌ 유효한 위치가 2개 미만');
           isRouteDisplayed = false;
           return;
@@ -2067,7 +2062,7 @@
         const routeBtn = document.getElementById('routeBtn');
         if (routeBtn) routeBtn.disabled = false;
         isRouteDisplayed = false;
-        alert('경로를 표시하는 중 오류가 발생했습니다.');
+        showToast('경로를 표시하는 중 오류가 발생했습니다.', 'error', 4000);
       });
     }
 
@@ -2239,7 +2234,7 @@
 
       }, (error) => {
         console.error('❌ 사용자 목록 로드 실패:', error);
-        alert('사용자 목록을 불러오는데 실패했습니다.');
+        showToast('사용자 목록을 불러오는데 실패했습니다.', 'error');
       });
     }
     
@@ -2248,11 +2243,11 @@
       const input = document.getElementById('newUserInput');
       const name = input.value.trim();
       if (!name) {
-        alert('사용자 이름을 입력하세요.');
+        showToast('사용자 이름을 입력하세요.', 'warning');
         return;
       }
       if (assignees.some(a => a.name === name)) {
-        alert('이미 존재하는 사용자입니다.');
+        showToast('이미 존재하는 사용자입니다.', 'warning');
         return;
       }
       const assigneesRef = window.dbRef(window.db, `companies/${currentCompanyId}/assignees`);
@@ -2410,7 +2405,7 @@
       console.log('⚠️ 회사 탈퇴 시도');
       
       if (!isAdmin) {
-        alert('회사 탈퇴는 관리자만 할 수 있습니다.');
+        showToast('회사 탈퇴는 관리자만 할 수 있습니다.', 'warning');
         return;
       }
       
@@ -2433,7 +2428,7 @@
       const password = prompt('회사 비밀번호를 입력하여 탈퇴를 확인하세요:');
       
       if (!password) {
-        alert('탈퇴가 취소되었습니다.');
+        showToast('탈퇴가 취소되었습니다.', 'info');
         console.log('❌ 비밀번호 입력 취소됨');
         return;
       }
@@ -2445,12 +2440,12 @@
           const companyInfo = snapshot.val();
           
           if (!companyInfo) {
-            alert('회사 정보를 찾을 수 없습니다.');
+            showToast('회사 정보를 찾을 수 없습니다.', 'error');
             return;
           }
           
           if (companyInfo.password !== password) {
-            alert('비밀번호가 일치하지 않습니다.');
+            showToast('비밀번호가 일치하지 않습니다.', 'error');
             console.log('❌ 비밀번호 불일치');
             return;
           }
@@ -2462,7 +2457,7 @@
           );
           
           if (!finalConfirm) {
-            alert('탈퇴가 취소되었습니다.');
+            showToast('탈퇴가 취소되었습니다.', 'info');
             console.log('❌ 최종 확인 취소됨');
             return;
           }
@@ -2473,13 +2468,9 @@
             console.log('✅ 회사 데이터 삭제 완료');
             
             clearAutoLogin();
-            
-            alert(
-              '회사 탈퇴가 완료되었습니다.\n\n' +
-              '모든 데이터가 삭제되었습니다.\n' +
-              '이용해 주셔서 감사합니다.'
-            );
-            
+
+            showToast('회사 탈퇴가 완료되었습니다. 모든 데이터가 삭제되었습니다.', 'success', 5000);
+
             currentUser = null;
             currentCompanyId = null;
             
@@ -2503,14 +2494,14 @@
             
           }).catch((error) => {
             console.error('❌ 회사 삭제 중 오류:', error);
-            alert('회사 탈퇴 중 오류가 발생했습니다: ' + error.message);
+            showToast('회사 탈퇴 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
           });
           
         }, { onlyOnce: true });
         
       } catch (error) {
         console.error('❌ 회사 탈퇴 처리 중 오류:', error);
-        alert('회사 탈퇴 처리 중 오류가 발생했습니다: ' + error.message);
+        showToast('회사 탈퇴 처리 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
       }
     };
 
@@ -2540,7 +2531,7 @@
       const site = document.getElementById('siteInput').value.trim();
       const work = document.getElementById('workInput').value.trim();
       if (!site || !work) {
-        alert('현장명과 작업 내용을 입력하세요.');
+        showToast('현장명과 작업 내용을 입력하세요.', 'warning');
         return;
       }
 
@@ -3688,11 +3679,11 @@
       const address = addressInput.value.trim();
       
       if (!name) {
-        alert('현장명을 입력하세요.');
+        showToast('현장명을 입력하세요.', 'warning');
         return;
       }
       if (!address) {
-        alert('주소를 입력하세요.');
+        showToast('주소를 입력하세요.', 'warning');
         return;
       }
       
@@ -3749,24 +3740,24 @@
             
             if (updatedCount > 0) {
               window.dbUpdate(window.dbRef(window.db), updates).then(() => {
-                alert(`현장이 수정되었습니다.\n관련 작업 ${updatedCount}개도 함께 업데이트되었습니다.`);
+                showToast(`현장이 수정되었습니다. (관련 작업 ${updatedCount}개 업데이트됨)`, 'success', 4000);
                 cancelEditSite();
                 renderWorks();
               }).catch((error) => {
-                alert('작업 업데이트 중 오류가 발생했습니다: ' + error.message);
+                showToast('작업 업데이트 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
               });
             } else {
-              alert('현장이 수정되었습니다.');
+              showToast('현장이 수정되었습니다.', 'success');
               cancelEditSite();
             }
             
           } else {
-            alert('현장 정보가 수정되었습니다.');
+            showToast('현장 정보가 수정되었습니다.', 'success');
             cancelEditSite();
           }
           
         }).catch((error) => {
-          alert('현장 수정 중 오류가 발생했습니다: ' + error.message);
+          showToast('현장 수정 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
         });
         
       } else {
@@ -3788,9 +3779,9 @@
         }).then(() => {
           nameInput.value = '';
           addressInput.value = '';
-          alert('현장이 추가되었습니다.');
+          showToast('현장이 추가되었습니다.', 'success');
         }).catch((error) => {
-          alert('현장 추가 중 오류가 발생했습니다: ' + error.message);
+          showToast('현장 추가 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
         });
       }
     };
@@ -3989,7 +3980,7 @@
         case 'custom':
           selectedDate = document.getElementById('customDeadlineInput').value;
           if (!selectedDate) {
-            alert('날짜를 선택하세요.');
+            showToast('날짜를 선택하세요.', 'warning');
             return;
           }
           break;
@@ -4097,7 +4088,7 @@
 
     window.copyCompanyCode = function() {
       if (!companyInfo || !companyInfo.companyCode) {
-        alert('팀코드를 불러올 수 없습니다.');
+        showToast('팀코드를 불러올 수 없습니다.', 'error');
         return;
       }
 
@@ -4196,7 +4187,7 @@
     
     window.removeStaff = function(userId, userName) {
       if (!isAdmin) {
-        alert('관리자만 사용할 수 있습니다.');
+        showToast('관리자만 사용할 수 있습니다.', 'warning');
         return;
       }
       
@@ -4214,17 +4205,17 @@
       
       const assigneeRef = window.dbRef(window.db, `companies/${currentCompanyId}/assignees/${userId}`);
       window.dbRemove(assigneeRef).then(() => {
-        alert(`${userName}님이 퇴출되었습니다.`);
+        showToast(`${userName}님이 퇴출되었습니다.`, 'success');
         console.log('✅ 직원 퇴출 완료:', userName);
       }).catch((error) => {
-        alert('직원 퇴출 중 오류가 발생했습니다: ' + error.message);
+        showToast('직원 퇴출 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
         console.error('❌ 직원 퇴출 실패:', error);
       });
     };
 
     window.saveCompanyInfo = function() {
       if (!isAdmin) {
-        alert('관리자만 사용할 수 있습니다.');
+        showToast('관리자만 사용할 수 있습니다.', 'warning');
         return;
       }
       
@@ -4234,28 +4225,28 @@
       const confirmPassword = document.getElementById('confirmNewPassword').value;
       
       if (!newCompanyName) {
-        alert('회사명을 입력하세요.');
+        showToast('회사명을 입력하세요.', 'warning');
         return;
       }
       
       if (!currentPassword) {
-        alert('현재 비밀번호를 입력하세요.');
+        showToast('현재 비밀번호를 입력하세요.', 'warning');
         return;
       }
       
       if (!companyInfo || companyInfo.password !== currentPassword) {
-        alert('현재 비밀번호가 일치하지 않습니다.');
+        showToast('현재 비밀번호가 일치하지 않습니다.', 'error');
         return;
       }
       
       if (newPassword) {
         if (newPassword.length < 4) {
-          alert('새 비밀번호는 최소 4자 이상이어야 합니다.');
+          showToast('새 비밀번호는 최소 4자 이상이어야 합니다.', 'warning');
           return;
         }
         
         if (newPassword !== confirmPassword) {
-          alert('새 비밀번호가 일치하지 않습니다.');
+          showToast('새 비밀번호가 일치하지 않습니다.', 'warning');
           return;
         }
       }
@@ -4280,14 +4271,14 @@
             localStorage.setItem('savedPassword', newPassword);
           }
         }
-        
-        alert(message);
-        
+
+        showToast(message, 'success', 4000);
+
         toggleCompanyInfoModal();
         
         console.log('✅ 회사 정보 수정 완료');
       }).catch((error) => {
-        alert('회사 정보 수정 중 오류가 발생했습니다: ' + error.message);
+        showToast('회사 정보 수정 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
         console.error('❌ 회사 정보 수정 실패:', error);
       });
     };
@@ -4318,7 +4309,7 @@
     
     window.transferAdmin = function() {
       if (!isAdmin) {
-        alert('관리자만 사용할 수 있습니다.');
+        showToast('관리자만 사용할 수 있습니다.', 'warning');
         return;
       }
       
@@ -4326,24 +4317,24 @@
       const password = document.getElementById('passwordForTransfer').value;
       
       if (!newAdminId) {
-        alert('새 관리자를 선택하세요.');
+        showToast('새 관리자를 선택하세요.', 'warning');
         return;
       }
       
       if (!password) {
-        alert('비밀번호를 입력하세요.');
+        showToast('비밀번호를 입력하세요.', 'warning');
         return;
       }
       
       if (!companyInfo || companyInfo.password !== password) {
-        alert('비밀번호가 일치하지 않습니다.');
+        showToast('비밀번호가 일치하지 않습니다.', 'error');
         return;
       }
       
       const newAdmin = assignees.find(a => a.id === newAdminId);
       
       if (!newAdmin) {
-        alert('선택한 직원을 찾을 수 없습니다.');
+        showToast('선택한 직원을 찾을 수 없습니다.', 'error');
         return;
       }
       
@@ -4370,17 +4361,13 @@
       updates[`companies/${currentCompanyId}/assignees/${currentUserId}/isAdmin`] = false;
       
       window.dbUpdate(window.dbRef(window.db), updates).then(() => {
-        alert(
-          `권한 이전이 완료되었습니다!\n\n` +
-          `새 관리자: ${newAdmin.name}\n\n` +
-          `앱을 다시 시작합니다.`
-        );
-        
+        showToast(`권한 이전이 완료되었습니다! 새 관리자: ${newAdmin.name}`, 'success', 4000);
+
         logout();
         
         console.log('✅ 관리자 권한 이전 완료:', newAdmin.name);
       }).catch((error) => {
-        alert('권한 이전 중 오류가 발생했습니다: ' + error.message);
+        showToast('권한 이전 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
         console.error('❌ 권한 이전 실패:', error);
       });
     };
@@ -4410,7 +4397,7 @@
           }, 2000);
         }
       } catch (err) {
-        alert(`코드를 복사할 수 없습니다.\n\n수동으로 복사하세요: ${text}`);
+        showToast(`코드를 복사할 수 없습니다. 수동으로 복사하세요: ${text}`, 'error', 5000);
       }
 
       document.body.removeChild(textArea);
@@ -4418,7 +4405,7 @@
     
     window.regenerateCompanyCode = function() {
       if (!isAdmin) {
-        alert('관리자만 사용할 수 있습니다.');
+        showToast('관리자만 사용할 수 있습니다.', 'warning');
         return;
       }
       
@@ -4437,12 +4424,12 @@
       const password = prompt('비밀번호를 입력하여 확인하세요:');
       
       if (!password) {
-        alert('재발급이 취소되었습니다.');
+        showToast('재발급이 취소되었습니다.', 'info');
         return;
       }
       
       if (!companyInfo || companyInfo.password !== password) {
-        alert('비밀번호가 일치하지 않습니다.');
+        showToast('비밀번호가 일치하지 않습니다.', 'error');
         return;
       }
       
@@ -4453,13 +4440,13 @@
         companyCode: newCode,
         codeUpdatedAt: new Date().toISOString()
       }).then(() => {
-        alert(`회사 코드가 재발급되었습니다!\n\n새 코드: ${newCode}\n\n새로운 코드를 직원들에게 공유하세요.`);
-        
+        showToast(`회사 코드가 재발급되었습니다! (새 코드: ${newCode})`, 'success', 5000);
+
         document.getElementById('displayCompanyCode').textContent = newCode;
         
         console.log('✅ 회사 코드 재발급 완료:', newCode);
       }).catch((error) => {
-        alert('코드 재발급 중 오류가 발생했습니다: ' + error.message);
+        showToast('코드 재발급 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
         console.error('❌ 코드 재발급 실패:', error);
       });
     };
@@ -4570,7 +4557,7 @@
         console.log('📋 [네비] 내 작업:', myActiveWorks.length, '개');
 
         if (myActiveWorks.length === 0) {
-          alert('실행할 작업이 없습니다.');
+          showToast('실행할 작업이 없습니다.', 'info');
           return;
         }
 
@@ -4589,7 +4576,7 @@
         // 현재 위치 가져오기
         if (!navigator.geolocation) {
           if (loadingOverlay) loadingOverlay.classList.remove('active');
-          alert('이 브라우저는 위치 서비스를 지원하지 않습니다.');
+          showToast('이 브라우저는 위치 서비스를 지원하지 않습니다.', 'error');
           return;
         }
 
@@ -4627,7 +4614,7 @@
                 if (!siteInfo || !siteInfo.address) {
                   if (loadingOverlay) loadingOverlay.classList.remove('active');
                   console.warn(`⚠️ [네비] 현장 "${work.site}"의 주소를 찾을 수 없습니다`);
-                  alert(`현장 "${work.site}"의 주소 정보가 없습니다.\n현장 관리에서 주소를 등록해주세요.`);
+                  showToast(`현장 "${work.site}"의 주소 정보가 없습니다. 현장 관리에서 주소를 등록해주세요.`, 'warning', 4000);
                   return;
                 }
 
@@ -4689,7 +4676,7 @@
             } catch (error) {
               if (loadingOverlay) loadingOverlay.classList.remove('active');
               console.error('❌ [네비] 좌표 변환 오류:', error);
-              alert('주소를 좌표로 변환하는 중 오류가 발생했습니다.\n' + error.message);
+              showToast('주소를 좌표로 변환하는 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
             }
           },
           function(error) {
@@ -4710,7 +4697,7 @@
               default:
                 errorMsg += '알 수 없는 오류가 발생했습니다.';
             }
-            alert(errorMsg);
+            showToast(errorMsg, 'error', 4000);
           },
           {
             enableHighAccuracy: true,
@@ -4720,7 +4707,7 @@
         );
       } catch (error) {
         console.error('❌ [네비] 전체 오류:', error);
-        alert('네비게이션 실행 중 오류가 발생했습니다.\n' + error.message);
+        showToast('네비게이션 실행 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
         const loadingOverlay = document.getElementById('loadingOverlay');
         if (loadingOverlay) loadingOverlay.classList.remove('active');
       }
