@@ -1070,6 +1070,9 @@
       cursor: pointer;
       width: fit-content;
       line-height: 1;
+      pointer-events: auto;
+      user-select: none;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
     }
     
     .deadline-label-text {

@@ -3115,8 +3115,13 @@
         deadlineContainer.className = 'deadline-label-container';
         deadlineContainer.onclick = (e) => {
           e.stopPropagation();
+          e.preventDefault();
+          console.log('📅 [완료기한] 클릭됨:', work.id, isCompleted);
           if (!isCompleted) {
+            console.log('📅 [완료기한] 모달 열기:', work.deadline || work.date);
             openDeadlineModal(work.id, work.deadline || work.date);
+          } else {
+            console.log('⚠️ [완료기한] 완료된 작업은 수정 불가');
           }
         };
         const deadlineLabel = document.createElement('span');
