@@ -4,11 +4,12 @@
 
 ### 1. 버전 관리 (캐시 버스팅)
 - **중요:** CSS/JS 파일 수정 시 반드시 버전 업데이트 필수!
-- 현재 버전: **Ver 0.8.3**
+- 현재 버전: **Ver 0.8.4**
 - 위치: `index.html`의 `<link>` 및 `<script>` 태그
   ```html
-  <link rel="stylesheet" href="styles.css?v=Ver.0.8.3">
-  <script src="script.js?v=Ver.0.8.3"></script>
+  <link rel="stylesheet" href="styles.css?v=Ver.0.8.4">
+  <script src="config.js?v=Ver.0.8.4"></script>
+  <script src="script.js?v=Ver.0.8.4"></script>
   ```
 - 버전 형식: `Ver 0.X.X` (세 자리 형식)
 
@@ -88,7 +89,8 @@ worklist/
 ---
 
 ## 🔧 주요 수정 이력
-- **Ver 0.8.3**: 팀 관리 기능 개선 - 팀코드 실시간 동기화, 5분 변경 제한, 팀 나가기 후 페이지 새로고침
+- **Ver 0.8.4**: API 키 보안 강화 - config.js 분리, .gitignore 추가, Capacitor 준비
+- Ver 0.8.3: 팀 관리 기능 개선 - 팀코드 실시간 동기화, 5분 변경 제한, 팀 나가기 후 페이지 새로고침
 - Ver 0.8.2: 담당자 변경 시 지도 경로 색상 잔상 제거 (경로 제거 로직 강화)
 - Ver 0.8.1: 네비게이션 앱 설치 확인 로직 개선 (불필요한 메시지 제거)
 - Ver 0.8.0: 모든 alert() → Toast 알림으로 교체 (116개) - UX 대폭 개선
