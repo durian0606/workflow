@@ -3255,9 +3255,7 @@
         checkbox.style.cursor = 'pointer';
         checkbox.onclick = (e) => {
           e.stopPropagation();
-          if (confirm('이 작업을 다시 진행중으로 되돌리시겠습니까?')) {
-            toggleComplete(work.id);
-          }
+          toggleComplete(work.id);
         };
         completedCheckContainer.appendChild(checkbox);
 
