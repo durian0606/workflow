@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>작업 관리</title>
-  <link rel="stylesheet" href="styles.css?v=Ver.0.8.4">
+  <link rel="stylesheet" href="styles.css?v=Ver.0.8.3">
 </head>
 
 <body>
@@ -840,21 +840,9 @@
     </div>
   </div>
 
-  <!-- API 설정 파일 (가장 먼저 로드) -->
-  <script src="config.js?v=Ver.0.8.4"></script>
-
-  <!-- Kakao Map API (동적 로드) -->
-  <script>
-    // CONFIG 객체에서 API 키를 가져와 Kakao Maps SDK 동적 로드
-    (function() {
-      const script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${CONFIG.kakao.appKey}&libraries=services`;
-      script.onload = function() {
-        console.log('✅ Kakao Maps SDK loaded');
-      };
-      document.head.appendChild(script);
-    })();
+  <!-- Kakao Map API -->
+  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=edfe0792f24f219880fc608009d59a0f&libraries=services">
+    
   </script>
 
   <!-- Firebase SDK -->
@@ -869,13 +857,17 @@
       push,
       onValue,
       update,
-      remove,
-      off
+      remove
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-    // CONFIG 객체에서 Firebase 설정 가져오기
-    const firebaseConfig = window.CONFIG.firebase;
-
+    const firebaseConfig = {
+      apiKey: "AIzaSyAMv0BmH24fyd0F8CUTkSYSXMlvbcnUXU4",
+      authDomain: "work-todo-6ab7f.firebaseapp.com",
+      databaseURL: "https://work-todo-6ab7f-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "work-todo-6ab7f",
+      storageBucket: "work-todo-6ab7f.firebasestorage.app",
+      messagingSenderId: "263893669261",
+      appId: "1:263893669261:web:bdce10bec177ff1f67d9c4"
+    };
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
     window.db = database;
@@ -885,12 +877,10 @@
     window.dbOnValue = onValue;
     window.dbUpdate = update;
     window.dbRemove = remove;
-    window.dbOff = off;
     window.firebaseReady = true;
     console.log('✅ Firebase initialized');
   </script>
 
-  <script src="script.js?v=Ver.0.8.4"></script>
+  <script src="script.js?v=Ver.0.8.3"></script>
 </body>
 </html>              
-
