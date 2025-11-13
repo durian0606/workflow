@@ -4,11 +4,11 @@
 
 ### 1. 버전 관리 (캐시 버스팅)
 - **중요:** CSS/JS 파일 수정 시 반드시 버전 업데이트 필수!
-- 현재 버전: **Ver 0.9.0**
+- 현재 버전: **Ver 0.9.1**
 - 위치: `index.html`의 `<link>` 및 `<script>` 태그
   ```html
-  <link rel="stylesheet" href="styles.css?v=Ver.0.9.0">
-  <script src="script.js?v=Ver.0.9.0"></script>
+  <link rel="stylesheet" href="styles.css?v=Ver.0.9.1">
+  <script src="script.js?v=Ver.0.9.1"></script>
   ```
 - 버전 형식: `Ver 0.X.X` (세 자리 형식)
 
@@ -88,6 +88,7 @@ worklist/
 ---
 
 ## 🔧 주요 수정 이력
+- **Ver 0.9.1**: UI 개선 - 팀명 입력창과 저장 버튼 크기 비율 조정
 - **Ver 0.9.0**: UI/UX 개선 - 팀 설정 모달 저장 버튼 재배치 (팀명 옆으로 이동)
 - **Ver 0.8.9**: 팀원 목록 실시간 업데이트 - 팀원 가입 시 팀장 화면에도 즉시 반영
 - **Ver 0.8.8**: 팀설정 모달 재오픈 문제 해결 - toggle 순서 개선, 로그 추가
