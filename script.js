@@ -892,7 +892,10 @@
         });
 
         showToast('초대를 거절했습니다.', 'info');
+
+        // 두 곳의 초대 리스트 모두 새로고침
         await loadInvitations();
+        await loadInvitationsInTeamSelection();
       } catch (error) {
         console.error('초대 거절 실패:', error);
         showToast('초대 거절 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
@@ -1075,7 +1078,29 @@
           return;
         }
 
-        // 3. 초대 정보 생성 (바로 팀원 추가하지 않음)
+        // 3. 이미 초대를 보냈는지 확인 (중복 초대 방지)
+        const invitationsRef = window.dbRef(window.db, `users/${userId}/invitations`);
+        const invitationsSnapshot = await new Promise((resolve, reject) => {
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          window.dbOnValue(invitationsRef, (snapshot) => {
+            clearTimeout(timeoutId);
+            resolve(snapshot);
+          }, { onlyOnce: true });
+        });
+
+        if (invitationsSnapshot.exists()) {
+          const invitations = invitationsSnapshot.val();
+          const hasPendingInvitation = Object.values(invitations).some(
+            inv => inv.teamId === currentTeamId && inv.status === 'pending'
+          );
+
+          if (hasPendingInvitation) {
+            showToast(`${targetUserInfo.name}님에게 이미 초대를 보냈습니다.`, 'warning');
+            return;
+          }
+        }
+
+        // 4. 초대 정보 생성 (바로 팀원 추가하지 않음)
         const invitationId = Date.now().toString();
         const invitationRef = window.dbRef(window.db, `users/${userId}/invitations/${invitationId}`);
         await window.dbSet(invitationRef, {

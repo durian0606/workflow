@@ -4,11 +4,11 @@
 
 ### 1. 버전 관리 (캐시 버스팅)
 - **중요:** CSS/JS 파일 수정 시 반드시 버전 업데이트 필수!
-- 현재 버전: **Ver 0.9.6**
+- 현재 버전: **Ver 0.9.7**
 - 위치: `index.html`의 `<link>` 및 `<script>` 태그
   ```html
-  <link rel="stylesheet" href="styles.css?v=Ver.0.9.6">
-  <script src="script.js?v=Ver.0.9.6"></script>
+  <link rel="stylesheet" href="styles.css?v=Ver.0.9.7">
+  <script src="script.js?v=Ver.0.9.7"></script>
   ```
 - 버전 형식: `Ver 0.X.X` (세 자리 형식)
 
@@ -88,6 +88,7 @@ worklist/
 ---
 
 ## 🔧 주요 수정 이력
+- **Ver 0.9.7**: 버그 수정 - 중복 초대 방지 기능 추가, 초대 거절 시 리스트 자동 새로고침
 - **Ver 0.9.6**: UI 정리 - 메뉴에서 팀 나가기 버튼 제거, 팀 설정에서 받은 초대 섹션 제거
 - **Ver 0.9.5**: UX 개선 - 팀 합류/나가기 시 로그인 상태 유지 (location.reload 제거)
 - **Ver 0.9.4**: UX 개선 - 팀 선택 모달에 받은 초대 섹션 추가, 로그인 시 초대 알림
