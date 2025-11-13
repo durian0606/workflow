@@ -3913,19 +3913,193 @@
 
     window.cancelEditSite = function() {
       console.log('❌ 현장 수정 취소');
-      
+
       currentEditingSiteId = null;
-      
+
       document.getElementById('newSiteName').value = '';
       document.getElementById('newSiteAddress').value = '';
-      
+
       document.getElementById('siteModalTitle').textContent = '현장 추가';
-      
+
       document.getElementById('saveSiteBtn').textContent = '저장';
-      
+
       document.getElementById('cancelEditBtn').style.display = 'none';
     };
-    
+
+    // ===== 반경 검색 기능 =====
+    let selectedRadius = 5; // 기본값 5km
+
+    window.toggleRadiusSearchModal = function() {
+      const modal = document.getElementById('radiusSearchModal');
+      if (!modal) return;
+
+      const isOpening = !modal.classList.contains('active');
+
+      if (isOpening) {
+        // 모달을 열 때 현장 목록 로드
+        const select = document.getElementById('radiusBaseSite');
+        select.innerHTML = '<option value="">현장을 선택하세요</option>';
+
+        Object.entries(sites).forEach(([id, site]) => {
+          const option = document.createElement('option');
+          option.value = id;
+          option.textContent = `${site.name} (${site.address})`;
+          select.appendChild(option);
+        });
+
+        // 검색 결과 초기화
+        document.getElementById('radiusSearchResults').style.display = 'none';
+        document.getElementById('radiusResultList').innerHTML = '';
+
+        // 기본 반경 선택 (5km)
+        selectRadius(5);
+      }
+
+      modal.classList.toggle('active');
+    };
+
+    window.selectRadius = function(km) {
+      selectedRadius = km;
+
+      // 모든 버튼의 스타일 초기화
+      document.querySelectorAll('.radius-option').forEach(btn => {
+        btn.style.background = 'white';
+        btn.style.color = '#333';
+        btn.style.borderColor = '#ddd';
+      });
+
+      // 선택된 버튼 스타일 변경
+      const selectedBtn = document.querySelector(`[data-radius="${km}"]`);
+      if (selectedBtn) {
+        selectedBtn.style.background = '#4CAF50';
+        selectedBtn.style.color = 'white';
+        selectedBtn.style.borderColor = '#4CAF50';
+      }
+    };
+
+    // Haversine 공식으로 두 지점 간 거리 계산 (km)
+    function calculateDistance(lat1, lng1, lat2, lng2) {
+      const R = 6371; // 지구 반경 (km)
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLng = (lng2 - lng1) * Math.PI / 180;
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLng / 2) * Math.sin(dLng / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    window.performRadiusSearch = async function() {
+      const baseSiteId = document.getElementById('radiusBaseSite').value;
+
+      if (!baseSiteId) {
+        showToast('기준 현장을 선택하세요.', 'warning');
+        return;
+      }
+
+      const baseSite = sites[baseSiteId];
+      if (!baseSite || !baseSite.address) {
+        showToast('선택한 현장의 주소 정보가 없습니다.', 'error');
+        return;
+      }
+
+      showToast('현장 위치를 검색하는 중...', 'info', 2000);
+
+      try {
+        // Kakao Geocoder로 기준 현장의 좌표 구하기
+        const geocoder = new kakao.maps.services.Geocoder();
+
+        const baseCoords = await new Promise((resolve, reject) => {
+          geocoder.addressSearch(baseSite.address, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+              resolve({ lat: parseFloat(result[0].y), lng: parseFloat(result[0].x) });
+            } else {
+              reject(new Error('기준 현장의 좌표를 찾을 수 없습니다.'));
+            }
+          });
+        });
+
+        // 모든 현장의 좌표 구하기 및 거리 계산
+        const sitesWithDistance = [];
+
+        for (const [id, site] of Object.entries(sites)) {
+          if (id === baseSiteId) continue; // 기준 현장 제외
+          if (!site.address) continue;
+
+          try {
+            const coords = await new Promise((resolve, reject) => {
+              geocoder.addressSearch(site.address, function(result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                  resolve({ lat: parseFloat(result[0].y), lng: parseFloat(result[0].x) });
+                } else {
+                  resolve(null);
+                }
+              });
+            });
+
+            if (coords) {
+              const distance = calculateDistance(
+                baseCoords.lat, baseCoords.lng,
+                coords.lat, coords.lng
+              );
+
+              if (distance <= selectedRadius) {
+                sitesWithDistance.push({
+                  id,
+                  site,
+                  distance: distance.toFixed(2)
+                });
+              }
+            }
+          } catch (error) {
+            console.warn(`현장 "${site.name}" 좌표 검색 실패:`, error);
+          }
+        }
+
+        // 거리순으로 정렬
+        sitesWithDistance.sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
+
+        // 결과 표시
+        const resultList = document.getElementById('radiusResultList');
+        const resultCount = document.getElementById('radiusResultCount');
+
+        resultCount.textContent = sitesWithDistance.length;
+        resultList.innerHTML = '';
+
+        if (sitesWithDistance.length === 0) {
+          resultList.innerHTML = '<li style="padding: 20px; text-align: center; color: #999;">반경 내 현장이 없습니다.</li>';
+        } else {
+          sitesWithDistance.forEach(({ id, site, distance }) => {
+            const li = document.createElement('li');
+            li.className = 'site-item';
+            li.innerHTML = `
+              <div style="flex: 1;">
+                <strong>${site.name}</strong>
+                <div style="font-size: 12px; color: #999; margin-top: 4px;">${site.address}</div>
+              </div>
+              <div style="font-size: 12px; color: #4CAF50; font-weight: 600; white-space: nowrap; margin-left: 10px;">
+                ${distance}km
+              </div>
+            `;
+            li.style.cursor = 'pointer';
+            li.onclick = function() {
+              document.getElementById('siteInput').value = site.name;
+              toggleRadiusSearchModal();
+              showToast(`"${site.name}" 현장이 선택되었습니다.`, 'success');
+            };
+            resultList.appendChild(li);
+          });
+        }
+
+        document.getElementById('radiusSearchResults').style.display = 'block';
+        showToast(`${sitesWithDistance.length}개의 현장을 찾았습니다.`, 'success');
+
+      } catch (error) {
+        console.error('반경 검색 실패:', error);
+        showToast(error.message || '반경 검색에 실패했습니다.', 'error');
+      }
+    };
+
     function calculateBusinessDays(startDate, endDate) {
       if (startDate > endDate) return -1;
       let count = 0;
@@ -3975,6 +4149,12 @@
     document.getElementById('siteSelectModal').addEventListener('click', (e) => {
       if (e.target === document.getElementById('siteSelectModal')) {
         toggleSiteSelectModal();
+      }
+    });
+
+    document.getElementById('radiusSearchModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('radiusSearchModal')) {
+        toggleRadiusSearchModal();
       }
     });
 

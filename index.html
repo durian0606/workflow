@@ -207,7 +207,12 @@
       </div>
   
       <div class="site-list-section">
-        <h4 class="site-list-title">저장된 현장 목록</h4>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h4 class="site-list-title" style="margin-bottom: 0;">저장된 현장 목록</h4>
+          <button class="secondary-btn" onclick="toggleRadiusSearchModal()" style="padding: 6px 12px; font-size: 12px;">
+            📍 반경 검색
+          </button>
+        </div>
         <ul class="site-list" id="siteList"></ul>
       </div>
     </div>
@@ -246,6 +251,55 @@
         <button class="close-btn" onclick="toggleSiteSelectModal()">×</button>
       </div>
       <ul class="site-list" id="siteSelectList"></ul>
+    </div>
+  </div>
+
+  <!-- 반경 검색 모달 -->
+  <div class="modal-overlay" id="radiusSearchModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">📍 반경 검색</h3>
+        <button class="close-btn" onclick="toggleRadiusSearchModal()">×</button>
+      </div>
+
+      <div style="padding: 20px;">
+        <div class="input-group" style="margin-bottom: 20px;">
+          <label class="input-label">기준 현장 선택</label>
+          <select class="admin-input" id="radiusBaseSite" style="padding: 12px;">
+            <option value="">현장을 선택하세요</option>
+          </select>
+          <div class="input-hint">이 현장을 기준으로 반경 내 현장을 검색합니다</div>
+        </div>
+
+        <div class="input-group" style="margin-bottom: 20px;">
+          <label class="input-label">검색 반경</label>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <button class="admin-btn radius-option" data-radius="1" onclick="selectRadius(1)" style="background: white; color: #333; border: 2px solid #ddd;">
+              1km
+            </button>
+            <button class="admin-btn radius-option" data-radius="3" onclick="selectRadius(3)" style="background: white; color: #333; border: 2px solid #ddd;">
+              3km
+            </button>
+            <button class="admin-btn radius-option" data-radius="5" onclick="selectRadius(5)" style="background: white; color: #333; border: 2px solid #ddd;">
+              5km
+            </button>
+            <button class="admin-btn radius-option" data-radius="10" onclick="selectRadius(10)" style="background: white; color: #333; border: 2px solid #ddd;">
+              10km
+            </button>
+          </div>
+        </div>
+
+        <button class="admin-btn" onclick="performRadiusSearch()" style="width: 100%; margin-top: 10px;">
+          검색하기
+        </button>
+
+        <div id="radiusSearchResults" style="margin-top: 20px; display: none;">
+          <h4 style="font-size: 14px; color: #666; margin-bottom: 10px; font-weight: 600;">
+            검색 결과 (<span id="radiusResultCount">0</span>개)
+          </h4>
+          <ul class="site-list" id="radiusResultList"></ul>
+        </div>
+      </div>
     </div>
   </div>
 
