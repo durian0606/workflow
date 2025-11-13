@@ -185,14 +185,15 @@
 
               // 팀명 표시
               const nameInput = document.getElementById('editTeamNameInput');
-              if (nameInput && modal.classList.contains('active')) {
+              if (nameInput) {
                 nameInput.value = teamInfo.name || '';
               }
 
               // 팀코드 표시
               const codeDisplay = document.getElementById('settingsTeamCode');
-              if (codeDisplay && modal.classList.contains('active')) {
+              if (codeDisplay) {
                 codeDisplay.textContent = teamInfo.teamCode || '------';
+                console.log('✅ 팀코드 표시됨:', teamInfo.teamCode);
               }
 
               // 코드 변경 버튼 활성화 상태 확인
@@ -254,17 +255,18 @@
           } catch (error) {
             console.error('팀 정보 로드 실패:', error);
           }
-        } else if (!isOpening) {
-          // 모달을 닫을 때 리스너 정리
-          const teamInfoRef = window.dbRef(window.db, `teams/${currentTeamId}/info`);
-          if (teamInfoListener) {
-            window.dbOff(teamInfoRef, 'value', teamInfoListener);
-            teamInfoListener = null;
-            console.log('🗑️ 팀 정보 리스너 제거됨');
-          }
         }
 
+        // 모달 토글
         modal.classList.toggle('active');
+
+        // 모달이 닫힌 경우 리스너 정리
+        if (!modal.classList.contains('active') && teamInfoListener) {
+          const teamInfoRef = window.dbRef(window.db, `teams/${currentTeamId}/info`);
+          window.dbOff(teamInfoRef, 'value', teamInfoListener);
+          teamInfoListener = null;
+          console.log('🗑️ 팀 정보 리스너 제거됨');
+        }
       }
     };
 
