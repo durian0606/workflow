@@ -864,12 +864,14 @@
         // 초대 모달 닫기
         toggleInvitationsModal();
 
+        // 초대 배지 업데이트 (0으로 설정)
+        updateInvitationBadge(0);
+
         // 페이지 새로고침 대신 데이터 다시 로드
         loadWorks();
         loadSites();
         loadAssignees();
         loadAllCompaniesWorks();
-        loadInvitations();
 
         console.log('✅ 팀 데이터 재로드 완료');
       } catch (error) {
