@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>작업 관리</title>
-  <link rel="stylesheet" href="styles.css?v=Ver.0.9.5">
+  <link rel="stylesheet" href="styles.css?v=Ver.0.9.6">
 </head>
 
 <body>
@@ -170,10 +170,6 @@
     </div>
 
     <div class="menu-divider"></div>
-    <div class="menu-item menu-item-danger" onclick="deleteCompany()">
-      <span class="menu-item-icon">⚠️</span>
-      <span class="menu-item-text">팀 나가기</span>
-    </div>
     <div class="menu-item menu-item-danger" onclick="logout()">
       <span class="menu-item-icon">🚪</span>
       <span class="menu-item-text">로그아웃</span>
@@ -459,16 +455,6 @@
           <button class="admin-btn" onclick="inviteByUserIdFromSettings()" style="width: 100%; padding: 8px; font-size: 13px;">
             초대 보내기
           </button>
-        </div>
-
-        <!-- 받은 초대 목록 -->
-        <div style="margin-bottom: 10px;">
-          <h4 style="font-size: 13px; color: #666; margin-bottom: 6px; font-weight: 600;">
-            📬 받은 초대
-          </h4>
-          <div id="teamSettingsInvitationsList">
-            <p style="text-align: center; color: #999; padding: 10px; font-size: 12px;">받은 초대가 없습니다</p>
-          </div>
         </div>
 
         <!-- 팀원 목록 -->
@@ -886,6 +872,6 @@
     console.log('✅ Firebase initialized');
   </script>
 
-  <script src="script.js?v=Ver.0.9.5">
+  <script src="script.js?v=Ver.0.9.6">
 </body>
 </html>              
