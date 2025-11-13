@@ -164,109 +164,111 @@
     window.toggleTeamSettingsModal = async function() {
       console.log('⚙️ 팀 설정 모달 토글');
       const modal = document.getElementById('teamSettingsModal');
-      if (modal) {
-        const isOpening = !modal.classList.contains('active');
+      if (!modal) return;
 
-        if (isOpening && currentTeamId) {
-          // 팀 정보 실시간 리스너 등록
-          const teamInfoRef = window.dbRef(window.db, `teams/${currentTeamId}/info`);
+      const isOpening = !modal.classList.contains('active');
+      console.log('모달 상태:', isOpening ? '열기' : '닫기');
 
-          // 기존 리스너 제거
-          if (teamInfoListener) {
-            window.dbOff(teamInfoRef, 'value', teamInfoListener);
-            teamInfoListener = null;
-          }
+      // 먼저 모달 토글
+      modal.classList.toggle('active');
 
-          // 새 리스너 등록
-          teamInfoListener = (snapshot) => {
-            if (snapshot.exists()) {
-              teamInfo = snapshot.val();
-              console.log('🔄 팀 정보 업데이트됨:', teamInfo);
+      // 모달을 여는 경우에만 데이터 로드
+      if (isOpening && currentTeamId) {
+        console.log('✅ 모달 열림 - 데이터 로드 시작');
 
-              // 팀명 표시
-              const nameInput = document.getElementById('editTeamNameInput');
-              if (nameInput) {
-                nameInput.value = teamInfo.name || '';
-              }
+        // 팀 정보 실시간 리스너 등록
+        const teamInfoRef = window.dbRef(window.db, `teams/${currentTeamId}/info`);
 
-              // 팀코드 표시
-              const codeDisplay = document.getElementById('settingsTeamCode');
-              if (codeDisplay) {
-                codeDisplay.textContent = teamInfo.teamCode || '------';
-                console.log('✅ 팀코드 표시됨:', teamInfo.teamCode);
-              }
-
-              // 코드 변경 버튼 활성화 상태 확인
-              updateChangeCodeButtonState();
-            }
-          };
-
-          window.dbOnValue(teamInfoRef, teamInfoListener);
-
-          try {
-
-            // 팀원 목록 로드
-            const membersRef = window.dbRef(window.db, `teams/${currentTeamId}/members`);
-            const membersSnapshot = await new Promise((resolve, reject) => {
-              const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
-              window.dbOnValue(membersRef, (snapshot) => {
-                clearTimeout(timeoutId);
-                resolve(snapshot);
-              }, { onlyOnce: true });
-            });
-
-            const memberList = document.getElementById('teamMemberList');
-            const memberCount = document.getElementById('teamMemberCount');
-
-            if (membersSnapshot.exists()) {
-              const members = membersSnapshot.val();
-              const memberArray = Object.entries(members);
-
-              if (memberCount) {
-                memberCount.textContent = memberArray.length;
-              }
-
-              if (memberList) {
-                memberList.innerHTML = '';
-                memberArray.forEach(([userId, memberData]) => {
-                  const li = document.createElement('li');
-                  li.className = 'site-item';
-
-                  const roleIcon = memberData.role === 'creator' ? '👑 ' : '👤 ';
-                  const roleText = '';
-
-                  li.innerHTML = `
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                      <span>${roleIcon}${memberData.name}${roleText}</span>
-                      <span style="font-size: 11px; color: #999;">(${userId})</span>
-                    </span>
-                  `;
-                  memberList.appendChild(li);
-                });
-              }
-            } else {
-              if (memberCount) memberCount.textContent = '0';
-              if (memberList) memberList.innerHTML = '<li class="site-item" style="text-align: center; color: #999;">팀원이 없습니다</li>';
-            }
-
-            // 받은 초대 목록 로드
-            await loadInvitationsInSettings();
-
-          } catch (error) {
-            console.error('팀 정보 로드 실패:', error);
-          }
-        }
-
-        // 모달 토글
-        modal.classList.toggle('active');
-
-        // 모달이 닫힌 경우 리스너 정리
-        if (!modal.classList.contains('active') && teamInfoListener) {
-          const teamInfoRef = window.dbRef(window.db, `teams/${currentTeamId}/info`);
+        // 기존 리스너 제거
+        if (teamInfoListener) {
           window.dbOff(teamInfoRef, 'value', teamInfoListener);
           teamInfoListener = null;
-          console.log('🗑️ 팀 정보 리스너 제거됨');
         }
+
+        // 새 리스너 등록
+        teamInfoListener = (snapshot) => {
+          if (snapshot.exists()) {
+            teamInfo = snapshot.val();
+            console.log('🔄 팀 정보 업데이트됨:', teamInfo);
+
+            // 팀명 표시
+            const nameInput = document.getElementById('editTeamNameInput');
+            if (nameInput) {
+              nameInput.value = teamInfo.name || '';
+            }
+
+            // 팀코드 표시
+            const codeDisplay = document.getElementById('settingsTeamCode');
+            if (codeDisplay) {
+              codeDisplay.textContent = teamInfo.teamCode || '------';
+              console.log('✅ 팀코드 표시됨:', teamInfo.teamCode);
+            }
+
+            // 코드 변경 버튼 활성화 상태 확인
+            updateChangeCodeButtonState();
+          }
+        };
+
+        window.dbOnValue(teamInfoRef, teamInfoListener);
+
+        try {
+          // 팀원 목록 로드
+          const membersRef = window.dbRef(window.db, `teams/${currentTeamId}/members`);
+          const membersSnapshot = await new Promise((resolve, reject) => {
+            const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+            window.dbOnValue(membersRef, (snapshot) => {
+              clearTimeout(timeoutId);
+              resolve(snapshot);
+            }, { onlyOnce: true });
+          });
+
+          const memberList = document.getElementById('teamMemberList');
+          const memberCount = document.getElementById('teamMemberCount');
+
+          if (membersSnapshot.exists()) {
+            const members = membersSnapshot.val();
+            const memberArray = Object.entries(members);
+
+            if (memberCount) {
+              memberCount.textContent = memberArray.length;
+            }
+
+            if (memberList) {
+              memberList.innerHTML = '';
+              memberArray.forEach(([userId, memberData]) => {
+                const li = document.createElement('li');
+                li.className = 'site-item';
+
+                const roleIcon = memberData.role === 'creator' ? '👑 ' : '👤 ';
+                const roleText = '';
+
+                li.innerHTML = `
+                  <span style="display: flex; align-items: center; gap: 8px;">
+                    <span>${roleIcon}${memberData.name}${roleText}</span>
+                    <span style="font-size: 11px; color: #999;">(${userId})</span>
+                  </span>
+                `;
+                memberList.appendChild(li);
+              });
+            }
+          } else {
+            if (memberCount) memberCount.textContent = '0';
+            if (memberList) memberList.innerHTML = '<li class="site-item" style="text-align: center; color: #999;">팀원이 없습니다</li>';
+          }
+
+          // 받은 초대 목록 로드
+          await loadInvitationsInSettings();
+
+        } catch (error) {
+          console.error('팀 정보 로드 실패:', error);
+        }
+      }
+      // 모달을 닫는 경우 리스너 정리
+      else if (!isOpening && teamInfoListener) {
+        console.log('✅ 모달 닫힘 - 리스너 정리');
+        const teamInfoRef = window.dbRef(window.db, `teams/${currentTeamId}/info`);
+        window.dbOff(teamInfoRef, 'value', teamInfoListener);
+        teamInfoListener = null;
       }
     };
 

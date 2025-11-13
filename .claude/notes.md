@@ -4,11 +4,11 @@
 
 ### 1. 버전 관리 (캐시 버스팅)
 - **중요:** CSS/JS 파일 수정 시 반드시 버전 업데이트 필수!
-- 현재 버전: **Ver 0.8.7**
+- 현재 버전: **Ver 0.8.8**
 - 위치: `index.html`의 `<link>` 및 `<script>` 태그
   ```html
-  <link rel="stylesheet" href="styles.css?v=Ver.0.8.7">
-  <script src="script.js?v=Ver.0.8.7"></script>
+  <link rel="stylesheet" href="styles.css?v=Ver.0.8.8">
+  <script src="script.js?v=Ver.0.8.8"></script>
   ```
 - 버전 형식: `Ver 0.X.X` (세 자리 형식)
 
@@ -88,6 +88,7 @@ worklist/
 ---
 
 ## 🔧 주요 수정 이력
+- **Ver 0.8.8**: 팀설정 모달 재오픈 문제 해결 - toggle 순서 개선, 로그 추가
 - **Ver 0.8.7**: 팀설정 모달 버그 수정 - 팀코드 표시 조건 제거, 모달 닫기 순서 수정
 - **Ver 0.8.6**: 팀 관리 개선 - 팀 생성 후 팀코드 자동 표시, 모달 재오픈 리스너 정리 강화
 - **Ver 0.8.5**: UX 개선 - 완료→진행중 confirm 제거, 주소 없는 현장 경로에서 자동 제외
