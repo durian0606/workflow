@@ -160,6 +160,7 @@
 
     // 팀 정보 실시간 리스너
     let teamInfoListener = null;
+    let teamMembersListener = null;
 
     window.toggleTeamSettingsModal = async function() {
       console.log('⚙️ 팀 설정 모달 토글');
@@ -211,22 +212,22 @@
 
         window.dbOnValue(teamInfoRef, teamInfoListener);
 
-        try {
-          // 팀원 목록 로드
-          const membersRef = window.dbRef(window.db, `teams/${currentTeamId}/members`);
-          const membersSnapshot = await new Promise((resolve, reject) => {
-            const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
-            window.dbOnValue(membersRef, (snapshot) => {
-              clearTimeout(timeoutId);
-              resolve(snapshot);
-            }, { onlyOnce: true });
-          });
+        // 팀원 목록 실시간 리스너 등록
+        const membersRef = window.dbRef(window.db, `teams/${currentTeamId}/members`);
 
+        // 기존 리스너 제거
+        if (teamMembersListener) {
+          window.dbOff(membersRef, 'value', teamMembersListener);
+          teamMembersListener = null;
+        }
+
+        // 새 리스너 등록
+        teamMembersListener = (snapshot) => {
           const memberList = document.getElementById('teamMemberList');
           const memberCount = document.getElementById('teamMemberCount');
 
-          if (membersSnapshot.exists()) {
-            const members = membersSnapshot.val();
+          if (snapshot.exists()) {
+            const members = snapshot.val();
             const memberArray = Object.entries(members);
 
             if (memberCount) {
@@ -251,11 +252,16 @@
                 memberList.appendChild(li);
               });
             }
+            console.log('✅ 팀원 목록 업데이트됨:', memberArray.length, '명');
           } else {
             if (memberCount) memberCount.textContent = '0';
             if (memberList) memberList.innerHTML = '<li class="site-item" style="text-align: center; color: #999;">팀원이 없습니다</li>';
           }
+        };
 
+        window.dbOnValue(membersRef, teamMembersListener);
+
+        try {
           // 받은 초대 목록 로드
           await loadInvitationsInSettings();
 
@@ -264,11 +270,22 @@
         }
       }
       // 모달을 닫는 경우 리스너 정리
-      else if (!isOpening && teamInfoListener) {
+      else if (!isOpening) {
         console.log('✅ 모달 닫힘 - 리스너 정리');
-        const teamInfoRef = window.dbRef(window.db, `teams/${currentTeamId}/info`);
-        window.dbOff(teamInfoRef, 'value', teamInfoListener);
-        teamInfoListener = null;
+
+        // 팀 정보 리스너 정리
+        if (teamInfoListener) {
+          const teamInfoRef = window.dbRef(window.db, `teams/${currentTeamId}/info`);
+          window.dbOff(teamInfoRef, 'value', teamInfoListener);
+          teamInfoListener = null;
+        }
+
+        // 팀원 목록 리스너 정리
+        if (teamMembersListener) {
+          const membersRef = window.dbRef(window.db, `teams/${currentTeamId}/members`);
+          window.dbOff(membersRef, 'value', teamMembersListener);
+          teamMembersListener = null;
+        }
       }
     };
 
