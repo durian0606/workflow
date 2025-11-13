@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>작업 관리</title>
-  <link rel="stylesheet" href="styles.css?v=Ver.0.8.9">
+  <link rel="stylesheet" href="styles.css?v=Ver.0.9.0">
 </head>
 
 <body>
@@ -417,7 +417,12 @@
         <!-- 팀명 수정 -->
         <div class="input-group" style="margin-bottom: 10px;">
           <label class="input-label" style="margin-bottom: 4px;">팀명</label>
-          <input type="text" class="admin-input" id="editTeamNameInput" placeholder="팀 이름" autocomplete="off" style="padding: 10px 12px; margin-bottom: 0;">
+          <div style="display: flex; gap: 6px;">
+            <input type="text" class="admin-input" id="editTeamNameInput" placeholder="팀 이름" autocomplete="off" style="padding: 10px 12px; margin-bottom: 0; flex: 1;">
+            <button class="admin-btn" onclick="saveTeamSettings()" style="padding: 10px 16px; font-size: 13px; white-space: nowrap;">
+              💾 저장
+            </button>
+          </div>
         </div>
 
         <!-- 팀코드 표시 -->
@@ -470,14 +475,9 @@
         </div>
 
         <!-- 버튼들 -->
-        <div style="display: flex; gap: 8px;">
-          <button class="admin-btn" onclick="saveTeamSettings()" style="flex: 1; padding: 10px; font-size: 13px;">
-            저장
-          </button>
-          <button class="admin-btn" onclick="leaveTeam()" style="flex: 1; padding: 10px; font-size: 13px; background: #f44336;">
-            팀 나가기
-          </button>
-        </div>
+        <button class="admin-btn" onclick="leaveTeam()" style="width: 100%; padding: 10px; font-size: 13px; background: #f44336;">
+          팀 나가기
+        </button>
       </div>
     </div>
   </div>
@@ -881,6 +881,6 @@
     console.log('✅ Firebase initialized');
   </script>
 
-  <script src="script.js?v=Ver.0.8.9"></script>
+  <script src="script.js?v=Ver.0.9.0"></script>
 </body>
 </html>              
