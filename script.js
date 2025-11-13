@@ -680,16 +680,7 @@
       }
     };
 
-    // 팀 설정에서 ID로 초대 (동일 기능)
-    window.inviteByUserIdFromSettings = function() {
-      const input = document.getElementById('settingsInviteUserIdInput');
-      // inviteUserIdInput에 값 복사
-      document.getElementById('inviteUserIdInput').value = input.value;
-      // 초대 실행
-      window.inviteByUserId();
-      // 입력 필드 초기화
-      input.value = '';
-    };
+    // (삭제됨 - 987번 줄의 async 함수로 대체)
 
     // 초대 목록 모달 토글
     window.toggleInvitationsModal = async function() {
@@ -1028,20 +1019,19 @@
           return;
         }
 
-        // 3. 팀에 멤버로 추가
-        const memberRef = window.dbRef(window.db, `teams/${currentTeamId}/members/${userId}`);
-        await window.dbSet(memberRef, {
-          name: targetUserInfo.name,
-          joinedAt: new Date().toISOString(),
-          role: 'member'
+        // 3. 초대 정보 생성 (바로 팀원 추가하지 않음)
+        const invitationId = Date.now().toString();
+        const invitationRef = window.dbRef(window.db, `users/${userId}/invitations/${invitationId}`);
+        await window.dbSet(invitationRef, {
+          teamId: currentTeamId,
+          teamName: teamInfo.name,
+          invitedBy: currentUserId,
+          inviterName: userInfo.name,
+          createdAt: new Date().toISOString(),
+          status: 'pending'
         });
 
-        // 4. 대상 사용자의 currentTeamId 업데이트
-        await window.dbUpdate(targetUserRef, {
-          currentTeamId: currentTeamId
-        });
-
-        showToast(`${targetUserInfo.name}님을 팀에 초대했습니다.`, 'success');
+        showToast(`${targetUserInfo.name}님에게 초대를 보냈습니다. 상대방이 수락하면 팀에 추가됩니다.`, 'success', 4000);
 
         // 입력 필드 초기화
         document.getElementById('settingsInviteUserIdInput').value = '';
