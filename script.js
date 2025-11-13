@@ -438,12 +438,18 @@
         currentTeamId = teamId;
         userInfo.currentTeamId = teamId;
 
-        showToast(`팀이 생성되었습니다! (팀코드: ${teamCode})`, 'success', 4000);
+        showToast(`팀이 생성되었습니다!`, 'success', 3000);
 
         // 입력 필드 초기화
         document.getElementById('newTeamNameInput').value = '';
 
+        // 팀 만들기 모달 닫기
         toggleCreateTeamModal();
+
+        // 잠시 후 팀원 초대 모달 열어서 팀 코드 보여주기
+        setTimeout(() => {
+          toggleInviteMemberModal();
+        }, 500);
 
         console.log('팀 생성 완료:', teamId, teamCode);
 
