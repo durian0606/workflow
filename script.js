@@ -174,6 +174,7 @@
           // 기존 리스너 제거
           if (teamInfoListener) {
             window.dbOff(teamInfoRef, 'value', teamInfoListener);
+            teamInfoListener = null;
           }
 
           // 새 리스너 등록
@@ -252,6 +253,14 @@
 
           } catch (error) {
             console.error('팀 정보 로드 실패:', error);
+          }
+        } else if (!isOpening) {
+          // 모달을 닫을 때 리스너 정리
+          const teamInfoRef = window.dbRef(window.db, `teams/${currentTeamId}/info`);
+          if (teamInfoListener) {
+            window.dbOff(teamInfoRef, 'value', teamInfoListener);
+            teamInfoListener = null;
+            console.log('🗑️ 팀 정보 리스너 제거됨');
           }
         }
 
@@ -444,6 +453,17 @@
         document.getElementById('newTeamNameInput').value = '';
 
         toggleCreateTeamModal();
+
+        // 팀 선택 모달도 닫기
+        const teamSelectionModal = document.getElementById('teamSelectionModal');
+        if (teamSelectionModal && teamSelectionModal.classList.contains('active')) {
+          teamSelectionModal.classList.remove('active');
+        }
+
+        // 팀 설정 모달 자동으로 열기
+        setTimeout(() => {
+          toggleTeamSettingsModal();
+        }, 500);
 
         console.log('팀 생성 완료:', teamId, teamCode);
 
