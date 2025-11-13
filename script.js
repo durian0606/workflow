@@ -929,10 +929,24 @@
         teamInfo = null;
 
         showToast('팀 초대를 수락했습니다!', 'success');
+
+        // 팀 선택 모달 닫기
+        const teamSelectionModal = document.getElementById('teamSelectionModal');
+        if (teamSelectionModal && teamSelectionModal.classList.contains('active')) {
+          teamSelectionModal.classList.remove('active');
+        }
+
+        // 초대 모달 닫기
         toggleInvitationsModal();
 
-        // 페이지 새로고침하여 팀 데이터 로드
-        location.reload();
+        // 페이지 새로고침 대신 데이터 다시 로드
+        loadWorks();
+        loadSites();
+        loadAssignees();
+        loadAllCompaniesWorks();
+        loadInvitations();
+
+        console.log('✅ 팀 데이터 재로드 완료');
       } catch (error) {
         console.error('초대 수락 실패:', error);
         showToast('초대 수락 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
@@ -1231,10 +1245,14 @@
 
         console.log('팀 나가기 완료:', oldTeamId);
 
-        // 페이지 새로고침하여 이전 팀 작업 목록 제거
-        setTimeout(() => {
-          location.reload();
-        }, 2000);
+        // 페이지 새로고침 대신 데이터 다시 로드
+        loadWorks();
+        loadSites();
+        loadAssignees();
+        loadAllCompaniesWorks();
+        loadInvitations();
+
+        console.log('✅ 데이터 재로드 완료 - 이전 팀 작업 목록 제거됨');
 
       } catch (error) {
         console.error('팀 나가기 실패:', error);
