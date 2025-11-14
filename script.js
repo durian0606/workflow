@@ -656,23 +656,6 @@
       }
     };
 
-    // 모바일에서 입력란 포커스 시 스크롤
-    window.scrollToInviteInput = function() {
-      setTimeout(() => {
-        const modal = document.getElementById('inviteMemberModal');
-        if (modal) {
-          const modalContent = modal.querySelector('.modal-content');
-          if (modalContent) {
-            // 모달을 위로 스크롤하여 입력란과 버튼이 보이도록
-            modalContent.scrollTo({
-              top: modalContent.scrollHeight,
-              behavior: 'smooth'
-            });
-          }
-        }
-      }, 350);
-    };
-
     window.inviteByUserId = async function() {
       const inputElement = document.getElementById('inviteUserIdInput');
       const userId = inputElement.value.trim();

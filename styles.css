@@ -839,8 +839,13 @@
 
     /* 모바일에서 키보드 올라올 때 대비 */
     @media (max-width: 768px) {
+      .modal-overlay {
+        align-items: flex-start;
+        padding-top: 20px;
+      }
+
       .modal-content {
-        max-height: 60vh;
+        max-height: 80vh;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
       }
