@@ -656,6 +656,23 @@
       }
     };
 
+    // 모바일에서 입력란 포커스 시 스크롤
+    window.scrollToInviteInput = function() {
+      setTimeout(() => {
+        const modal = document.getElementById('inviteMemberModal');
+        if (modal) {
+          const modalContent = modal.querySelector('.modal-content');
+          const input = document.getElementById('inviteUserIdInput');
+          if (modalContent && input) {
+            const inputRect = input.getBoundingClientRect();
+            const modalRect = modalContent.getBoundingClientRect();
+            const scrollOffset = inputRect.top - modalRect.top - 100;
+            modalContent.scrollTop += scrollOffset;
+          }
+        }
+      }, 300);
+    };
+
     window.inviteByUserId = async function() {
       const inputElement = document.getElementById('inviteUserIdInput');
       const userId = inputElement.value.trim();
