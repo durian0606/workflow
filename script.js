@@ -1390,51 +1390,8 @@
     }
     
     async function checkSavedCompany() {
-      const autoLogin = localStorage.getItem('autoLogin') === 'true';
-      const savedUserId = localStorage.getItem('savedUserId');
-      const savedPassword = localStorage.getItem('savedPassword');
-
-      if (autoLogin && savedUserId && savedPassword) {
-        console.log('🔐 자동 로그인 시도...');
-
-        try {
-          // 1. 사용자 정보 확인
-          const userRef = window.dbRef(window.db, `users/${savedUserId}/info`);
-          const userData = await new Promise((resolve, reject) => {
-            const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
-            window.dbOnValue(userRef, (snapshot) => {
-              clearTimeout(timeoutId);
-              resolve(snapshot.val());
-            }, { onlyOnce: true });
-          });
-
-          if (!userData || userData.password !== savedPassword) {
-            console.log('❌ 자동 로그인 실패 - 로그인 화면 표시');
-            clearAutoLogin();
-            showLoginScreen();
-            return;
-          }
-
-          // 2. 전역 변수 설정
-          currentUserId = savedUserId;
-          currentUser = userData.name;
-          currentTeamId = userData.currentTeamId || null;
-          currentCompanyId = savedUserId; // 기존 코드 호환성을 위해
-          userInfo = userData;
-
-          console.log('✅ 자동 로그인 성공!');
-
-          // 3. 바로 메인 앱 표시
-          showMainApp();
-
-        } catch (error) {
-          console.error('❌ 자동 로그인 오류:', error);
-          clearAutoLogin();
-          showLoginScreen();
-        }
-      } else {
-        showLoginScreen();
-      }
+      // 보안을 위해 자동 로그인 기능 제거, ID만 기억
+      showLoginScreen();
     }
 
     function showLoginScreen() {
@@ -1472,7 +1429,6 @@
     window.loginCompany = async function() {
       const userId = document.getElementById('companyIdInput').value.trim();
       const password = document.getElementById('companyPasswordInput').value;
-      const autoLogin = document.getElementById('autoLoginCheckbox').checked;
 
       if (!userId) {
         showToast('ID를 입력하세요.', 'warning');
@@ -1516,18 +1472,11 @@
         currentCompanyId = userId; // 기존 코드 호환성을 위해
         userInfo = userData;
 
-        // 3. 자동 로그인 저장
-        if (autoLogin) {
-          localStorage.setItem('autoLogin', 'true');
-          localStorage.setItem('savedUserId', userId);
-          localStorage.setItem('savedPassword', password);
-          console.log('✅ 자동 로그인 정보 저장됨');
-        } else {
-          localStorage.removeItem('autoLogin');
-          localStorage.setItem('savedUserId', userId);
-          localStorage.removeItem('savedPassword');
-          console.log('ℹ️ 사용자 ID만 저장됨');
-        }
+        // 3. ID만 저장 (보안을 위해 비밀번호는 저장하지 않음)
+        localStorage.setItem('savedUserId', userId);
+        localStorage.removeItem('autoLogin');
+        localStorage.removeItem('savedPassword');
+        console.log('ℹ️ 사용자 ID만 저장됨 (보안상 비밀번호는 저장 안함)');
 
         console.log('🎉 로그인 성공! 메인 앱으로 이동...');
 
