@@ -1521,9 +1521,10 @@
       display: flex;
       gap: 16px;
       margin-bottom: 20px;
+      margin-left: 20px;
       align-items: flex-start;
     }
-    
+
     .guide-step-number {
       background: #2a459c;
       color: white;
@@ -1537,23 +1538,24 @@
       font-size: 14px;
       flex-shrink: 0;
     }
-    
+
     .guide-step-content {
       flex: 1;
     }
-    
+
     .guide-step-content h4 {
       font-size: 16px;
       font-weight: 600;
       color: #333;
       margin-bottom: 8px;
     }
-    
+
     .guide-step-content p {
       font-size: 14px;
       line-height: 1.6;
       color: #666;
       margin-bottom: 8px;
+      padding-left: 8px;
     }
     
     .guide-list {
@@ -1573,25 +1575,28 @@
       border-left: 4px solid #2196F3;
       padding: 10px 12px;
       margin-top: 12px;
+      margin-left: 8px;
       font-size: 13px;
       color: #1565C0;
       border-radius: 4px;
     }
-    
+
     .guide-warning {
       background: #fff3e0;
       border-left: 4px solid #ff9800;
       padding: 10px 12px;
       margin-top: 12px;
+      margin-left: 8px;
       font-size: 13px;
       color: #e65100;
       border-radius: 4px;
     }
-    
+
     .guide-tips-list {
       display: flex;
       flex-direction: column;
       gap: 12px;
+      margin-left: 20px;
     }
     
     .guide-tip-item {
@@ -1618,6 +1623,7 @@
       background: #f5f7fa;
       padding: 20px;
       border-radius: 8px;
+      margin-left: 20px;
     }
     
     .guide-contact p {
