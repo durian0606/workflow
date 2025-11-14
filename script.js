@@ -862,7 +862,10 @@
         }
 
         // 초대 모달 닫기
-        toggleInvitationsModal();
+        const invitationsModal = document.getElementById('invitationsModal');
+        if (invitationsModal) {
+          invitationsModal.classList.remove('active');
+        }
 
         // 초대 배지 업데이트 (0으로 설정)
         updateInvitationBadge(0);
