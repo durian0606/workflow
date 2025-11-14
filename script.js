@@ -377,10 +377,10 @@
             </div>
             <div style="display: flex; gap: 8px;">
               <button class="admin-btn" onclick="acceptInvitation('${invitationId}', '${invitation.teamId}')" style="flex: 1; background: #4caf50; padding: 10px; width: auto;">
-                ✓ 수락
+                <i data-lucide="check" style="width: 14px; height: 14px; vertical-align: text-bottom;"></i> 수락
               </button>
               <button class="admin-btn" onclick="rejectInvitation('${invitationId}')" style="flex: 1; background: #f44336; padding: 10px; width: auto;">
-                ✗ 거절
+                <i data-lucide="x" style="width: 14px; height: 14px; vertical-align: text-bottom;"></i> 거절
               </button>
             </div>
           `;
@@ -392,6 +392,9 @@
         const divider = document.createElement('div');
         divider.style.cssText = 'border-top: 1px solid #ddd; margin: 20px 0;';
         invitationsList.appendChild(divider);
+
+        // Lucide 아이콘 초기화
+        if (window.lucide) lucide.createIcons();
 
       } catch (error) {
         console.error('초대 목록 로드 실패:', error);
@@ -636,12 +639,14 @@
       if (navigator.clipboard) {
         navigator.clipboard.writeText(code).then(() => {
           if (btn) {
-            btn.innerHTML = '✓ 복사완료!';
+            btn.innerHTML = '<i data-lucide="check" style="width: 14px; height: 14px; vertical-align: text-bottom;"></i> 복사완료!';
             btn.style.background = '#4caf50';
+            if (window.lucide) lucide.createIcons();
 
             setTimeout(() => {
-              btn.innerHTML = '📋 코드 복사하기';
+              btn.innerHTML = '<i data-lucide="clipboard" style="width: 14px; height: 14px; vertical-align: text-bottom;"></i> 코드 복사하기';
               btn.style.background = '';
+              if (window.lucide) lucide.createIcons();
             }, 2000);
           }
 
@@ -795,16 +800,20 @@
             </div>
             <div style="display: flex; gap: 10px;">
               <button class="admin-btn" onclick="acceptInvitation('${invitationId}', '${invitation.teamId}')" style="flex: 1; background: #4caf50;">
-                ✓ 수락
+                <i data-lucide="check" style="width: 14px; height: 14px; vertical-align: text-bottom;"></i> 수락
               </button>
               <button class="admin-btn" onclick="rejectInvitation('${invitationId}')" style="flex: 1; background: #f44336;">
-                ✗ 거절
+                <i data-lucide="x" style="width: 14px; height: 14px; vertical-align: text-bottom;"></i> 거절
               </button>
             </div>
           `;
 
           invitationsList.appendChild(invitationCard);
         });
+
+        // Lucide 아이콘 초기화
+        if (window.lucide) lucide.createIcons();
+
       } catch (error) {
         console.error('초대 목록 로드 실패:', error);
       }
@@ -931,12 +940,14 @@
       if (navigator.clipboard) {
         navigator.clipboard.writeText(code).then(() => {
           if (btn) {
-            btn.innerHTML = '✓ 복사완료!';
+            btn.innerHTML = '<i data-lucide="check" style="width: 14px; height: 14px; vertical-align: text-bottom;"></i> 복사완료!';
             btn.style.background = '#4caf50';
+            if (window.lucide) lucide.createIcons();
 
             setTimeout(() => {
-              btn.innerHTML = '📋 코드 복사하기';
+              btn.innerHTML = '<i data-lucide="clipboard" style="width: 14px; height: 14px; vertical-align: text-bottom;"></i> 코드 복사하기';
               btn.style.background = '';
+              if (window.lucide) lucide.createIcons();
             }, 2000);
           }
 
@@ -3014,16 +3025,20 @@
         const emptyState = document.createElement('div');
         emptyState.className = 'empty-state';
         emptyState.innerHTML = `
-          <div class="empty-icon">📋</div>
+          <div class="empty-icon"><i data-lucide="clipboard" style="width: 48px; height: 48px;"></i></div>
           <div>이 날짜에 예정된 작업이 없습니다</div>
         `;
         container.appendChild(emptyState);
+        if (window.lucide) lucide.createIcons();
       }
 
       // 작업 렌더링 후 자동으로 경로 표시
       updateMapAutomatically(myActiveWorks);
+
+      // Lucide 아이콘 초기화
+      if (window.lucide) lucide.createIcons();
     }
-    
+
     function toggleSection(sectionKey) {
       sectionStates[sectionKey] = !sectionStates[sectionKey];
       renderWorks();
@@ -3423,7 +3438,7 @@
         const completedInfo = document.createElement('div');
         completedInfo.style.cssText = 'margin-top: 6px; font-size: 11px; color: #4caf50;';
         const completedLabel = document.createElement('span');
-        completedLabel.textContent = '✓ 완료: ';
+        completedLabel.innerHTML = '<i data-lucide="check-circle" style="width: 12px; height: 12px; vertical-align: text-bottom;"></i> 완료: ';
         completedLabel.style.fontWeight = '600';
         const completedDate = document.createElement('span');
         completedDate.textContent = work.completedDate;
@@ -3491,7 +3506,7 @@
       
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'action-btn';
-      deleteBtn.textContent = '🗑️';
+      deleteBtn.innerHTML = '<i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>';
       deleteBtn.onclick = (e) => {
         e.stopPropagation();
         deleteWork(work.id);

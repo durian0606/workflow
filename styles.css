@@ -3,7 +3,20 @@
       padding: 0;
       box-sizing: border-box;
     }
-    
+
+    /* Lucide Icons 스타일 */
+    [data-lucide] {
+      display: inline-block;
+      vertical-align: text-bottom;
+      color: currentColor;
+      stroke-width: 2;
+    }
+
+    button [data-lucide],
+    a [data-lucide] {
+      vertical-align: middle;
+    }
+
     html {
       margin: 0;
       padding: 0;
