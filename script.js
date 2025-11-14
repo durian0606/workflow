@@ -657,7 +657,8 @@
     };
 
     window.inviteByUserId = async function() {
-      const userId = document.getElementById('inviteUserIdInput').value.trim();
+      const inputElement = document.getElementById('inviteUserIdInput');
+      const userId = inputElement.value.trim();
 
       if (!userId) {
         showToast('사용자 ID를 입력하세요.', 'warning');
@@ -682,6 +683,7 @@
 
         if (!userSnapshot.exists()) {
           showToast('존재하지 않는 사용자 ID입니다.', 'error');
+          inputElement.blur(); // 키보드 내리기
           return;
         }
 
@@ -699,6 +701,7 @@
 
         if (memberSnapshot.exists()) {
           showToast('이미 팀에 소속된 사용자입니다.', 'warning');
+          inputElement.blur(); // 키보드 내리기
           return;
         }
 
@@ -715,10 +718,12 @@
         });
 
         showToast(`${targetUser.name}님에게 초대를 보냈습니다.`, 'success');
-        document.getElementById('inviteUserIdInput').value = '';
+        inputElement.value = '';
+        inputElement.blur(); // 키보드 내리기
       } catch (error) {
         console.error('초대 실패:', error);
         showToast('초대 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
+        inputElement.blur(); // 키보드 내리기
       }
     };
 
