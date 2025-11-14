@@ -662,15 +662,15 @@
         const modal = document.getElementById('inviteMemberModal');
         if (modal) {
           const modalContent = modal.querySelector('.modal-content');
-          const input = document.getElementById('inviteUserIdInput');
-          if (modalContent && input) {
-            const inputRect = input.getBoundingClientRect();
-            const modalRect = modalContent.getBoundingClientRect();
-            const scrollOffset = inputRect.top - modalRect.top - 100;
-            modalContent.scrollTop += scrollOffset;
+          if (modalContent) {
+            // 모달을 위로 스크롤하여 입력란과 버튼이 보이도록
+            modalContent.scrollTo({
+              top: modalContent.scrollHeight,
+              behavior: 'smooth'
+            });
           }
         }
-      }, 300);
+      }, 350);
     };
 
     window.inviteByUserId = async function() {
