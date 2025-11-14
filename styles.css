@@ -57,6 +57,7 @@
       bottom: 0;
       margin: 0;
       padding: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
     
     .app-header {
@@ -88,8 +89,26 @@
       }
 
       .login-box {
-        padding: 24px;
+        padding: 20px;
         margin-bottom: 20px;
+      }
+
+      .login-title {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+
+      .input-group {
+        margin-bottom: 12px;
+      }
+
+      .input-hint {
+        font-size: 11px;
+        margin-top: 4px;
+      }
+
+      .auto-login-container {
+        margin-bottom: 12px;
       }
     }
 
