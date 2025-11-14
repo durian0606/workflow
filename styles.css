@@ -79,6 +79,20 @@
       max-width: 400px;
     }
 
+    /* 모바일에서 로그인 화면 개선 */
+    @media (max-width: 768px) {
+      .login-container {
+        align-items: flex-start;
+        padding: 10px 0;
+        overflow-y: auto;
+      }
+
+      .login-box {
+        padding: 24px;
+        margin-bottom: 20px;
+      }
+    }
+
     .login-title {
       font-size: 28px;
       font-weight: 600;
