@@ -1925,6 +1925,12 @@
       console.log('📋 내 작업 진행 중:', myActiveWorks.length, '개');
       if (myActiveWorks.length === 0) {
         showToast('표시할 작업이 없습니다.', 'info');
+        // 경로 정보 숨기기
+        const routeInfo = document.getElementById('routeInfo');
+        if (routeInfo) {
+          routeInfo.style.display = 'none';
+          routeInfo.textContent = '';
+        }
         return;
       }
       
