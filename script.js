@@ -1806,6 +1806,13 @@
           routeLine = null;
         }
 
+        // 경로 정보 텍스트 숨기기
+        const routeInfo = document.getElementById('routeInfo');
+        if (routeInfo) {
+          routeInfo.style.display = 'none';
+          routeInfo.textContent = '';
+        }
+
         // 내 작업이 없으면 현재 위치 중심으로 표시
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
