@@ -1476,6 +1476,15 @@
     .guide-modal-content {
       max-width: 700px;
       max-height: 85vh;
+      background: white !important;
+      overflow-y: auto !important;
+    }
+
+    @media (max-width: 768px) {
+      .guide-modal-content {
+        max-height: 90vh;
+        overflow-y: auto !important;
+      }
     }
     
     .guide-content {
