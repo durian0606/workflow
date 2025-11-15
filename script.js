@@ -710,7 +710,14 @@
           return;
         }
 
-        // 3. 초대 생성
+        // 3. 초대하려는 사용자가 다른 팀에 소속되어 있는지 확인
+        if (targetUser.currentTeamId) {
+          showToast('해당 사용자는 이미 다른 팀에 소속되어 있습니다.', 'warning');
+          inputElement.blur(); // 키보드 내리기
+          return;
+        }
+
+        // 4. 초대 생성
         const invitationsRef = window.dbRef(window.db, `users/${userId}/invitations`);
         const newInvitationRef = window.dbPush(invitationsRef);
         await window.dbSet(newInvitationRef, {
