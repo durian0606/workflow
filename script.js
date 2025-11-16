@@ -144,7 +144,7 @@
           try {
             const teamInfoRef = window.dbRef(window.db, `teams/${currentTeamId}/info`);
             const teamInfoSnapshot = await new Promise((resolve, reject) => {
-              const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+              const timeoutId = setTimeout(() => reject(new Error('Timeout')), 15000);
               window.dbOnValue(teamInfoRef, (snapshot) => {
                 clearTimeout(timeoutId);
                 resolve(snapshot);
@@ -294,7 +294,7 @@
       try {
         const invitationsRef = window.dbRef(window.db, `users/${currentUserId}/invitations`);
         const snapshot = await new Promise((resolve, reject) => {
-          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 15000);
           window.dbOnValue(invitationsRef, (snapshot) => {
             clearTimeout(timeoutId);
             resolve(snapshot);
@@ -321,7 +321,7 @@
       try {
         const invitationsRef = window.dbRef(window.db, `users/${currentUserId}/invitations`);
         const snapshot = await new Promise((resolve, reject) => {
-          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 15000);
           window.dbOnValue(invitationsRef, (snapshot) => {
             clearTimeout(timeoutId);
             resolve(snapshot);
@@ -457,7 +457,7 @@
         // 4. 기존 개인 작업을 팀 작업으로 이전
         const personalWorksRef = window.dbRef(window.db, `companies/${currentUserId}/works`);
         const personalWorksSnapshot = await new Promise((resolve, reject) => {
-          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 15000);
           window.dbOnValue(personalWorksRef, (snapshot) => {
             clearTimeout(timeoutId);
             resolve(snapshot);
@@ -483,7 +483,7 @@
         // 4-1. 기존 개인 현장도 팀 현장으로 이전
         const personalSitesRef = window.dbRef(window.db, `companies/${currentUserId}/sites`);
         const personalSitesSnapshot = await new Promise((resolve, reject) => {
-          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 15000);
           window.dbOnValue(personalSitesRef, (snapshot) => {
             clearTimeout(timeoutId);
             resolve(snapshot);
@@ -679,7 +679,7 @@
         // 1. 해당 사용자가 존재하는지 확인
         const userRef = window.dbRef(window.db, `users/${userId}/info`);
         const userSnapshot = await new Promise((resolve, reject) => {
-          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 15000);
           window.dbOnValue(userRef, (snapshot) => {
             clearTimeout(timeoutId);
             resolve(snapshot);
@@ -697,7 +697,7 @@
         // 2. 이미 팀원인지 확인
         const memberRef = window.dbRef(window.db, `teams/${currentTeamId}/members/${userId}`);
         const memberSnapshot = await new Promise((resolve, reject) => {
-          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 15000);
           window.dbOnValue(memberRef, (snapshot) => {
             clearTimeout(timeoutId);
             resolve(snapshot);
@@ -760,7 +760,7 @@
       try {
         const invitationsRef = window.dbRef(window.db, `users/${currentUserId}/invitations`);
         const snapshot = await new Promise((resolve, reject) => {
-          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 15000);
           window.dbOnValue(invitationsRef, (snapshot) => {
             clearTimeout(timeoutId);
             resolve(snapshot);
@@ -1086,7 +1086,7 @@
         // 1. 초대할 사용자가 존재하는지 확인
         const targetUserRef = window.dbRef(window.db, `users/${userId}/info`);
         const targetUserSnapshot = await new Promise((resolve, reject) => {
-          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 15000);
           window.dbOnValue(targetUserRef, (snapshot) => {
             clearTimeout(timeoutId);
             resolve(snapshot);
@@ -1109,7 +1109,7 @@
         // 3. 이미 초대를 보냈는지 확인 (중복 초대 방지)
         const invitationsRef = window.dbRef(window.db, `users/${userId}/invitations`);
         const invitationsSnapshot = await new Promise((resolve, reject) => {
-          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 15000);
           window.dbOnValue(invitationsRef, (snapshot) => {
             clearTimeout(timeoutId);
             resolve(snapshot);
@@ -1461,10 +1461,18 @@
       try {
         console.log('🔐 로그인 시도:', userId);
 
+        // Firebase 연결 확인
+        if (!window.db || !window.dbRef || !window.dbOnValue) {
+          console.error('❌ Firebase가 초기화되지 않았습니다');
+          showToast('데이터베이스 연결 오류. 페이지를 새로고침 해주세요.', 'error', 4000);
+          return;
+        }
+        console.log('✅ Firebase 연결 확인 완료');
+
         // 1. 사용자 정보 확인
         const userRef = window.dbRef(window.db, `users/${userId}/info`);
         const userData = await new Promise((resolve, reject) => {
-          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 5000);
+          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 15000);
           window.dbOnValue(userRef, (snapshot) => {
             clearTimeout(timeoutId);
             resolve(snapshot.val());
@@ -1503,7 +1511,11 @@
 
       } catch (error) {
         console.error('❌ 로그인 오류:', error);
-        showToast('로그인 중 오류가 발생했습니다. 다시 시도해주세요.', 'error', 4000);
+        if (error.message === 'Timeout') {
+          showToast('네트워크 연결이 느립니다. 잠시 후 다시 시도해주세요.', 'error', 4000);
+        } else {
+          showToast('로그인 중 오류가 발생했습니다. 다시 시도해주세요.', 'error', 4000);
+        }
       }
     };
     
@@ -1608,6 +1620,13 @@
       }
 
       try {
+        // Firebase 연결 확인
+        if (!window.db || !window.dbRef || !window.dbSet) {
+          console.error('❌ Firebase가 초기화되지 않았습니다');
+          showToast('데이터베이스 연결 오류. 페이지를 새로고침 해주세요.', 'error', 4000);
+          return;
+        }
+
         // 1. 사용자 정보 생성
         const userInfoRef = window.dbRef(window.db, `users/${userId}/info`);
 
@@ -1664,7 +1683,11 @@
 
       } catch (error) {
         console.error('❌ 회원가입 중 오류:', error);
-        showToast('회원가입 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
+        if (error.message === 'Timeout') {
+          showToast('네트워크 연결이 느립니다. 잠시 후 다시 시도해주세요.', 'error', 4000);
+        } else {
+          showToast('회원가입 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
+        }
       }
     };
     
