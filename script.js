@@ -4986,3 +4986,145 @@
     // 기존의 모달 외부 클릭 이벤트는 삭제해도 됩니다 (중복이므로)
     console.log('✅ 모든 모달 이벤트 리스너 등록 완료');
 
+    // ===== 이미지 관련 함수들 =====
+
+    /**
+     * 이미지를 500KB 이하로 압축
+     * @param {File} file - 원본 이미지 파일
+     * @param {number} maxSizeKB - 최대 크기 (KB), 기본 500KB
+     * @returns {Promise<Blob>} - 압축된 이미지 Blob
+     */
+    window.compressImage = async function(file, maxSizeKB = 500) {
+      return new Promise((resolve, reject) => {
+        const maxSize = maxSizeKB * 1024; // KB to bytes
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            let width = img.width;
+            let height = img.height;
+            let quality = 0.9;
+
+            // 이미지가 이미 작으면 그대로 반환
+            if (file.size <= maxSize) {
+              resolve(file);
+              return;
+            }
+
+            // 최대 해상도 제한 (긴 쪽 기준 2048px)
+            const maxDimension = 2048;
+            if (width > maxDimension || height > maxDimension) {
+              if (width > height) {
+                height = (height / width) * maxDimension;
+                width = maxDimension;
+              } else {
+                width = (width / height) * maxDimension;
+                height = maxDimension;
+              }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // 압축 시도 (최대 5번)
+            let attempt = 0;
+            const tryCompress = () => {
+              canvas.toBlob(
+                (blob) => {
+                  if (!blob) {
+                    reject(new Error('이미지 압축 실패'));
+                    return;
+                  }
+
+                  console.log(`압축 시도 ${attempt + 1}: ${(blob.size / 1024).toFixed(1)}KB (목표: ${maxSizeKB}KB)`);
+
+                  if (blob.size <= maxSize || attempt >= 5 || quality <= 0.1) {
+                    console.log(`✅ 최종 이미지 크기: ${(blob.size / 1024).toFixed(1)}KB`);
+                    resolve(blob);
+                  } else {
+                    // 크기가 너무 크면 품질 낮추고 재시도
+                    quality -= 0.15;
+                    attempt++;
+                    tryCompress();
+                  }
+                },
+                'image/jpeg',
+                quality
+              );
+            };
+
+            tryCompress();
+          };
+
+          img.onerror = () => reject(new Error('이미지 로드 실패'));
+          img.src = e.target.result;
+        };
+
+        reader.onerror = () => reject(new Error('파일 읽기 실패'));
+        reader.readAsDataURL(file);
+      });
+    };
+
+    /**
+     * 이미지를 Firebase Storage에 업로드
+     * @param {Blob} imageBlob - 압축된 이미지 Blob
+     * @param {string} folderPath - Storage 경로 (예: 'workImages/teamId/workId')
+     * @returns {Promise<string>} - 업로드된 이미지 URL
+     */
+    window.uploadImageToStorage = async function(imageBlob, folderPath) {
+      try {
+        if (!window.storage) {
+          throw new Error('Firebase Storage가 초기화되지 않았습니다');
+        }
+
+        const timestamp = Date.now();
+        const fileName = `image_${timestamp}.jpg`;
+        const fullPath = `${folderPath}/${fileName}`;
+
+        const imageRef = window.storageRef(window.storage, fullPath);
+
+        console.log(`📤 이미지 업로드 시작: ${fullPath}`);
+        const snapshot = await window.storageUploadBytes(imageRef, imageBlob);
+
+        const downloadURL = await window.storageGetDownloadURL(snapshot.ref);
+        console.log(`✅ 이미지 업로드 완료: ${downloadURL}`);
+
+        return downloadURL;
+      } catch (error) {
+        console.error('❌ 이미지 업로드 실패:', error);
+        throw error;
+      }
+    };
+
+    /**
+     * Firebase Storage에서 이미지 삭제
+     * @param {string} imageUrl - 삭제할 이미지 URL
+     */
+    window.deleteImageFromStorage = async function(imageUrl) {
+      try {
+        if (!window.storage) {
+          throw new Error('Firebase Storage가 초기화되지 않았습니다');
+        }
+
+        // URL에서 경로 추출
+        const url = new URL(imageUrl);
+        const pathMatch = url.pathname.match(/\/o\/(.+?)(\?|$)/);
+        if (!pathMatch) {
+          throw new Error('잘못된 이미지 URL입니다');
+        }
+
+        const path = decodeURIComponent(pathMatch[1]);
+        const imageRef = window.storageRef(window.storage, path);
+
+        await window.storageDeleteObject(imageRef);
+        console.log(`🗑️ 이미지 삭제 완료: ${path}`);
+      } catch (error) {
+        console.error('❌ 이미지 삭제 실패:', error);
+        // 삭제 실패는 치명적이지 않으므로 에러를 throw하지 않음
+      }
+    };
+
