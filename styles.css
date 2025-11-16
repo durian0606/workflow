@@ -924,45 +924,11 @@
       height: 30px;
     }
 
-    /* 작업 상세 모달 스타일 */
-    .work-detail-info {
-      margin-bottom: 20px;
-    }
-
-    .work-detail-field {
-      margin-bottom: 16px;
-      padding: 12px;
-      background: #f5f7fa;
-      border-radius: 8px;
-    }
-
-    .work-detail-field label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: #666;
-      margin-bottom: 6px;
-    }
-
-    .work-detail-value {
-      font-size: 15px;
-      color: #333;
-      word-wrap: break-word;
-      white-space: pre-wrap;
-    }
-
+    /* 작업 메모 모달 스타일 */
     .work-detail-memo {
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid #e0e0e0;
-    }
-
-    .work-detail-memo label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
     .timeline-item {

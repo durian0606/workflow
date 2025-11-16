@@ -3887,26 +3887,9 @@
     };
 
     window.openWorkDetailModal = function(work) {
-      console.log('📝 작업 상세 모달 열기:', work);
+      console.log('📝 작업 메모 모달 열기:', work);
 
       currentWorkDetailId = work.id;
-
-      // 작업 정보 표시
-      document.getElementById('workDetailSite').textContent = work.site || '없음';
-      document.getElementById('workDetailWork').textContent = work.displayWork || work.work || '없음';
-      document.getElementById('workDetailAssignee').textContent = work.assignee || '미정';
-      document.getElementById('workDetailDeadline').textContent = work.deadline || work.date || '없음';
-
-      // 현장 특이사항 표시
-      const siteNotes = getSiteNotes(work.site);
-      const siteNotesElement = document.getElementById('workDetailSiteNotes');
-      if (siteNotes) {
-        siteNotesElement.textContent = siteNotes;
-        siteNotesElement.style.color = '#333';
-      } else {
-        siteNotesElement.textContent = '없음';
-        siteNotesElement.style.color = '#999';
-      }
 
       // 작업 메모 불러오기
       document.getElementById('workMemo').value = work.memo || '';
@@ -3914,12 +3897,6 @@
       // 모달 열기
       document.getElementById('workDetailModal').classList.add('active');
     };
-
-    function getSiteNotes(siteName) {
-      if (!siteName) return null;
-      const site = Object.values(sites).find(s => s.name === siteName);
-      return site ? site.notes : null;
-    }
 
     window.saveWorkMemo = function() {
       if (!currentWorkDetailId) {
