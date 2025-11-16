@@ -193,6 +193,7 @@
       <div class="add-site-form">
         <input type="text" class="task-input" id="newSiteName" placeholder="현장명 입력">
         <input type="text" class="task-input" id="newSiteAddress" placeholder="주소 입력">
+        <textarea class="task-input" id="newSiteNotes" placeholder="특이사항 입력 (예: 주차 공간 협소, 안전모 필수 등)" rows="3" style="resize: vertical; min-height: 60px;"></textarea>
         <button class="add-btn" id="saveSiteBtn" onclick="saveSite()">저장</button>
         <button class="secondary-btn" id="cancelEditBtn" onclick="cancelEditSite()" style="display: none;">취소</button>
       </div>
@@ -237,6 +238,45 @@
         <button class="close-btn" onclick="toggleSiteSelectModal()">×</button>
       </div>
       <ul class="site-list" id="siteSelectList"></ul>
+    </div>
+  </div>
+
+  <!-- 작업 상세 모달 -->
+  <div class="modal-overlay" id="workDetailModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">작업 상세</h3>
+        <button class="close-btn" onclick="toggleWorkDetailModal()">×</button>
+      </div>
+
+      <div class="work-detail-info">
+        <div class="work-detail-field">
+          <label>📍 현장</label>
+          <div id="workDetailSite" class="work-detail-value"></div>
+        </div>
+        <div class="work-detail-field">
+          <label>📋 작업</label>
+          <div id="workDetailWork" class="work-detail-value"></div>
+        </div>
+        <div class="work-detail-field">
+          <label>👤 담당자</label>
+          <div id="workDetailAssignee" class="work-detail-value"></div>
+        </div>
+        <div class="work-detail-field">
+          <label>📅 완료 기한</label>
+          <div id="workDetailDeadline" class="work-detail-value"></div>
+        </div>
+        <div class="work-detail-field">
+          <label>📝 현장 특이사항</label>
+          <div id="workDetailSiteNotes" class="work-detail-value"></div>
+        </div>
+      </div>
+
+      <div class="work-detail-memo">
+        <label for="workMemo">작업 메모</label>
+        <textarea id="workMemo" class="task-input" placeholder="이 작업에 대한 메모를 입력하세요&#10;(예: 작업 진행 상황, 특이사항 등)" rows="5" style="resize: vertical; min-height: 100px;"></textarea>
+        <button class="add-btn" onclick="saveWorkMemo()">메모 저장</button>
+      </div>
     </div>
   </div>
 

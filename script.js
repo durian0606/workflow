@@ -3435,6 +3435,17 @@
         title.appendChild(document.createTextNode(' '));
         title.appendChild(warningBadge);
       }
+
+      // 메모가 있으면 아이콘 표시
+      if (work.memo && work.memo.trim()) {
+        const memoIcon = document.createElement('span');
+        memoIcon.className = 'memo-icon';
+        memoIcon.textContent = ' 📝';
+        memoIcon.style.fontSize = '14px';
+        memoIcon.title = '메모 있음';
+        title.appendChild(memoIcon);
+      }
+
       cardBody.appendChild(title);
       
       if (work.work !== '시험' && !work.parentWorkId) {
@@ -3503,6 +3514,16 @@
         completedInfo.appendChild(completedBy);
         cardBody.appendChild(completedInfo);
       }
+
+      // 작업 상세 모달 열기 (클릭 이벤트)
+      cardBody.style.cursor = 'pointer';
+      cardBody.onclick = (e) => {
+        // 완료기한 컨테이너나 시험일자 컨테이너를 클릭한 경우는 제외
+        if (e.target.closest('.deadline-label-container')) {
+          return;
+        }
+        openWorkDetailModal(work);
+      };
 
       card.appendChild(cardBody);
 
@@ -3854,6 +3875,87 @@
       }
     };
 
+    // 작업 상세 모달 관련 변수
+    let currentWorkDetailId = null;
+
+    window.toggleWorkDetailModal = function() {
+      const modal = document.getElementById('workDetailModal');
+      modal.classList.toggle('active');
+      if (!modal.classList.contains('active')) {
+        currentWorkDetailId = null;
+      }
+    };
+
+    window.openWorkDetailModal = function(work) {
+      console.log('📝 작업 상세 모달 열기:', work);
+
+      currentWorkDetailId = work.id;
+
+      // 작업 정보 표시
+      document.getElementById('workDetailSite').textContent = work.site || '없음';
+      document.getElementById('workDetailWork').textContent = work.displayWork || work.work || '없음';
+      document.getElementById('workDetailAssignee').textContent = work.assignee || '미정';
+      document.getElementById('workDetailDeadline').textContent = work.deadline || work.date || '없음';
+
+      // 현장 특이사항 표시
+      const siteNotes = getSiteNotes(work.site);
+      const siteNotesElement = document.getElementById('workDetailSiteNotes');
+      if (siteNotes) {
+        siteNotesElement.textContent = siteNotes;
+        siteNotesElement.style.color = '#333';
+      } else {
+        siteNotesElement.textContent = '없음';
+        siteNotesElement.style.color = '#999';
+      }
+
+      // 작업 메모 불러오기
+      document.getElementById('workMemo').value = work.memo || '';
+
+      // 모달 열기
+      document.getElementById('workDetailModal').classList.add('active');
+    };
+
+    function getSiteNotes(siteName) {
+      if (!siteName) return null;
+      const site = Object.values(sites).find(s => s.name === siteName);
+      return site ? site.notes : null;
+    }
+
+    window.saveWorkMemo = function() {
+      if (!currentWorkDetailId) {
+        showToast('작업 정보를 찾을 수 없습니다.', 'error');
+        return;
+      }
+
+      const memo = document.getElementById('workMemo').value.trim();
+
+      // 팀이 있으면 팀 작업, 없으면 개인 작업
+      let workPath;
+      if (currentTeamId) {
+        workPath = `teams/${currentTeamId}/worklists/${currentWorkDetailId}`;
+      } else {
+        workPath = `companies/${currentCompanyId}/works/${currentWorkDetailId}`;
+      }
+
+      const workRef = window.dbRef(window.db, workPath);
+      window.dbUpdate(workRef, {
+        memo: memo,
+        updatedAt: new Date().toISOString()
+      }).then(() => {
+        showToast('메모가 저장되었습니다.', 'success');
+        // 로컬 데이터도 업데이트
+        if (works[currentWorkDetailId]) {
+          works[currentWorkDetailId].memo = memo;
+        }
+        // 모달 닫기
+        toggleWorkDetailModal();
+        // 작업 목록 다시 렌더링 (메모 아이콘 표시를 위해)
+        renderWorks();
+      }).catch((error) => {
+        showToast('메모 저장 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
+      });
+    };
+
     function renderSiteList() {
       const list = document.getElementById('siteList');
       list.innerHTML = '';
@@ -3868,11 +3970,20 @@
         const name = document.createElement('div');
         name.className = 'site-item-name';
         name.textContent = site.name;
-        
+
+        // 특이사항이 있으면 아이콘 표시
+        if (site.notes && site.notes.trim()) {
+          const noteIcon = document.createElement('span');
+          noteIcon.textContent = ' 📝';
+          noteIcon.style.fontSize = '14px';
+          noteIcon.title = '특이사항 있음';
+          name.appendChild(noteIcon);
+        }
+
         const address = document.createElement('div');
         address.className = 'site-item-address';
         address.textContent = site.address || '주소 없음';
-        
+
         infoDiv.appendChild(name);
         infoDiv.appendChild(address);
         
@@ -3882,7 +3993,7 @@
         const editBtn = document.createElement('button');
         editBtn.className = 'site-item-edit';
         editBtn.textContent = '수정';
-        editBtn.onclick = () => editSite(id, site.name, site.address);
+        editBtn.onclick = () => editSite(id, site.name, site.address, site.notes || '');
         
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'site-item-delete';
@@ -3922,9 +4033,11 @@
     window.saveSite = function() {
       const nameInput = document.getElementById('newSiteName');
       const addressInput = document.getElementById('newSiteAddress');
+      const notesInput = document.getElementById('newSiteNotes');
       const name = nameInput.value.trim();
       const address = addressInput.value.trim();
-      
+      const notes = notesInput.value.trim();
+
       if (!name) {
         showToast('현장명을 입력하세요.', 'warning');
         return;
@@ -3954,6 +4067,7 @@
         window.dbUpdate(siteRef, {
           name: name,
           address: address,
+          notes: notes,
           updatedAt: new Date().toISOString()
         }).then(() => {
           
@@ -4022,10 +4136,12 @@
         window.dbSet(newSiteRef, {
           name: name,
           address: address,
+          notes: notes,
           createdAt: new Date().toISOString()
         }).then(() => {
           nameInput.value = '';
           addressInput.value = '';
+          notesInput.value = '';
           showToast('현장이 추가되었습니다.', 'success');
         }).catch((error) => {
           showToast('현장 추가 중 오류가 발생했습니다: ' + error.message, 'error', 4000);
@@ -4047,35 +4163,37 @@
       window.dbRemove(siteRef);
     }
 
-    window.editSite = function(siteId, siteName, siteAddress) {
+    window.editSite = function(siteId, siteName, siteAddress, siteNotes) {
       console.log('✏️ 현장 수정 시작:', siteId);
-      
+
       currentEditingSiteId = siteId;
-      
+
       document.getElementById('newSiteName').value = siteName;
       document.getElementById('newSiteAddress').value = siteAddress;
-      
+      document.getElementById('newSiteNotes').value = siteNotes || '';
+
       document.getElementById('siteModalTitle').textContent = '현장 수정';
-      
+
       document.getElementById('saveSiteBtn').textContent = '수정 완료';
-      
+
       document.getElementById('cancelEditBtn').style.display = 'block';
-      
+
       document.getElementById('newSiteName').focus();
     };
 
     window.cancelEditSite = function() {
       console.log('❌ 현장 수정 취소');
-      
+
       currentEditingSiteId = null;
-      
+
       document.getElementById('newSiteName').value = '';
       document.getElementById('newSiteAddress').value = '';
-      
+      document.getElementById('newSiteNotes').value = '';
+
       document.getElementById('siteModalTitle').textContent = '현장 추가';
-      
+
       document.getElementById('saveSiteBtn').textContent = '저장';
-      
+
       document.getElementById('cancelEditBtn').style.display = 'none';
     };
     
