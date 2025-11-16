@@ -1759,11 +1759,10 @@
           return;
         }
 
-        // 비밀번호 해시 처리 및 비교
+        // 비밀번호 확인 (평문 비교)
         console.log('🔐 비밀번호 확인 중...');
-        const hashedInputPassword = await hashPassword(password);
 
-        if (userData.password !== hashedInputPassword) {
+        if (userData.password !== password) {
           showToast('비밀번호가 일치하지 않습니다.', 'error');
           return;
         }
@@ -1906,21 +1905,19 @@
           return;
         }
 
-        // 1. 비밀번호 해시 처리
-        console.log('🔐 비밀번호 해시 생성 중...');
-        const hashedPassword = await hashPassword(password);
-        console.log('✅ 비밀번호 해시 생성 완료');
-
-        // 2. 사용자 정보 생성
+        // 1. 사용자 정보 생성
+        console.log('📝 사용자 정보 생성 중...');
         const userInfoRef = window.dbRef(window.db, `users/${userId}/info`);
 
         await window.dbSet(userInfoRef, {
           userId: userId,
           name: userName,
-          password: hashedPassword,
+          password: password, // 평문으로 저장
           currentTeamId: null,
           createdAt: new Date().toISOString()
         });
+
+        console.log('✅ 사용자 정보 생성 완료');
 
         // 2. 개인 작업 목록 초기화
         const personalWorklistsRef = window.dbRef(window.db, `users/${userId}/personalWorklists`);
