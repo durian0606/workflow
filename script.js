@@ -3019,7 +3019,7 @@
       if (myActiveWorks.length > 0) {
         const header = document.createElement('div');
         header.className = 'section-header my-work' + (sectionStates.myActive ? '' : ' collapsed');
-        header.innerHTML = '<span class="section-toggle">▼</span> 📌 내 작업 진행 중 <span style="color: #2a459c; font-weight: 700;">(' + myActiveWorks.length + ')</span>';
+        header.innerHTML = '<span class="section-toggle">▼</span> <i data-lucide="user" style="width: 16px; height: 16px; vertical-align: text-bottom;"></i> 내 작업 진행 중 <span style="color: #2a459c; font-weight: 700;">(' + myActiveWorks.length + ')</span>';
         header.onclick = () => toggleSection('myActive');
         container.appendChild(header);
         const grid = document.createElement('div');
@@ -3044,7 +3044,7 @@
         }
         const header = document.createElement('div');
         header.className = 'section-header' + (sectionStates.teamActive ? '' : ' collapsed');
-        header.innerHTML = '<span class="section-toggle">▼</span> 👥 팀 작업 진행 중 <span style="color: #666; font-weight: 700;">(' + teamActiveWorks.length + ')</span>';
+        header.innerHTML = '<span class="section-toggle">▼</span> <i data-lucide="users" style="width: 16px; height: 16px; vertical-align: text-bottom;"></i> 팀 작업 진행 중 <span style="color: #666; font-weight: 700;">(' + teamActiveWorks.length + ')</span>';
         header.onclick = () => toggleSection('teamActive');
         container.appendChild(header);
         const grid = document.createElement('div');
@@ -3063,7 +3063,7 @@
         }
         const header = document.createElement('div');
         header.className = 'section-header' + (sectionStates.completed ? '' : ' collapsed');
-        header.innerHTML = `<span class="section-toggle">▼</span> ✅ 완료됨 <span style="color: #4caf50; font-weight: 700;">(${completedWorks.length})</span>`;
+        header.innerHTML = `<span class="section-toggle">▼</span> <i data-lucide="check-circle" style="width: 16px; height: 16px; vertical-align: text-bottom;"></i> 완료됨 <span style="color: #4caf50; font-weight: 700;">(${completedWorks.length})</span>`;
         header.onclick = () => toggleSection('completed');
         container.appendChild(header);
         const grid = document.createElement('div');

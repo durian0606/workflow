@@ -429,14 +429,16 @@
   <div class="modal-overlay" id="teamSettingsModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title">⚙️ 팀 설정</h3>
+        <h3 class="modal-title"><i data-lucide="users" style="width: 20px; height: 20px; vertical-align: text-bottom;"></i> 팀 관리</h3>
         <button class="close-btn" onclick="toggleTeamSettingsModal()">×</button>
       </div>
 
       <div style="padding: 10px;">
         <!-- 팀명 수정 -->
         <div class="input-group" style="margin-bottom: 10px;">
-          <label class="input-label" style="margin-bottom: 4px;">팀명</label>
+          <label class="input-label" style="margin-bottom: 4px;">
+            <i data-lucide="edit-3" style="width: 14px; height: 14px; vertical-align: text-bottom;"></i> 팀명
+          </label>
           <div style="display: flex; gap: 6px; align-items: center;">
             <input type="text" class="admin-input" id="editTeamNameInput" placeholder="팀 이름" autocomplete="off" style="padding: 10px 12px; margin-bottom: 0; flex: 1;">
             <button class="admin-btn" onclick="saveTeamSettings()" style="padding: 8px 12px; font-size: 12px; white-space: nowrap; width: auto; flex: 0 0 auto;">
@@ -448,7 +450,7 @@
         <!-- 팀원 목록 -->
         <div style="margin-bottom: 10px;">
           <h4 style="font-size: 13px; color: #666; margin-bottom: 6px; font-weight: 600;">
-            팀원 목록 (<span id="teamMemberCount">0</span>명)
+            <i data-lucide="users" style="width: 14px; height: 14px; vertical-align: text-bottom;"></i> 팀원 목록 (<span id="teamMemberCount">0</span>명)
           </h4>
           <ul class="site-list" id="teamMemberList"></ul>
         </div>
@@ -456,7 +458,7 @@
         <!-- 팀코드 표시 -->
         <div style="margin-bottom: 10px;">
           <h4 style="font-size: 13px; color: #666; margin-bottom: 6px; font-weight: 600;">
-            팀코드
+            <i data-lucide="key" style="width: 14px; height: 14px; vertical-align: text-bottom;"></i> 팀코드
           </h4>
           <div style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%); border: 2px dashed #1976d2; border-radius: 8px; padding: 8px; text-align: center;">
             <div style="font-size: 18px; font-weight: 700; color: #1976d2; letter-spacing: 2px; font-family: 'Courier New', monospace; margin-bottom: 8px;" id="settingsTeamCode">
@@ -476,7 +478,7 @@
         <!-- 팀원 초대 -->
         <div style="margin-bottom: 10px;">
           <h4 style="font-size: 13px; color: #666; margin-bottom: 6px; font-weight: 600;">
-            ID로 팀원 초대
+            <i data-lucide="user-plus" style="width: 14px; height: 14px; vertical-align: text-bottom;"></i> ID로 팀원 초대
           </h4>
           <input type="text" class="admin-input" id="settingsInviteUserIdInput" placeholder="초대할 사용자 ID" autocomplete="off" style="padding: 8px 12px; margin-bottom: 6px;">
           <button class="admin-btn" onclick="inviteByUserIdFromSettings()" style="width: 100%; padding: 8px; font-size: 13px;">
