@@ -3891,12 +3891,30 @@
 
       currentWorkDetailId = work.id;
 
+      // 현장 특이사항 표시
+      const siteNotes = getSiteNotes(work.site);
+      const siteNotesSection = document.getElementById('siteNotesSection');
+      const siteNotesContent = document.getElementById('workDetailSiteNotes');
+
+      if (siteNotes && siteNotes.trim()) {
+        siteNotesContent.textContent = siteNotes;
+        siteNotesSection.style.display = 'block';
+      } else {
+        siteNotesSection.style.display = 'none';
+      }
+
       // 작업 메모 불러오기
       document.getElementById('workMemo').value = work.memo || '';
 
       // 모달 열기
       document.getElementById('workDetailModal').classList.add('active');
     };
+
+    function getSiteNotes(siteName) {
+      if (!siteName) return null;
+      const site = Object.values(sites).find(s => s.name === siteName);
+      return site ? site.notes : null;
+    }
 
     window.saveWorkMemo = function() {
       if (!currentWorkDetailId) {

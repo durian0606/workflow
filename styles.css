@@ -925,10 +925,39 @@
     }
 
     /* 작업 메모 모달 스타일 */
+    .site-notes-section {
+      margin-bottom: 20px;
+      padding: 16px;
+      background: #fff8e1;
+      border-left: 4px solid #ffa726;
+      border-radius: 8px;
+    }
+
+    .site-notes-header {
+      font-size: 14px;
+      font-weight: 600;
+      color: #f57c00;
+      margin-bottom: 8px;
+    }
+
+    .site-notes-content {
+      font-size: 14px;
+      color: #333;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
     .work-detail-memo {
       display: flex;
       flex-direction: column;
       gap: 12px;
+    }
+
+    .work-detail-memo label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
     }
 
     .timeline-item {
