@@ -1471,12 +1471,35 @@
 
         // 1. 사용자 정보 확인
         const userRef = window.dbRef(window.db, `users/${userId}/info`);
+        console.log('📡 Firebase에서 사용자 정보 조회 시작:', `users/${userId}/info`);
+
         const userData = await new Promise((resolve, reject) => {
-          const timeoutId = setTimeout(() => reject(new Error('Timeout')), 15000);
-          window.dbOnValue(userRef, (snapshot) => {
+          const timeoutId = setTimeout(() => {
+            console.error('⏰ 15초 타임아웃 - Firebase 응답 없음. Security Rules를 확인하세요.');
+            reject(new Error('Timeout'));
+          }, 15000);
+
+          let unsubscribe;
+
+          try {
+            unsubscribe = window.dbOnValue(userRef,
+              (snapshot) => {
+                console.log('📨 Firebase 응답 수신:', snapshot.exists() ? '데이터 있음' : '데이터 없음');
+                clearTimeout(timeoutId);
+                if (unsubscribe) unsubscribe();
+                resolve(snapshot.val());
+              },
+              (error) => {
+                console.error('🚫 Firebase 읽기 권한 에러:', error.message);
+                clearTimeout(timeoutId);
+                reject(error);
+              }
+            );
+          } catch (error) {
+            console.error('🚫 Firebase onValue 호출 실패:', error);
             clearTimeout(timeoutId);
-            resolve(snapshot.val());
-          }, { onlyOnce: true });
+            reject(error);
+          }
         });
 
         if (!userData) {
