@@ -3479,20 +3479,19 @@
       if (work.testDate) {
         const dateContainer = document.createElement('div');
         dateContainer.className = 'deadline-label-container';
-        dateContainer.style.cursor = 'pointer';
         dateContainer.onclick = (e) => {
           e.stopPropagation();
           showTimeline(work);
         };
-        
+
         const dateLabel = document.createElement('span');
         dateLabel.className = 'deadline-label-text';
         dateLabel.textContent = '작업등록일자:';
-        
+
         const testDateTag = document.createElement('span');
         testDateTag.className = 'test-date-label';
         testDateTag.textContent = work.testDate;
-        
+
         dateContainer.appendChild(dateLabel);
         dateContainer.appendChild(testDateTag);
         cardBody.appendChild(dateContainer);
