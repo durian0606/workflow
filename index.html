@@ -251,7 +251,7 @@
 
       <!-- 현장 특이사항 표시 -->
       <div class="site-notes-section" id="siteNotesSection" style="display: none;">
-        <div class="site-notes-header">📝 현장 특이사항</div>
+        <div class="site-notes-header"><i data-lucide="sticky-note" style="width: 16px; height: 16px; vertical-align: text-bottom;"></i> 현장 특이사항</div>
         <div class="site-notes-content" id="workDetailSiteNotes"></div>
       </div>
 
@@ -268,7 +268,7 @@
   <div class="modal-overlay" id="companyCodeModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title">🔑 팀코드</h3>
+        <h3 class="modal-title"><i data-lucide="key" style="width: 20px; height: 20px; vertical-align: text-bottom;"></i> 팀코드</h3>
         <button class="close-btn" onclick="toggleCompanyCodeModal()">×</button>
       </div>
       
@@ -285,15 +285,15 @@
         
         <div style="display: flex; gap: 10px; justify-content: center;">
           <button class="admin-btn" id="copyBtn" onclick="copyCompanyCode()" style="flex: 1; max-width: 200px;">
-            📋 복사하기
+            <i data-lucide="clipboard" style="width: 16px; height: 16px; vertical-align: text-bottom;"></i> 복사하기
           </button>
           <button class="admin-btn" onclick="regenerateCompanyCode()" style="flex: 1; max-width: 200px; background: #ff9800;">
-            🔄 코드 재발급
+            <i data-lucide="refresh-cw" style="width: 16px; height: 16px; vertical-align: text-bottom;"></i> 코드 재발급
           </button>
         </div>
         
         <p style="font-size: 12px; color: #999; margin-top: 20px;">
-          💡 코드를 재발급하면 기존 코드는 사용할 수 없습니다
+          <i data-lucide="lightbulb" style="width: 14px; height: 14px; vertical-align: text-bottom;"></i> 코드를 재발급하면 기존 코드는 사용할 수 없습니다
         </p>
       </div>
     </div>
@@ -395,7 +395,7 @@
               ------
             </div>
             <button class="admin-btn" id="copyInviteCodeBtn" onclick="copyTeamCodeForInvite()" style="max-width: 200px;">
-              📋 코드 복사하기
+              <i data-lucide="clipboard" style="width: 16px; height: 16px; vertical-align: text-bottom;"></i> 코드 복사하기
             </button>
           </div>
           <p style="font-size: 12px; color: #999; margin-top: 10px; text-align: center;">
@@ -456,10 +456,10 @@
             </div>
             <div style="display: flex; gap: 6px; justify-content: center;">
               <button class="admin-btn" id="copySettingsCodeBtn" onclick="copyTeamCodeFromSettings()" style="flex: 1; max-width: 140px; padding: 8px; font-size: 13px;">
-                📋 복사
+                <i data-lucide="clipboard" style="width: 14px; height: 14px; vertical-align: text-bottom;"></i> 복사
               </button>
               <button class="admin-btn" onclick="changeTeamCode()" style="flex: 1; max-width: 140px; padding: 8px; font-size: 13px; background: #ff9800;">
-                🔄 변경
+                <i data-lucide="refresh-cw" style="width: 14px; height: 14px; vertical-align: text-bottom;"></i> 변경
               </button>
             </div>
           </div>
@@ -576,7 +576,7 @@
       <div style="padding: 10px 0;">
         <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 12px; margin-bottom: 20px; border-radius: 4px;">
           <p style="font-size: 13px; color: #e65100; line-height: 1.6;">
-            ⚠️ <strong>주의:</strong> 관리자 권한을 이전하면 본인은 일반 직원이 됩니다. 이 작업은 되돌릴 수 없습니다.
+            <i data-lucide="alert-triangle" style="width: 16px; height: 16px; vertical-align: text-bottom;"></i> <strong>주의:</strong> 관리자 권한을 이전하면 본인은 일반 직원이 됩니다. 이 작업은 되돌릴 수 없습니다.
           </p>
         </div>
         

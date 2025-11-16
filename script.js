@@ -246,7 +246,9 @@
                 const li = document.createElement('li');
                 li.className = 'site-item';
 
-                const roleIcon = memberData.role === 'creator' ? '👑 ' : '👤 ';
+                const roleIcon = memberData.role === 'creator'
+                  ? '<i data-lucide="crown" style="width: 16px; height: 16px; vertical-align: text-bottom; color: #ffa726;"></i> '
+                  : '<i data-lucide="user" style="width: 16px; height: 16px; vertical-align: text-bottom;"></i> ';
                 const roleText = '';
 
                 li.innerHTML = `
@@ -3431,7 +3433,7 @@
       if (!isCompleted && work.isOverdue) {
         const warningBadge = document.createElement('span');
         warningBadge.className = 'overdue-warning';
-        warningBadge.textContent = '⚠️ 기한초과';
+        warningBadge.innerHTML = '<i data-lucide="alert-triangle" style="width: 12px; height: 12px; vertical-align: text-bottom;"></i> 기한초과';
         title.appendChild(document.createTextNode(' '));
         title.appendChild(warningBadge);
       }
@@ -3440,8 +3442,7 @@
       if (work.memo && work.memo.trim()) {
         const memoIcon = document.createElement('span');
         memoIcon.className = 'memo-icon';
-        memoIcon.textContent = ' 📝';
-        memoIcon.style.fontSize = '14px';
+        memoIcon.innerHTML = ' <i data-lucide="sticky-note" style="width: 14px; height: 14px; vertical-align: text-bottom;"></i>';
         memoIcon.title = '메모 있음';
         title.appendChild(memoIcon);
       }
@@ -3968,8 +3969,7 @@
         // 특이사항이 있으면 아이콘 표시
         if (site.notes && site.notes.trim()) {
           const noteIcon = document.createElement('span');
-          noteIcon.textContent = ' 📝';
-          noteIcon.style.fontSize = '14px';
+          noteIcon.innerHTML = ' <i data-lucide="sticky-note" style="width: 14px; height: 14px; vertical-align: text-bottom;"></i>';
           noteIcon.title = '특이사항 있음';
           name.appendChild(noteIcon);
         }
