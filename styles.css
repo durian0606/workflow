@@ -1232,6 +1232,27 @@
       animation: pulse 1.5s infinite;
     }
 
+    /* 오늘 마감 - 주황색 */
+    .task-card.due-today {
+      border-left: 4px solid #ff9800;
+      background: #fff3e0;
+    }
+
+    .task-card.due-today .task-title {
+      color: #e65100;
+      font-weight: 600;
+    }
+
+    /* 내일 마감 - 노란색 */
+    .task-card.due-tomorrow {
+      border-left: 4px solid #ffc107;
+      background: #fffde7;
+    }
+
+    .task-card.due-tomorrow .task-title {
+      color: #f57f17;
+    }
+
     @keyframes pulse {
       0%, 100% {
         opacity: 1;
@@ -1271,6 +1292,16 @@
       cursor: pointer;
       pointer-events: auto;
       -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    }
+
+    /* 담당자별 색상 인디케이터 */
+    .assignee-color-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
     }
 
     .loading-overlay {
@@ -1970,5 +2001,277 @@
           transform: translateY(100px);
           opacity: 0;
         }
+      }
+    }
+
+    /* ========================================
+       통계 대시보드 스타일
+       ======================================== */
+
+    .stats-content {
+      padding: 20px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    /* 기간 선택 버튼 */
+    .stats-period-selector {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+
+    .stats-period-btn {
+      flex: 1;
+      max-width: 120px;
+      padding: 10px 16px;
+      border: 2px solid #e0e0e0;
+      background: white;
+      color: #666;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .stats-period-btn:hover {
+      background: #f5f5f5;
+      border-color: #2196f3;
+    }
+
+    .stats-period-btn.active {
+      background: #2196f3;
+      color: white;
+      border-color: #2196f3;
+    }
+
+    /* 요약 카드 그리드 */
+    .stats-summary {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .stats-card {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 18px;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .stats-card-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .stats-card-content {
+      flex: 1;
+    }
+
+    .stats-card-label {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 5px;
+    }
+
+    .stats-card-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #333;
+    }
+
+    /* 통계 섹션 */
+    .stats-section {
+      margin-bottom: 25px;
+      padding: 18px;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+    }
+
+    .stats-section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 완료율 프로그레스 바 */
+    .stats-progress-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .stats-progress-bar {
+      flex: 1;
+      height: 24px;
+      background: #e0e0e0;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .stats-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4caf50, #8bc34a);
+      transition: width 0.5s ease;
+      border-radius: 12px;
+    }
+
+    .stats-progress-label {
+      font-size: 18px;
+      font-weight: 700;
+      color: #4caf50;
+      min-width: 50px;
+      text-align: right;
+    }
+
+    /* 담당자별 통계 리스트 */
+    .stats-assignee-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .stats-assignee-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: #f5f5f5;
+      border-radius: 8px;
+      border-left: 4px solid;
+    }
+
+    .stats-assignee-name {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stats-assignee-color-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .stats-assignee-counts {
+      display: flex;
+      gap: 15px;
+      font-size: 13px;
+    }
+
+    .stats-count {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stats-count-label {
+      color: #666;
+    }
+
+    .stats-count-value {
+      font-weight: 700;
+      color: #333;
+    }
+
+    .stats-count-value.completed {
+      color: #4caf50;
+    }
+
+    .stats-count-value.total {
+      color: #2196f3;
+    }
+
+    /* 현장별 통계 리스트 */
+    .stats-site-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .stats-site-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: #f5f5f5;
+      border-radius: 8px;
+    }
+
+    .stats-site-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      flex: 1;
+    }
+
+    .stats-site-count {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2196f3;
+      min-width: 40px;
+      text-align: right;
+    }
+
+    /* 모바일 반응형 */
+    @media (max-width: 768px) {
+      .stats-content {
+        padding: 15px;
+      }
+
+      .stats-summary {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .stats-card {
+        padding: 15px;
+      }
+
+      .stats-card-icon {
+        width: 45px;
+        height: 45px;
+      }
+
+      .stats-card-value {
+        font-size: 24px;
+      }
+
+      .stats-assignee-counts {
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .stats-period-selector {
+        gap: 8px;
+      }
+
+      .stats-period-btn {
+        padding: 8px 12px;
+        font-size: 13px;
       }
     }

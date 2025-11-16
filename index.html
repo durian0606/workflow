@@ -157,6 +157,10 @@
       <span class="menu-item-icon"><i data-lucide="users"></i></span>
       <span class="menu-item-text">팀 관리 <span id="invitationBadge" style="display: none; background: #f44336; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; margin-left: 5px;"></span></span>
     </div>
+    <div class="menu-item" onclick="toggleStatsModal(); toggleMenu();">
+      <span class="menu-item-icon"><i data-lucide="bar-chart-2"></i></span>
+      <span class="menu-item-text">통계 대시보드</span>
+    </div>
 
     <div class="menu-divider"></div>
     <div class="menu-item" onclick="toggleGuideModal(); toggleMenu();">
@@ -777,6 +781,95 @@
             <div class="guide-tip" style="margin-top: 15px;">
               <i data-lucide="lightbulb" style="width: 16px; height: 16px; vertical-align: text-bottom;"></i> 빠른 응답을 원하시면 카카오톡으로 연락주세요!
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 통계 대시보드 모달 -->
+  <div class="modal-overlay" id="statsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i data-lucide="bar-chart-2" style="width: 20px; height: 20px; vertical-align: text-bottom;"></i> 통계 대시보드</h3>
+        <button class="close-btn" onclick="toggleStatsModal()">×</button>
+      </div>
+
+      <div id="statsContent" class="stats-content">
+        <!-- 통계 기간 선택 -->
+        <div class="stats-period-selector">
+          <button class="stats-period-btn active" onclick="changeStatsPeriod('week')">이번 주</button>
+          <button class="stats-period-btn" onclick="changeStatsPeriod('month')">이번 달</button>
+          <button class="stats-period-btn" onclick="changeStatsPeriod('all')">전체</button>
+        </div>
+
+        <!-- 전체 요약 -->
+        <div class="stats-summary">
+          <div class="stats-card">
+            <div class="stats-card-icon" style="background: #2196f3;">
+              <i data-lucide="clipboard-list" style="width: 24px; height: 24px;"></i>
+            </div>
+            <div class="stats-card-content">
+              <div class="stats-card-label">전체 작업</div>
+              <div class="stats-card-value" id="statsTotalWorks">0</div>
+            </div>
+          </div>
+
+          <div class="stats-card">
+            <div class="stats-card-icon" style="background: #4caf50;">
+              <i data-lucide="check-circle" style="width: 24px; height: 24px;"></i>
+            </div>
+            <div class="stats-card-content">
+              <div class="stats-card-label">완료</div>
+              <div class="stats-card-value" id="statsCompletedWorks">0</div>
+            </div>
+          </div>
+
+          <div class="stats-card">
+            <div class="stats-card-icon" style="background: #ff9800;">
+              <i data-lucide="clock" style="width: 24px; height: 24px;"></i>
+            </div>
+            <div class="stats-card-content">
+              <div class="stats-card-label">진행중</div>
+              <div class="stats-card-value" id="statsInProgressWorks">0</div>
+            </div>
+          </div>
+
+          <div class="stats-card">
+            <div class="stats-card-icon" style="background: #f44336;">
+              <i data-lucide="alert-triangle" style="width: 24px; height: 24px;"></i>
+            </div>
+            <div class="stats-card-content">
+              <div class="stats-card-label">기한 초과</div>
+              <div class="stats-card-value" id="statsOverdueWorks">0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 완료율 -->
+        <div class="stats-section">
+          <h4 class="stats-section-title"><i data-lucide="pie-chart" style="width: 18px; height: 18px; vertical-align: text-bottom;"></i> 작업 완료율</h4>
+          <div class="stats-progress-container">
+            <div class="stats-progress-bar">
+              <div class="stats-progress-fill" id="statsCompletionBar" style="width: 0%;"></div>
+            </div>
+            <div class="stats-progress-label" id="statsCompletionRate">0%</div>
+          </div>
+        </div>
+
+        <!-- 담당자별 통계 -->
+        <div class="stats-section">
+          <h4 class="stats-section-title"><i data-lucide="users" style="width: 18px; height: 18px; vertical-align: text-bottom;"></i> 담당자별 통계</h4>
+          <div id="statsAssigneeList" class="stats-assignee-list">
+            <!-- 동적으로 생성 -->
+          </div>
+        </div>
+
+        <!-- 현장별 통계 -->
+        <div class="stats-section">
+          <h4 class="stats-section-title"><i data-lucide="map-pin" style="width: 18px; height: 18px; vertical-align: text-bottom;"></i> 현장별 작업 수</h4>
+          <div id="statsSiteList" class="stats-site-list">
+            <!-- 동적으로 생성 -->
           </div>
         </div>
       </div>

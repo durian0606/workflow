@@ -1,5 +1,58 @@
     // ========================================
-    // ⭐ Toast 알림 시스템 - 가장 먼저 정의!
+    // ⭐ 유틸리티 함수
+    // ========================================
+
+    /**
+     * SHA-256 해시 생성
+     * @param {string} str - 해시할 문자열
+     * @returns {Promise<string>} - 16진수 해시 문자열
+     */
+    async function hashPassword(str) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(str);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      return hashHex;
+    }
+
+    /**
+     * 담당자별 색상 팔레트 (12가지 구분 가능한 색상)
+     */
+    const ASSIGNEE_COLORS = [
+      '#2196f3', // 파란색
+      '#4caf50', // 초록색
+      '#ff9800', // 주황색
+      '#9c27b0', // 보라색
+      '#f44336', // 빨간색
+      '#00bcd4', // 청록색
+      '#ff5722', // 진한 주황색
+      '#3f51b5', // 남색
+      '#8bc34a', // 연두색
+      '#e91e63', // 분홍색
+      '#009688', // 청록색 (진함)
+      '#673ab7'  // 진보라색
+    ];
+
+    /**
+     * 담당자별 고유 색상 반환
+     * @param {string} assigneeName - 담당자 이름
+     * @returns {string} - 색상 코드 (#xxxxxx)
+     */
+    function getAssigneeColor(assigneeName) {
+      if (!assigneeName) return '#999999'; // 미정인 경우 회색
+
+      // assignees 배열에서 해당 담당자의 인덱스 찾기
+      const index = assignees.findIndex(a => a.name === assigneeName);
+
+      if (index === -1) return '#999999'; // 찾지 못한 경우 회색
+
+      // 색상 팔레트를 순환하여 색상 반환
+      return ASSIGNEE_COLORS[index % ASSIGNEE_COLORS.length];
+    }
+
+    // ========================================
+    // ⭐ Toast 알림 시스템
     // ========================================
 
     /**
@@ -56,7 +109,204 @@
         console.error('❌ guideModal을 찾을 수 없습니다');
       }
     };
-    
+
+    // ========================================
+    // ⭐ 통계 대시보드
+    // ========================================
+
+    let currentStatsPeriod = 'week'; // 'week', 'month', 'all'
+
+    window.toggleStatsModal = function() {
+      console.log('📊 통계 대시보드 모달 토글');
+      const modal = document.getElementById('statsModal');
+      if (modal) {
+        const isOpening = !modal.classList.contains('active');
+        modal.classList.toggle('active');
+
+        if (isOpening) {
+          console.log('✅ 통계 모달 열림 - 데이터 계산 중...');
+          calculateAndRenderStats();
+        }
+
+        console.log(modal.classList.contains('active') ? '✅ 열림' : '✅ 닫힘');
+      } else {
+        console.error('❌ statsModal을 찾을 수 없습니다');
+      }
+    };
+
+    window.changeStatsPeriod = function(period) {
+      console.log('📅 통계 기간 변경:', period);
+      currentStatsPeriod = period;
+
+      // 버튼 활성화 상태 변경
+      document.querySelectorAll('.stats-period-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      // 통계 재계산
+      calculateAndRenderStats();
+    };
+
+    function calculateAndRenderStats() {
+      console.log('📊 통계 계산 시작 - 기간:', currentStatsPeriod);
+
+      // 기간 필터링을 위한 날짜 계산
+      const now = new Date();
+      let startDate = null;
+
+      if (currentStatsPeriod === 'week') {
+        // 이번 주 (월요일부터)
+        const dayOfWeek = now.getDay();
+        const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // 일요일은 -6, 월~토는 1-dayOfWeek
+        startDate = new Date(now);
+        startDate.setDate(now.getDate() + diff);
+        startDate.setHours(0, 0, 0, 0);
+      } else if (currentStatsPeriod === 'month') {
+        // 이번 달 (1일부터)
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      }
+      // 'all'인 경우 startDate는 null로 유지 (필터링 없음)
+
+      const startDateStr = startDate ? startDate.toISOString().split('T')[0] : null;
+      console.log('📅 시작일:', startDateStr || '전체');
+
+      // 통계 객체 초기화
+      const stats = {
+        total: 0,
+        completed: 0,
+        inProgress: 0,
+        overdue: 0,
+        byAssignee: {},
+        bySite: {}
+      };
+
+      // 모든 작업 순회
+      Object.values(works).forEach(work => {
+        // 기간 필터링
+        if (startDateStr && work.date < startDateStr) {
+          return; // 기간 밖의 작업은 제외
+        }
+
+        stats.total++;
+
+        // 완료/진행중 구분
+        if (work.isCompleted) {
+          stats.completed++;
+        } else {
+          stats.inProgress++;
+
+          // 기한 초과 체크
+          const today = new Date().toISOString().split('T')[0];
+          const deadline = work.deadline || work.date;
+          if (deadline < today) {
+            stats.overdue++;
+          }
+        }
+
+        // 담당자별 집계
+        const assignee = work.assignee || '미정';
+        if (!stats.byAssignee[assignee]) {
+          stats.byAssignee[assignee] = { total: 0, completed: 0 };
+        }
+        stats.byAssignee[assignee].total++;
+        if (work.isCompleted) {
+          stats.byAssignee[assignee].completed++;
+        }
+
+        // 현장별 집계
+        const site = work.site || '미정';
+        if (!stats.bySite[site]) {
+          stats.bySite[site] = 0;
+        }
+        stats.bySite[site]++;
+      });
+
+      console.log('📊 통계 계산 완료:', stats);
+
+      // 통계 렌더링
+      renderStats(stats);
+    }
+
+    function renderStats(stats) {
+      // 1. 요약 카드 업데이트
+      document.getElementById('statsTotalWorks').textContent = stats.total;
+      document.getElementById('statsCompletedWorks').textContent = stats.completed;
+      document.getElementById('statsInProgressWorks').textContent = stats.inProgress;
+      document.getElementById('statsOverdueWorks').textContent = stats.overdue;
+
+      // 2. 완료율 계산 및 표시
+      const completionRate = stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
+      document.getElementById('statsCompletionBar').style.width = `${completionRate}%`;
+      document.getElementById('statsCompletionRate').textContent = `${completionRate}%`;
+
+      // 3. 담당자별 통계 렌더링
+      const assigneeListEl = document.getElementById('statsAssigneeList');
+      assigneeListEl.innerHTML = '';
+
+      // 담당자별 통계를 완료 작업 수 기준으로 정렬
+      const assigneeStats = Object.entries(stats.byAssignee).sort((a, b) => b[1].total - a[1].total);
+
+      if (assigneeStats.length === 0) {
+        assigneeListEl.innerHTML = '<div style="color: #999; text-align: center; padding: 20px;">데이터가 없습니다</div>';
+      } else {
+        assigneeStats.forEach(([assignee, data]) => {
+          const item = document.createElement('div');
+          item.className = 'stats-assignee-item';
+
+          const assigneeColor = getAssigneeColor(assignee);
+          item.style.borderLeftColor = assigneeColor;
+
+          item.innerHTML = `
+            <div class="stats-assignee-name">
+              <span class="stats-assignee-color-dot" style="background: ${assigneeColor};"></span>
+              ${assignee}
+            </div>
+            <div class="stats-assignee-counts">
+              <div class="stats-count">
+                <span class="stats-count-label">완료:</span>
+                <span class="stats-count-value completed">${data.completed}</span>
+              </div>
+              <div class="stats-count">
+                <span class="stats-count-label">전체:</span>
+                <span class="stats-count-value total">${data.total}</span>
+              </div>
+            </div>
+          `;
+
+          assigneeListEl.appendChild(item);
+        });
+      }
+
+      // 4. 현장별 통계 렌더링
+      const siteListEl = document.getElementById('statsSiteList');
+      siteListEl.innerHTML = '';
+
+      // 현장별 통계를 작업 수 기준으로 정렬
+      const siteStats = Object.entries(stats.bySite).sort((a, b) => b[1] - a[1]);
+
+      if (siteStats.length === 0) {
+        siteListEl.innerHTML = '<div style="color: #999; text-align: center; padding: 20px;">데이터가 없습니다</div>';
+      } else {
+        siteStats.forEach(([site, count]) => {
+          const item = document.createElement('div');
+          item.className = 'stats-site-item';
+
+          item.innerHTML = `
+            <div class="stats-site-name">${site}</div>
+            <div class="stats-site-count">${count}</div>
+          `;
+
+          siteListEl.appendChild(item);
+        });
+      }
+
+      // Lucide 아이콘 초기화
+      if (window.lucide) lucide.createIcons();
+
+      console.log('✅ 통계 렌더링 완료');
+    }
+
     window.toggleCompanyCodeModal = function() {
       console.log('🔑 팀코드 모달 토글');
       const modal = document.getElementById('companyCodeModal');
@@ -1509,7 +1759,11 @@
           return;
         }
 
-        if (userData.password !== password) {
+        // 비밀번호 해시 처리 및 비교
+        console.log('🔐 비밀번호 확인 중...');
+        const hashedInputPassword = await hashPassword(password);
+
+        if (userData.password !== hashedInputPassword) {
           showToast('비밀번호가 일치하지 않습니다.', 'error');
           return;
         }
@@ -1652,13 +1906,18 @@
           return;
         }
 
-        // 1. 사용자 정보 생성
+        // 1. 비밀번호 해시 처리
+        console.log('🔐 비밀번호 해시 생성 중...');
+        const hashedPassword = await hashPassword(password);
+        console.log('✅ 비밀번호 해시 생성 완료');
+
+        // 2. 사용자 정보 생성
         const userInfoRef = window.dbRef(window.db, `users/${userId}/info`);
 
         await window.dbSet(userInfoRef, {
           userId: userId,
           name: userName,
-          password: password,
+          password: hashedPassword,
           currentTeamId: null,
           createdAt: new Date().toISOString()
         });
@@ -1682,7 +1941,7 @@
         userInfo = {
           userId: userId,
           name: userName,
-          password: password,
+          password: hashedPassword,
           currentTeamId: null,
           createdAt: new Date().toISOString()
         };
@@ -2940,7 +3199,16 @@
         if (shouldShow) {
           const deadline = work.deadline || work.date;
           const isOverdue = deadline < searchDate;
-          
+
+          // 기한 임박 계산
+          const today = new Date(searchDate);
+          const tomorrow = new Date(today);
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+          const isDueToday = deadline === searchDate;
+          const isDueTomorrow = deadline === tomorrowStr;
+
           const otherCompanyInfo = [];
           if (work.site) {
             Object.keys(allCompaniesWorks).forEach(teamId => {
@@ -2989,6 +3257,8 @@
             id: workId,
             displayWork: work.displayWork || work.work,
             isOverdue: isOverdue,
+            isDueToday: isDueToday,
+            isDueTomorrow: isDueTomorrow,
             otherCompanyInfo: otherCompanyInfo
           };
           if (work.assignee && work.assignee === currentUser) {
@@ -3102,10 +3372,24 @@
     function createWorkCard(work, isCompleted) {
       const card = document.createElement('div');
       card.className = 'task-card' + (isCompleted ? ' completed' : '');
-      if (!isCompleted && work.isOverdue) {
-        card.classList.add('overdue');
+
+      // 기한 상태별 스타일 적용
+      if (!isCompleted) {
+        if (work.isOverdue) {
+          card.classList.add('overdue'); // 빨간색
+        } else if (work.isDueToday) {
+          card.classList.add('due-today'); // 주황색
+        } else if (work.isDueTomorrow) {
+          card.classList.add('due-tomorrow'); // 노란색
+        }
       }
-      
+
+      // 담당자별 색상 적용 (오른쪽 테두리)
+      if (work.assignee) {
+        const assigneeColor = getAssigneeColor(work.assignee);
+        card.style.borderRight = `6px solid ${assigneeColor}`;
+      }
+
       if (work.assignee === currentUser && !isCompleted) {
         card.draggable = true;
       } else {
@@ -3552,7 +3836,18 @@
       assigneeWrapper.className = 'select-wrapper';
       const assigneeLabel = document.createElement('label');
       assigneeLabel.className = 'select-label';
-      assigneeLabel.textContent = '담당자';
+
+      // 담당자 색상 인디케이터 추가
+      if (work.assignee) {
+        const colorDot = document.createElement('span');
+        colorDot.className = 'assignee-color-dot';
+        colorDot.style.backgroundColor = getAssigneeColor(work.assignee);
+        assigneeLabel.appendChild(colorDot);
+      }
+
+      const labelText = document.createTextNode('담당자');
+      assigneeLabel.appendChild(labelText);
+
       const assigneeSelect = document.createElement('select');
       assigneeSelect.className = 'assignee-select';
       assigneeSelect.onclick = (e) => e.stopPropagation();
@@ -3788,6 +4083,17 @@
 
       if (isCompleting) {
         updateData.completedDate = new Date().toISOString().split('T')[0];
+
+        // 축하 메시지
+        const congratsMessages = [
+          '수고하셨습니다! 👏',
+          '잘 하셨습니다! 💪',
+          '완료! 다음 작업도 화이팅! 🎉',
+          '멋지네요! ⭐',
+          '오늘도 고생하셨어요! 😊'
+        ];
+        const randomMessage = congratsMessages[Math.floor(Math.random() * congratsMessages.length)];
+        showToast(randomMessage, 'success', 2000);
 
         if (navigator.vibrate) {
           navigator.vibrate(50);
