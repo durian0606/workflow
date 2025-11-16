@@ -1,0 +1,46 @@
+{
+  "rules": {
+    "users": {
+      "$userId": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "companies": {
+      "$companyId": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "teams": {
+      "$teamId": {
+        "info": {
+          ".read": true,
+          ".write": true
+        },
+        "members": {
+          ".read": true,
+          ".write": true
+        },
+        "works": {
+          ".read": true,
+          ".write": true
+        },
+        "sites": {
+          ".read": true,
+          ".write": true
+        }
+      }
+    },
+    "userInvitations": {
+      "$userId": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "teamCodes": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}
