@@ -31,7 +31,7 @@ const CONFIG = {
   // 앱 설정
   app: {
     version: '0.8.4',
-    name: '작업 관리',
+    name: '작업 리스트',
     // 향후 유료화를 위한 설정
     features: {
       freeMaxSites: 5,        // 무료 버전 최대 현장 수
