@@ -39,3 +39,7 @@ yarn-debug.log*
 # 임시 파일
 *.tmp
 .cache/
+
+# Claude 로컬 설정
+.claude/settings.local.json
+.claude/*.backup
