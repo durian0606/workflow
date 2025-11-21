@@ -35,6 +35,9 @@
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232a459c'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='white' font-family='Arial, sans-serif'>📋</text></svg>">
 
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+
   <link rel="stylesheet" href="styles.css?v=Ver.0.9.7">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -123,7 +126,7 @@
         </div>
         <div class="header-right">
           <button class="install-btn" type="button" id="installBtn" onclick="showInstallPrompt()" title="홈 화면에 추가">
-            <span style="font-size: 18px;">📱</span>
+            <i data-lucide="smartphone" style="width: 20px; height: 20px;"></i>
           </button>
           <button class="menu-btn" type="button" id="mainMenuBtn" onclick="toggleMenu()">
             <span class="menu-hamburger">
