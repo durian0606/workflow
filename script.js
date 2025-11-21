@@ -2068,7 +2068,7 @@
         userInfo = {
           userId: userId,
           name: userName,
-          password: hashedPassword,
+          password: password,
           currentTeamId: null,
           createdAt: new Date().toISOString()
         };
