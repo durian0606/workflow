@@ -2243,30 +2243,31 @@
       }
 
       .stats-summary {
-        gap: 8px;
-        padding: 12px 8px;
+        gap: 6px;
+        padding: 12px 6px;
+        flex-wrap: nowrap;
       }
 
       .stats-card {
-        flex: 1 1 calc(50% - 8px);
+        flex: 1 1 25%;
         min-width: 0;
-        max-width: calc(50% - 4px);
-        gap: 6px;
-        padding: 10px 4px;
+        max-width: 25%;
+        gap: 4px;
+        padding: 8px 2px;
       }
 
       .stats-card i,
       .stats-card svg {
-        width: 20px !important;
-        height: 20px !important;
+        width: 18px !important;
+        height: 18px !important;
       }
 
       .stats-card-label {
-        font-size: var(--font-xs);
+        font-size: 10px;
       }
 
       .stats-card-value {
-        font-size: var(--font-xl);
+        font-size: var(--font-lg);
       }
 
       .stats-period-btn {
