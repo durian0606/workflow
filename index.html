@@ -881,102 +881,83 @@
           <!-- 왼쪽: 요약 카드 -->
           <div class="stats-grid-col">
             <div class="stats-summary">
-          <div class="stats-card">
-            <div class="stats-card-icon" style="background: #2196f3;">
-              <i data-lucide="clipboard-list" style="width: 24px; height: 24px;"></i>
+              <div class="stats-card">
+                <i data-lucide="clipboard-list" style="width: 18px; height: 18px; color: #2196f3;"></i>
+                <span class="stats-card-label">전체:</span>
+                <span class="stats-card-value" id="statsTotalWorks">0</span>
+              </div>
+              <div class="stats-card">
+                <i data-lucide="check-circle" style="width: 18px; height: 18px; color: #4caf50;"></i>
+                <span class="stats-card-label">완료:</span>
+                <span class="stats-card-value" id="statsCompletedWorks">0</span>
+              </div>
+              <div class="stats-card">
+                <i data-lucide="clock" style="width: 18px; height: 18px; color: #ff9800;"></i>
+                <span class="stats-card-label">진행중:</span>
+                <span class="stats-card-value" id="statsInProgressWorks">0</span>
+              </div>
+              <div class="stats-card">
+                <i data-lucide="alert-triangle" style="width: 18px; height: 18px; color: #f44336;"></i>
+                <span class="stats-card-label">기한초과:</span>
+                <span class="stats-card-value" id="statsOverdueWorks">0</span>
+              </div>
             </div>
-            <div class="stats-card-content">
-              <div class="stats-card-label">전체 작업</div>
-              <div class="stats-card-value" id="statsTotalWorks">0</div>
-            </div>
-          </div>
-
-          <div class="stats-card">
-            <div class="stats-card-icon" style="background: #4caf50;">
-              <i data-lucide="check-circle" style="width: 24px; height: 24px;"></i>
-            </div>
-            <div class="stats-card-content">
-              <div class="stats-card-label">완료</div>
-              <div class="stats-card-value" id="statsCompletedWorks">0</div>
-            </div>
-          </div>
-
-          <div class="stats-card">
-            <div class="stats-card-icon" style="background: #ff9800;">
-              <i data-lucide="clock" style="width: 24px; height: 24px;"></i>
-            </div>
-            <div class="stats-card-content">
-              <div class="stats-card-label">진행중</div>
-              <div class="stats-card-value" id="statsInProgressWorks">0</div>
-            </div>
-          </div>
-
-          <div class="stats-card">
-            <div class="stats-card-icon" style="background: #f44336;">
-              <i data-lucide="alert-triangle" style="width: 24px; height: 24px;"></i>
-            </div>
-            <div class="stats-card-content">
-              <div class="stats-card-label">기한 초과</div>
-              <div class="stats-card-value" id="statsOverdueWorks">0</div>
-            </div>
-          </div>
-        </div>
           </div>
 
           <!-- 오른쪽: 완료율 -->
           <div class="stats-grid-col">
             <div class="stats-section">
-          <h4 class="stats-section-title"><i data-lucide="pie-chart" style="width: 18px; height: 18px; vertical-align: text-bottom;"></i> 작업 완료율</h4>
-          <div class="stats-completion-container">
-            <!-- 원형 차트 -->
-            <div class="stats-circular-progress">
-              <svg class="stats-circle-svg" viewBox="0 0 120 120">
-                <defs>
-                  <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style="stop-color:#4caf50;stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#8bc34a;stop-opacity:1" />
-                  </linearGradient>
-                </defs>
-                <circle class="stats-circle-bg" cx="60" cy="60" r="52" />
-                <circle class="stats-circle-fill" id="statsCircleFill" cx="60" cy="60" r="52" />
-              </svg>
-              <div class="stats-circle-text">
-                <div class="stats-circle-percent" id="statsCompletionRate">0%</div>
-                <div class="stats-circle-label">완료</div>
+              <h4 class="stats-section-title"><i data-lucide="pie-chart" style="width: 18px; height: 18px; vertical-align: text-bottom;"></i> 작업 완료율</h4>
+              <div class="stats-completion-container">
+                <!-- 원형 차트 -->
+                <div class="stats-circular-progress">
+                  <svg class="stats-circle-svg" viewBox="0 0 120 120">
+                    <defs>
+                      <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#4caf50;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#8bc34a;stop-opacity:1" />
+                      </linearGradient>
+                    </defs>
+                    <circle class="stats-circle-bg" cx="60" cy="60" r="52" />
+                    <circle class="stats-circle-fill" id="statsCircleFill" cx="60" cy="60" r="52" />
+                  </svg>
+                  <div class="stats-circle-text">
+                    <div class="stats-circle-percent" id="statsCompletionRate">0%</div>
+                    <div class="stats-circle-label">완료</div>
+                  </div>
+                </div>
+                <!-- 진행 바 (보조) -->
+                <div class="stats-progress-detail">
+                  <div class="stats-progress-item">
+                    <div class="stats-progress-row">
+                      <span class="stats-progress-name"><i data-lucide="check-circle" style="width: 14px; height: 14px; vertical-align: text-bottom; color: #4caf50;"></i> 완료</span>
+                      <span class="stats-progress-count" id="statsCompletedCount">0개</span>
+                    </div>
+                    <div class="stats-mini-bar">
+                      <div class="stats-mini-fill" id="statsCompletedBar" style="width: 0%; background: #4caf50;"></div>
+                    </div>
+                  </div>
+                  <div class="stats-progress-item">
+                    <div class="stats-progress-row">
+                      <span class="stats-progress-name"><i data-lucide="clock" style="width: 14px; height: 14px; vertical-align: text-bottom; color: #ff9800;"></i> 진행중</span>
+                      <span class="stats-progress-count" id="statsInProgressCount">0개</span>
+                    </div>
+                    <div class="stats-mini-bar">
+                      <div class="stats-mini-fill" id="statsInProgressBar" style="width: 0%; background: #ff9800;"></div>
+                    </div>
+                  </div>
+                  <div class="stats-progress-item">
+                    <div class="stats-progress-row">
+                      <span class="stats-progress-name"><i data-lucide="alert-triangle" style="width: 14px; height: 14px; vertical-align: text-bottom; color: #f44336;"></i> 기한초과</span>
+                      <span class="stats-progress-count" id="statsOverdueCount">0개</span>
+                    </div>
+                    <div class="stats-mini-bar">
+                      <div class="stats-mini-fill" id="statsOverdueBar" style="width: 0%; background: #f44336;"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            <!-- 진행 바 (보조) -->
-            <div class="stats-progress-detail">
-              <div class="stats-progress-item">
-                <div class="stats-progress-row">
-                  <span class="stats-progress-name"><i data-lucide="check-circle" style="width: 14px; height: 14px; vertical-align: text-bottom; color: #4caf50;"></i> 완료</span>
-                  <span class="stats-progress-count" id="statsCompletedCount">0개</span>
-                </div>
-                <div class="stats-mini-bar">
-                  <div class="stats-mini-fill" id="statsCompletedBar" style="width: 0%; background: #4caf50;"></div>
-                </div>
-              </div>
-              <div class="stats-progress-item">
-                <div class="stats-progress-row">
-                  <span class="stats-progress-name"><i data-lucide="clock" style="width: 14px; height: 14px; vertical-align: text-bottom; color: #ff9800;"></i> 진행중</span>
-                  <span class="stats-progress-count" id="statsInProgressCount">0개</span>
-                </div>
-                <div class="stats-mini-bar">
-                  <div class="stats-mini-fill" id="statsInProgressBar" style="width: 0%; background: #ff9800;"></div>
-                </div>
-              </div>
-              <div class="stats-progress-item">
-                <div class="stats-progress-row">
-                  <span class="stats-progress-name"><i data-lucide="alert-triangle" style="width: 14px; height: 14px; vertical-align: text-bottom; color: #f44336;"></i> 기한초과</span>
-                  <span class="stats-progress-count" id="statsOverdueCount">0개</span>
-                </div>
-                <div class="stats-mini-bar">
-                  <div class="stats-mini-fill" id="statsOverdueBar" style="width: 0%; background: #f44336;"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
           </div>
         </div>
 
@@ -985,21 +966,21 @@
           <!-- 왼쪽: 담당자별 통계 -->
           <div class="stats-grid-col">
             <div class="stats-section">
-          <h4 class="stats-section-title"><i data-lucide="users" style="width: 18px; height: 18px; vertical-align: text-bottom;"></i> 담당자별 통계</h4>
-          <div id="statsAssigneeList" class="stats-assignee-list">
-            <!-- 동적으로 생성 -->
-          </div>
-        </div>
+              <h4 class="stats-section-title"><i data-lucide="users" style="width: 18px; height: 18px; vertical-align: text-bottom;"></i> 담당자별 통계</h4>
+              <div id="statsAssigneeList" class="stats-assignee-list">
+                <!-- 동적으로 생성 -->
+              </div>
+            </div>
           </div>
 
           <!-- 오른쪽: 현장별 통계 -->
           <div class="stats-grid-col">
             <div class="stats-section">
-          <h4 class="stats-section-title"><i data-lucide="map-pin" style="width: 18px; height: 18px; vertical-align: text-bottom;"></i> 현장별 작업 수</h4>
-          <div id="statsSiteList" class="stats-site-list">
-            <!-- 동적으로 생성 -->
-          </div>
-        </div>
+              <h4 class="stats-section-title"><i data-lucide="map-pin" style="width: 18px; height: 18px; vertical-align: text-bottom;"></i> 현장별 작업 수</h4>
+              <div id="statsSiteList" class="stats-site-list">
+                <!-- 동적으로 생성 -->
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -2240,6 +2240,29 @@
       .stats-grid-row {
         grid-template-columns: 1fr;
       }
+
+      .stats-summary {
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 12px;
+      }
+
+      .stats-card {
+        flex: 1 1 45%;
+        min-width: 0;
+        gap: 4px;
+        font-size: var(--font-sm);
+      }
+
+      .stats-card-value {
+        font-size: var(--font-base);
+      }
+
+      .stats-period-btn {
+        max-width: 80px;
+        padding: 8px 12px;
+        font-size: var(--font-sm);
+      }
     }
 
     /* 기간 선택 버튼 */
@@ -2291,36 +2314,19 @@
     .stats-card {
       display: flex;
       align-items: center;
-      gap: 8px;
-    }
-
-    .stats-card-icon {
-      width: 20px;
-      height: 20px;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      flex-shrink: 0;
-    }
-
-    .stats-card-content {
-      display: flex;
-      align-items: baseline;
       gap: 6px;
+      font-size: var(--font-base);
     }
 
     .stats-card-label {
-      font-size: var(--font-sm);
       color: #666;
-      white-space: nowrap;
+      font-weight: 500;
     }
 
     .stats-card-value {
-      font-size: var(--font-2xl);
       font-weight: 700;
       color: #333;
+      font-size: var(--font-lg);
     }
 
     /* 통계 섹션 */
