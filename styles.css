@@ -202,7 +202,7 @@
     
     /* 앱 컨테이너 */
     .app-container {
-      display: none !important;
+      display: none;
       min-height: 100vh;
       height: 100vh;
       background: var(--color-bg-primary);
@@ -215,15 +215,15 @@
       bottom: 0;
       overflow-y: auto;
     }
-    
+
     .app-container.active {
-      display: flex !important;
+      display: flex;
       flex-direction: column;
     }
 
     /* 로그인 화면 */
     .login-container {
-      display: flex !important;
+      display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
@@ -1729,14 +1729,14 @@
     .guide-modal-content {
       max-width: 700px;
       max-height: 85vh;
-      background: white !important;
-      overflow-y: auto !important;
+      background: white;
+      overflow-y: auto;
     }
 
     @media (max-width: 768px) {
       .guide-modal-content {
         max-height: 90vh;
-        overflow-y: auto !important;
+        overflow-y: auto;
       }
     }
     
