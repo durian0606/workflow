@@ -2259,9 +2259,33 @@
       }
 
       .stats-period-btn {
-        max-width: 80px;
-        padding: 8px 12px;
-        font-size: var(--font-sm);
+        max-width: 70px;
+        padding: 8px 10px;
+        font-size: var(--font-xs);
+      }
+
+      .stats-section {
+        padding: 12px;
+        margin-bottom: 16px;
+      }
+
+      .stats-completion-container {
+        flex-direction: column;
+        padding: 8px;
+        gap: 12px;
+      }
+
+      .stats-circular-progress {
+        width: 80px;
+        height: 80px;
+      }
+
+      .stats-circle-percent {
+        font-size: var(--font-xl);
+      }
+
+      .stats-progress-detail {
+        width: 100%;
       }
     }
 
@@ -2308,7 +2332,7 @@
       background: white;
       border: 1px solid #e0e0e0;
       border-radius: 10px;
-      margin-bottom: 0;
+      margin-bottom: 20px;
     }
 
     .stats-card {
@@ -2331,7 +2355,7 @@
 
     /* 통계 섹션 */
     .stats-section {
-      margin-bottom: 0; /* 그리드가 관리 */
+      margin-bottom: 20px;
       padding: 14px;
       background: white;
       border: 1px solid #e0e0e0;
