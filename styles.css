@@ -2235,8 +2235,8 @@
       min-width: 0; /* 그리드 오버플로우 방지 */
     }
 
-    /* 모바일에서는 1열로 */
-    @media (max-width: 768px) {
+    /* 모바일 최적화 - 작은 화면에서만 1열 */
+    @media (max-width: 480px) {
       .stats-grid-row {
         grid-template-columns: 1fr;
       }
@@ -2286,18 +2286,18 @@
     .stats-card {
       display: flex;
       align-items: center;
-      gap: 15px;
-      padding: 18px;
+      gap: 10px;
+      padding: 12px 14px;
       background: white;
       border: 1px solid #e0e0e0;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     }
 
     .stats-card-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 10px;
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -2307,34 +2307,35 @@
 
     .stats-card-content {
       flex: 1;
+      min-width: 0; /* 텍스트 오버플로우 방지 */
     }
 
     .stats-card-label {
-      font-size: var(--font-sm);
+      font-size: var(--font-xs);
       color: #666;
-      margin-bottom: 5px;
+      margin-bottom: 2px;
     }
 
     .stats-card-value {
-      font-size: var(--font-3xl);
+      font-size: var(--font-2xl);
       font-weight: 700;
       color: #333;
     }
 
     /* 통계 섹션 */
     .stats-section {
-      margin-bottom: 25px;
-      padding: 18px;
+      margin-bottom: 0; /* 그리드가 관리 */
+      padding: 14px;
       background: white;
       border: 1px solid #e0e0e0;
-      border-radius: 12px;
+      border-radius: 10px;
     }
 
     .stats-section-title {
-      font-size: var(--font-lg);
+      font-size: var(--font-base);
       font-weight: 600;
       color: #333;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -2345,24 +2346,24 @@
     .stats-completion-container {
       display: flex;
       align-items: center;
-      gap: 30px;
-      padding: 20px;
+      gap: 16px;
+      padding: 12px;
       background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
-      border-radius: var(--radius-lg);
+      border-radius: 8px;
     }
 
     /* 원형 차트 */
     .stats-circular-progress {
       position: relative;
-      width: 120px;
-      height: 120px;
+      width: 90px;
+      height: 90px;
       flex-shrink: 0;
     }
 
     .stats-circle-svg {
       transform: rotate(-90deg);
-      width: 120px;
-      height: 120px;
+      width: 90px;
+      height: 90px;
     }
 
     .stats-circle-bg {
@@ -2390,16 +2391,16 @@
     }
 
     .stats-circle-percent {
-      font-size: 28px;
+      font-size: 22px;
       font-weight: 700;
       color: var(--color-primary);
       line-height: 1;
     }
 
     .stats-circle-label {
-      font-size: var(--font-sm);
+      font-size: var(--font-xs);
       color: #666;
-      margin-top: 4px;
+      margin-top: 2px;
     }
 
     /* 진행 바 상세 */
