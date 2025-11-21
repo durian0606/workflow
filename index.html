@@ -853,6 +853,7 @@
               <i data-lucide="lightbulb" style="width: 16px; height: 16px; vertical-align: text-bottom;"></i> 빠른 응답을 원하시면 카카오톡으로 연락주세요!
             </div>
           </div>
+          </div>
         </div>
       </div>
     </div>
@@ -874,8 +875,11 @@
           <button class="stats-period-btn" onclick="changeStatsPeriod('all')">전체</button>
         </div>
 
-        <!-- 전체 요약 -->
-        <div class="stats-summary">
+        <!-- 상단 2열 레이아웃 -->
+        <div class="stats-grid-row">
+          <!-- 왼쪽: 요약 카드 -->
+          <div class="stats-grid-col">
+            <div class="stats-summary">
           <div class="stats-card">
             <div class="stats-card-icon" style="background: #2196f3;">
               <i data-lucide="clipboard-list" style="width: 24px; height: 24px;"></i>
@@ -916,9 +920,11 @@
             </div>
           </div>
         </div>
+          </div>
 
-        <!-- 완료율 -->
-        <div class="stats-section">
+          <!-- 오른쪽: 완료율 -->
+          <div class="stats-grid-col">
+            <div class="stats-section">
           <h4 class="stats-section-title"><i data-lucide="pie-chart" style="width: 18px; height: 18px; vertical-align: text-bottom;"></i> 작업 완료율</h4>
           <div class="stats-completion-container">
             <!-- 원형 차트 -->
@@ -970,20 +976,29 @@
             </div>
           </div>
         </div>
+          </div>
+        </div>
 
-        <!-- 담당자별 통계 -->
-        <div class="stats-section">
+        <!-- 하단 2열 레이아웃 -->
+        <div class="stats-grid-row">
+          <!-- 왼쪽: 담당자별 통계 -->
+          <div class="stats-grid-col">
+            <div class="stats-section">
           <h4 class="stats-section-title"><i data-lucide="users" style="width: 18px; height: 18px; vertical-align: text-bottom;"></i> 담당자별 통계</h4>
           <div id="statsAssigneeList" class="stats-assignee-list">
             <!-- 동적으로 생성 -->
           </div>
         </div>
+          </div>
 
-        <!-- 현장별 통계 -->
-        <div class="stats-section">
+          <!-- 오른쪽: 현장별 통계 -->
+          <div class="stats-grid-col">
+            <div class="stats-section">
           <h4 class="stats-section-title"><i data-lucide="map-pin" style="width: 18px; height: 18px; vertical-align: text-bottom;"></i> 현장별 작업 수</h4>
           <div id="statsSiteList" class="stats-site-list">
             <!-- 동적으로 생성 -->
+          </div>
+        </div>
           </div>
         </div>
       </div>
