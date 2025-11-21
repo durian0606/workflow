@@ -923,11 +923,54 @@
         <!-- 완료율 -->
         <div class="stats-section">
           <h4 class="stats-section-title"><i data-lucide="pie-chart" style="width: 18px; height: 18px; vertical-align: text-bottom;"></i> 작업 완료율</h4>
-          <div class="stats-progress-container">
-            <div class="stats-progress-bar">
-              <div class="stats-progress-fill" id="statsCompletionBar" style="width: 0%;"></div>
+          <div class="stats-completion-container">
+            <!-- 원형 차트 -->
+            <div class="stats-circular-progress">
+              <svg class="stats-circle-svg" viewBox="0 0 120 120">
+                <defs>
+                  <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#4caf50;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#8bc34a;stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                <circle class="stats-circle-bg" cx="60" cy="60" r="52" />
+                <circle class="stats-circle-fill" id="statsCircleFill" cx="60" cy="60" r="52" />
+              </svg>
+              <div class="stats-circle-text">
+                <div class="stats-circle-percent" id="statsCompletionRate">0%</div>
+                <div class="stats-circle-label">완료</div>
+              </div>
             </div>
-            <div class="stats-progress-label" id="statsCompletionRate">0%</div>
+            <!-- 진행 바 (보조) -->
+            <div class="stats-progress-detail">
+              <div class="stats-progress-item">
+                <div class="stats-progress-row">
+                  <span class="stats-progress-name"><i data-lucide="check-circle" style="width: 14px; height: 14px; vertical-align: text-bottom; color: #4caf50;"></i> 완료</span>
+                  <span class="stats-progress-count" id="statsCompletedCount">0개</span>
+                </div>
+                <div class="stats-mini-bar">
+                  <div class="stats-mini-fill" id="statsCompletedBar" style="width: 0%; background: #4caf50;"></div>
+                </div>
+              </div>
+              <div class="stats-progress-item">
+                <div class="stats-progress-row">
+                  <span class="stats-progress-name"><i data-lucide="clock" style="width: 14px; height: 14px; vertical-align: text-bottom; color: #ff9800;"></i> 진행중</span>
+                  <span class="stats-progress-count" id="statsInProgressCount">0개</span>
+                </div>
+                <div class="stats-mini-bar">
+                  <div class="stats-mini-fill" id="statsInProgressBar" style="width: 0%; background: #ff9800;"></div>
+                </div>
+              </div>
+              <div class="stats-progress-item">
+                <div class="stats-progress-row">
+                  <span class="stats-progress-name"><i data-lucide="alert-triangle" style="width: 14px; height: 14px; vertical-align: text-bottom; color: #f44336;"></i> 기한초과</span>
+                  <span class="stats-progress-count" id="statsOverdueCount">0개</span>
+                </div>
+                <div class="stats-mini-bar">
+                  <div class="stats-mini-fill" id="statsOverdueBar" style="width: 0%; background: #f44336;"></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

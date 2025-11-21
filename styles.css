@@ -2322,34 +2322,112 @@
     }
 
     /* 완료율 프로그레스 바 */
-    .stats-progress-container {
+    /* 완료율 컨테이너 */
+    .stats-completion-container {
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: 30px;
+      padding: 20px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+      border-radius: var(--radius-lg);
     }
 
-    .stats-progress-bar {
-      flex: 1;
-      height: 24px;
-      background: #e0e0e0;
-      border-radius: 12px;
-      overflow: hidden;
+    /* 원형 차트 */
+    .stats-circular-progress {
       position: relative;
+      width: 120px;
+      height: 120px;
+      flex-shrink: 0;
     }
 
-    .stats-progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #4caf50, #8bc34a);
-      transition: width 0.5s ease;
-      border-radius: 12px;
+    .stats-circle-svg {
+      transform: rotate(-90deg);
+      width: 120px;
+      height: 120px;
     }
 
-    .stats-progress-label {
-      font-size: var(--font-xl);
+    .stats-circle-bg {
+      fill: none;
+      stroke: #e0e0e0;
+      stroke-width: 8;
+    }
+
+    .stats-circle-fill {
+      fill: none;
+      stroke: url(#gradient);
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 326.7;
+      stroke-dashoffset: 326.7;
+      transition: stroke-dashoffset 1s ease;
+    }
+
+    .stats-circle-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .stats-circle-percent {
+      font-size: 28px;
       font-weight: 700;
-      color: #4caf50;
-      min-width: 50px;
-      text-align: right;
+      color: var(--color-primary);
+      line-height: 1;
+    }
+
+    .stats-circle-label {
+      font-size: var(--font-sm);
+      color: #666;
+      margin-top: 4px;
+    }
+
+    /* 진행 바 상세 */
+    .stats-progress-detail {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .stats-progress-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .stats-progress-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stats-progress-name {
+      font-size: var(--font-sm);
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stats-progress-count {
+      font-size: var(--font-sm);
+      font-weight: 600;
+      color: #333;
+    }
+
+    .stats-mini-bar {
+      height: 6px;
+      background: #e0e0e0;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .stats-mini-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.5s ease;
     }
 
     /* 담당자별 통계 리스트 */

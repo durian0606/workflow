@@ -369,8 +369,31 @@
 
       // 2. 완료율 계산 및 표시
       const completionRate = stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
-      document.getElementById('statsCompletionBar').style.width = `${completionRate}%`;
+
+      // 원형 차트 업데이트
+      const circle = document.getElementById('statsCircleFill');
+      const circumference = 326.7; // 2 * PI * 52
+      const offset = circumference - (completionRate / 100) * circumference;
+      if (circle) {
+        circle.style.strokeDashoffset = offset;
+      }
+
+      // 완료율 퍼센트 표시
       document.getElementById('statsCompletionRate').textContent = `${completionRate}%`;
+
+      // 진행 바 상세 업데이트
+      const total = stats.total || 1; // 0으로 나누기 방지
+      const completedPercent = Math.round((stats.completed / total) * 100);
+      const inProgressPercent = Math.round((stats.inProgress / total) * 100);
+      const overduePercent = Math.round((stats.overdue / total) * 100);
+
+      document.getElementById('statsCompletedCount').textContent = `${stats.completed}개`;
+      document.getElementById('statsInProgressCount').textContent = `${stats.inProgress}개`;
+      document.getElementById('statsOverdueCount').textContent = `${stats.overdue}개`;
+
+      document.getElementById('statsCompletedBar').style.width = `${completedPercent}%`;
+      document.getElementById('statsInProgressBar').style.width = `${inProgressPercent}%`;
+      document.getElementById('statsOverdueBar').style.width = `${overduePercent}%`;
 
       // 3. 담당자별 통계 렌더링
       const assigneeListEl = document.getElementById('statsAssigneeList');
