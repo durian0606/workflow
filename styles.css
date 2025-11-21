@@ -191,7 +191,7 @@
       }
 
       .login-title {
-        font-size: 24px;
+        font-size: var(--font-2xl);
         margin-bottom: 20px;
       }
 
@@ -200,7 +200,7 @@
       }
 
       .input-hint {
-        font-size: 11px;
+        font-size: var(--font-sm);
         margin-top: 4px;
       }
 
@@ -228,7 +228,7 @@
       padding: 12px 14px;
       border: 2px solid #e0e0e0;
       border-radius: 8px;
-      font-size: 14px;
+      font-size: var(--font-base);
       margin-bottom: 10px;
     }
 
@@ -261,14 +261,14 @@
 
     .input-label {
       display: block;
-      font-size: 13px;
+      font-size: var(--font-sm);
       font-weight: 600;
       color: #333;
       margin-bottom: 8px;
     }
 
     .input-hint {
-      font-size: 12px;
+      font-size: var(--font-sm);
       color: #999;
       margin-top: 6px;
     }
@@ -286,7 +286,7 @@
       align-items: center;
       margin: 24px 0;
       color: #999;
-      font-size: 13px;
+      font-size: var(--font-sm);
     }
 
     .divider::before,
@@ -307,7 +307,7 @@
       color: #2a459c;
       border: 2px solid #2a459c;
       border-radius: 8px;
-      font-size: 14px;
+      font-size: var(--font-base);
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
@@ -324,7 +324,7 @@
       padding: 8px 16px;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: var(--font-base);
       margin-bottom: 20px;
       transition: background 0.2s;
     }
@@ -345,11 +345,11 @@
     }
 
     .company-badge-icon {
-      font-size: 18px;
+      font-size: var(--font-xl);
     }
 
     .company-badge-name {
-      font-size: 14px;
+      font-size: var(--font-base);
       font-weight: 600;
       color: #2a459c;
     }
@@ -375,7 +375,7 @@
     }
 
     .checkbox-text {
-      font-size: 14px;
+      font-size: var(--font-base);
       color: #666;
       font-weight: 500;
     }
@@ -418,7 +418,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      font-size: 18px;
+      font-size: var(--font-xl);
     }
 
     .header-info {
@@ -427,12 +427,12 @@
     }
 
     .app-title {
-      font-size: 18px;
+      font-size: var(--font-xl);
       font-weight: 600;
     }
 
     .user-name {
-      font-size: 13px;
+      font-size: var(--font-sm);
       opacity: 0.9;
     }
 
@@ -443,7 +443,7 @@
       padding: 8px 16px;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: var(--font-base);
       transition: background 0.2s;
     }
 
@@ -464,7 +464,7 @@
     }
 
     .date-display {
-      font-size: 15px;
+      font-size: var(--font-md);
       font-weight: 600;
       color: white;
       flex: 1;
@@ -482,7 +482,7 @@
       padding: 8px 16px;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: var(--font-base);
       font-weight: 500;
       transition: background 0.2s;
       white-space: nowrap;
@@ -514,7 +514,7 @@
       padding: 14px 16px;
       border: 2px solid #e0e0e0;
       border-radius: 8px;
-      font-size: 15px;
+      font-size: var(--font-md);
       transition: border 0.2s;
     }
 
@@ -530,7 +530,7 @@
       padding: 14px 20px;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: var(--font-base);
       font-weight: 500;
       white-space: nowrap;
       transition: all 0.2s;
@@ -548,7 +548,7 @@
       padding: 14px 24px;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: var(--font-base);
       font-weight: 500;
       white-space: nowrap;
       transition: all 0.2s;
@@ -623,7 +623,7 @@
       border: 1px solid #ffb74d;
       padding: 4px 6px;
       border-radius: 4px;
-      font-size: 10px;
+      font-size: var(--font-xs);
       color: #f57c00;
       font-weight: 500;
       line-height: 1.2;
@@ -635,7 +635,7 @@
     }
 
     .other-company-assignee {
-      font-size: 9px;
+      font-size: var(--font-xs);
       opacity: 0.85;
       white-space: nowrap;
     }
@@ -682,7 +682,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      font-size: 10px;
+      font-size: var(--font-xs);
       flex-shrink: 0;
     }
     
@@ -726,7 +726,7 @@
       position: absolute;
       color: white;
       font-weight: bold;
-      font-size: 12px;
+      font-size: var(--font-sm);
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -743,7 +743,7 @@
     }
 
     .task-title {
-      font-size: 14px;
+      font-size: var(--font-base);
       font-weight: 500;
       color: #333;
       line-height: 1.3;
@@ -766,7 +766,7 @@
     }
 
     .select-label {
-      font-size: 9px;
+      font-size: var(--font-xs);
       color: #999;
       font-weight: 500;
     }
@@ -775,7 +775,7 @@
       padding: 3px 6px;
       border: 1.5px solid #e0e0e0;
       border-radius: 6px;
-      font-size: 11px;
+      font-size: var(--font-sm);
       background: white;
       cursor: pointer;
       transition: border 0.2s;
@@ -799,7 +799,7 @@
       border-top-right-radius: 8px;
       border-bottom-right-radius: 8px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: var(--font-lg);
       transition: all 0.3s ease;
       flex-shrink: 0;
       position: absolute;
@@ -836,7 +836,7 @@
     }
 
     .map-section-title {
-      font-size: 16px;
+      font-size: var(--font-lg);
       font-weight: 600;
       color: #333;
       display: flex;
@@ -845,7 +845,7 @@
     }
 
     .route-info {
-      font-size: 12px;
+      font-size: var(--font-sm);
       color: #2a459c;
       font-weight: 600;
       background: rgba(42, 69, 156, 0.1);
@@ -854,7 +854,7 @@
     }
 
     .section-header {
-      font-size: 15px;
+      font-size: var(--font-md);
       font-weight: 600;
       color: #333;
       margin-bottom: 12px;
@@ -878,7 +878,7 @@
 
     .section-toggle {
       margin-right: 8px;
-      font-size: 14px;
+      font-size: var(--font-base);
       transition: transform 0.3s;
     }
 
@@ -926,7 +926,7 @@
       padding: 10px 16px;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 13px;
+      font-size: var(--font-sm);
       font-weight: 500;
       transition: all 0.2s;
     }
@@ -993,7 +993,7 @@
     }
 
     .modal-title {
-      font-size: 18px;
+      font-size: var(--font-xl);
       font-weight: 600;
       color: #333;
     }
@@ -1001,7 +1001,7 @@
     .close-btn {
       background: none;
       border: none;
-      font-size: 24px;
+      font-size: var(--font-2xl);
       color: #999;
       cursor: pointer;
       padding: 0;
@@ -1019,14 +1019,14 @@
     }
 
     .site-notes-header {
-      font-size: 14px;
+      font-size: var(--font-base);
       font-weight: 600;
       color: #f57c00;
       margin-bottom: 8px;
     }
 
     .site-notes-content {
-      font-size: 14px;
+      font-size: var(--font-base);
       color: #333;
       line-height: 1.5;
       white-space: pre-wrap;
@@ -1040,7 +1040,7 @@
     }
 
     .work-detail-memo label {
-      font-size: 14px;
+      font-size: var(--font-base);
       font-weight: 600;
       color: #333;
     }
@@ -1061,13 +1061,13 @@
     }
 
     .timeline-work {
-      font-size: 15px;
+      font-size: var(--font-md);
       color: #333;
       font-weight: 500;
     }
 
     .timeline-date {
-      font-size: 13px;
+      font-size: var(--font-sm);
       color: #666;
     }
 
@@ -1100,13 +1100,13 @@
     }
 
     .site-item-name {
-      font-size: 14px;
+      font-size: var(--font-base);
       color: #333;
       font-weight: 600;
     }
 
     .site-item-address {
-      font-size: 12px;
+      font-size: var(--font-sm);
       color: #666;
     }
 
@@ -1121,7 +1121,7 @@
       color: #1976d2;
       padding: 4px 10px;
       border-radius: 4px;
-      font-size: 12px;
+      font-size: var(--font-sm);
       cursor: pointer;
       transition: background 0.2s;
     }
@@ -1136,7 +1136,7 @@
       color: #d13438;
       padding: 4px 10px;
       border-radius: 4px;
-      font-size: 12px;
+      font-size: var(--font-sm);
       cursor: pointer;
       transition: background 0.2s;
     }
@@ -1172,7 +1172,7 @@
     }
 
     .deadline-modal-header {
-      font-size: 18px;
+      font-size: var(--font-xl);
       font-weight: 600;
       color: #333;
       margin-bottom: 20px;
@@ -1192,7 +1192,7 @@
       cursor: pointer;
       transition: all 0.2s;
       text-align: left;
-      font-size: 15px;
+      font-size: var(--font-md);
     }
 
     .deadline-option:hover {
@@ -1207,7 +1207,7 @@
     }
 
     .deadline-option-date {
-      font-size: 13px;
+      font-size: var(--font-sm);
       opacity: 0.7;
       margin-top: 4px;
     }
@@ -1223,7 +1223,7 @@
       padding: 12px;
       border: 2px solid #e0e0e0;
       border-radius: 8px;
-      font-size: 14px;
+      font-size: var(--font-base);
     }
 
     .deadline-date-input:focus {
@@ -1238,7 +1238,7 @@
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: var(--font-base);
       font-weight: 500;
     }
 
@@ -1258,7 +1258,7 @@
     }
 
     .deadline-label-text {
-      font-size: 10px;
+      font-size: var(--font-xs);
       color: #666;
       white-space: nowrap;
       cursor: pointer;
@@ -1272,7 +1272,7 @@
       background: #e3f2fd;
       color: #1976d2;
       border-radius: 3px;
-      font-size: 10px;
+      font-size: var(--font-xs);
       font-weight: 500;
       white-space: nowrap;
       line-height: 1.2;
@@ -1295,7 +1295,7 @@
     }
 
     .site-list-title {
-      font-size: 14px;
+      font-size: var(--font-base);
       color: #666;
       margin-bottom: 12px;
       font-weight: 600;
@@ -1354,13 +1354,13 @@
       background: #f44336;
       color: white;
       border-radius: 3px;
-      font-size: 10px;
+      font-size: var(--font-xs);
       font-weight: 600;
       animation: pulse 1.5s infinite;
     }
 
     .date-label {
-      font-size: 11px;
+      font-size: var(--font-sm);
       color: #666;
       margin-right: 4px;
     }
@@ -1371,7 +1371,7 @@
       background: #fff3e0;
       color: #f57c00;
       border-radius: 3px;
-      font-size: 10px;
+      font-size: var(--font-xs);
       font-weight: 500;
       white-space: nowrap;
       cursor: pointer;
@@ -1433,7 +1433,7 @@
     }
 
     .loading-text {
-      font-size: 14px;
+      font-size: var(--font-base);
       color: #666;
     }
 
@@ -1594,7 +1594,7 @@
     }
     
     .menu-item-text {
-      font-size: 15px;
+      font-size: var(--font-md);
       font-weight: 500;
       color: #333;
       flex: 1;
@@ -1668,7 +1668,7 @@
     }
     
     .guide-section-title {
-      font-size: 18px;
+      font-size: var(--font-xl);
       font-weight: 700;
       color: #2a459c;
       margin-bottom: 16px;
@@ -1694,7 +1694,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 14px;
+      font-size: var(--font-base);
       flex-shrink: 0;
     }
 
@@ -1703,14 +1703,14 @@
     }
 
     .guide-step-content h4 {
-      font-size: 16px;
+      font-size: var(--font-lg);
       font-weight: 600;
       color: #333;
       margin-bottom: 8px;
     }
 
     .guide-step-content p {
-      font-size: 14px;
+      font-size: var(--font-base);
       line-height: 1.6;
       color: #666;
       margin-bottom: 8px;
@@ -1723,7 +1723,7 @@
     }
     
     .guide-list li {
-      font-size: 14px;
+      font-size: var(--font-base);
       color: #666;
       margin-bottom: 6px;
       line-height: 1.5;
@@ -1735,7 +1735,7 @@
       padding: 10px 12px;
       margin-top: 12px;
       margin-left: 8px;
-      font-size: 13px;
+      font-size: var(--font-sm);
       color: #1565C0;
       border-radius: 4px;
     }
@@ -1746,7 +1746,7 @@
       padding: 10px 12px;
       margin-top: 12px;
       margin-left: 8px;
-      font-size: 13px;
+      font-size: var(--font-sm);
       color: #e65100;
       border-radius: 4px;
     }
@@ -1773,7 +1773,7 @@
     }
     
     .guide-tip-item span:last-child {
-      font-size: 14px;
+      font-size: var(--font-base);
       line-height: 1.6;
       color: #666;
     }
@@ -1786,7 +1786,7 @@
     }
     
     .guide-contact p {
-      font-size: 14px;
+      font-size: var(--font-base);
       color: #666;
       margin-bottom: 16px;
       line-height: 1.6;
@@ -1802,12 +1802,12 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 14px;
+      font-size: var(--font-base);
       color: #333;
     }
     
     .contact-icon {
-      font-size: 18px;
+      font-size: var(--font-xl);
       width: 28px;
       display: flex;
       align-items: center;
@@ -1869,7 +1869,7 @@
       }
     
       .menu-item-text {
-        font-size: 14px;
+        font-size: var(--font-base);
       }
 
       .guide-modal-content {
@@ -1878,7 +1878,7 @@
       }
     
       .guide-section-title {
-        font-size: 16px;
+        font-size: var(--font-lg);
       }
     
       .guide-step {
@@ -1888,15 +1888,15 @@
       .guide-step-number {
         width: 28px;
         height: 28px;
-        font-size: 13px;
+        font-size: var(--font-sm);
       }
     
       .guide-step-content h4 {
-        font-size: 15px;
+        font-size: var(--font-md);
       }
     
       .guide-step-content p {
-        font-size: 13px;
+        font-size: var(--font-sm);
       }
 
       .task-card {
@@ -1926,7 +1926,7 @@
         width: 32px;
         height: 32px;
         border-radius: 6px;
-        font-size: 14px;
+        font-size: var(--font-base);
       }
     }
 
@@ -1956,7 +1956,7 @@
       gap: 12px;
       pointer-events: auto;
       animation: toastSlideIn 0.3s ease-out;
-      font-size: 14px;
+      font-size: var(--font-base);
       line-height: 1.5;
     }
 
@@ -1985,7 +1985,7 @@
       background: none;
       cursor: pointer;
       opacity: 0.5;
-      font-size: 18px;
+      font-size: var(--font-xl);
       line-height: 1;
       padding: 0;
       color: inherit;
@@ -2116,7 +2116,7 @@
       color: #666;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: var(--font-base);
       font-weight: 600;
       transition: all 0.2s;
     }
@@ -2167,13 +2167,13 @@
     }
 
     .stats-card-label {
-      font-size: 13px;
+      font-size: var(--font-sm);
       color: #666;
       margin-bottom: 5px;
     }
 
     .stats-card-value {
-      font-size: 28px;
+      font-size: var(--font-3xl);
       font-weight: 700;
       color: #333;
     }
@@ -2188,7 +2188,7 @@
     }
 
     .stats-section-title {
-      font-size: 16px;
+      font-size: var(--font-lg);
       font-weight: 600;
       color: #333;
       margin-bottom: 15px;
@@ -2221,7 +2221,7 @@
     }
 
     .stats-progress-label {
-      font-size: 18px;
+      font-size: var(--font-xl);
       font-weight: 700;
       color: #4caf50;
       min-width: 50px;
@@ -2247,7 +2247,7 @@
 
     .stats-assignee-name {
       flex: 1;
-      font-size: 14px;
+      font-size: var(--font-base);
       font-weight: 600;
       color: #333;
       display: flex;
@@ -2265,7 +2265,7 @@
     .stats-assignee-counts {
       display: flex;
       gap: 15px;
-      font-size: 13px;
+      font-size: var(--font-sm);
     }
 
     .stats-count {
@@ -2308,14 +2308,14 @@
     }
 
     .stats-site-name {
-      font-size: 14px;
+      font-size: var(--font-base);
       font-weight: 600;
       color: #333;
       flex: 1;
     }
 
     .stats-site-count {
-      font-size: 16px;
+      font-size: var(--font-lg);
       font-weight: 700;
       color: #2196f3;
       min-width: 40px;
@@ -2343,7 +2343,7 @@
       }
 
       .stats-card-value {
-        font-size: 24px;
+        font-size: var(--font-2xl);
       }
 
       .stats-assignee-counts {
@@ -2357,6 +2357,6 @@
 
       .stats-period-btn {
         padding: 8px 12px;
-        font-size: 13px;
+        font-size: var(--font-sm);
       }
     }
