@@ -3,6 +3,79 @@
     // ========================================
 
     /**
+     * 성능 최적화: 디바운스 (Debounce)
+     * 연속된 이벤트를 하나로 그룹화하여 마지막 호출만 실행
+     * @param {Function} func - 실행할 함수
+     * @param {number} wait - 대기 시간 (ms)
+     * @returns {Function} - 디바운스된 함수
+     */
+    function debounce(func, wait = 300) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    /**
+     * 성능 최적화: 쓰로틀 (Throttle)
+     * 일정 시간마다 최대 한 번만 함수 실행
+     * @param {Function} func - 실행할 함수
+     * @param {number} limit - 제한 시간 (ms)
+     * @returns {Function} - 쓰로틀된 함수
+     */
+    function throttle(func, limit = 300) {
+      let inThrottle;
+      return function executedFunction(...args) {
+        if (!inThrottle) {
+          func(...args);
+          inThrottle = true;
+          setTimeout(() => inThrottle = false, limit);
+        }
+      };
+    }
+
+    /**
+     * 성능 최적화: DOM 요소 캐싱
+     * 자주 사용하는 DOM 요소를 캐시하여 성능 향상
+     */
+    const DOM = {
+      cache: {},
+      get(selector) {
+        if (!this.cache[selector]) {
+          this.cache[selector] = document.querySelector(selector) || document.getElementById(selector);
+        }
+        return this.cache[selector];
+      },
+      clear() {
+        this.cache = {};
+      }
+    };
+
+    /**
+     * 성능 최적화: 메모이제이션 (Memoization)
+     * 함수 결과를 캐시하여 동일한 입력에 대해 재계산 방지
+     * @param {Function} func - 메모이제이션할 함수
+     * @returns {Function} - 메모이제이션된 함수
+     */
+    function memoize(func) {
+      const cache = new Map();
+      return function(...args) {
+        const key = JSON.stringify(args);
+        if (cache.has(key)) {
+          return cache.get(key);
+        }
+        const result = func.apply(this, args);
+        cache.set(key, result);
+        return result;
+      };
+    }
+
+    /**
      * SHA-256 해시 생성
      * @param {string} str - 해시할 문자열
      * @returns {Promise<string>} - 16진수 해시 문자열
@@ -35,11 +108,11 @@
     ];
 
     /**
-     * 담당자별 고유 색상 반환
+     * 담당자별 고유 색상 반환 (메모이제이션 적용)
      * @param {string} assigneeName - 담당자 이름
      * @returns {string} - 색상 코드 (#xxxxxx)
      */
-    function getAssigneeColor(assigneeName) {
+    const getAssigneeColor = memoize(function(assigneeName) {
       if (!assigneeName) return '#999999'; // 미정인 경우 회색
 
       // assignees 배열에서 해당 담당자의 인덱스 찾기
@@ -49,7 +122,7 @@
 
       // 색상 팔레트를 순환하여 색상 반환
       return ASSIGNEE_COLORS[index % ASSIGNEE_COLORS.length];
-    }
+    });
 
     // ========================================
     // ⭐ Toast 알림 시스템
