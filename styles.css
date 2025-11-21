@@ -2221,6 +2221,7 @@
       padding: 20px;
       max-height: 70vh;
       overflow-y: auto;
+      overflow-x: hidden;
     }
 
     /* 2열 그리드 레이아웃 */
@@ -2242,20 +2243,30 @@
       }
 
       .stats-summary {
-        flex-wrap: wrap;
-        gap: 12px;
-        padding: 12px;
+        gap: 8px;
+        padding: 12px 8px;
       }
 
       .stats-card {
-        flex: 1 1 45%;
+        flex: 1 1 calc(50% - 8px);
         min-width: 0;
-        gap: 4px;
-        font-size: var(--font-sm);
+        max-width: calc(50% - 4px);
+        gap: 6px;
+        padding: 10px 4px;
+      }
+
+      .stats-card i,
+      .stats-card svg {
+        width: 20px !important;
+        height: 20px !important;
+      }
+
+      .stats-card-label {
+        font-size: var(--font-xs);
       }
 
       .stats-card-value {
-        font-size: var(--font-base);
+        font-size: var(--font-xl);
       }
 
       .stats-period-btn {
@@ -2322,35 +2333,44 @@
       border-color: #2196f3;
     }
 
-    /* 요약 통계 - 한 줄 표시 */
+    /* 요약 통계 - 카드 세로 배치 */
     .stats-summary {
       display: flex;
       justify-content: space-around;
-      align-items: center;
-      gap: 20px;
-      padding: 16px 20px;
+      align-items: stretch;
+      gap: 12px;
+      padding: 16px 12px;
       background: white;
       border: 1px solid #e0e0e0;
       border-radius: 10px;
       margin-bottom: 20px;
+      flex-wrap: wrap;
+      overflow-x: hidden;
     }
 
     .stats-card {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 6px;
-      font-size: var(--font-base);
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 8px;
+      flex: 1 1 22%;
+      min-width: 0;
+      text-align: center;
     }
 
     .stats-card-label {
       color: #666;
       font-weight: 500;
+      font-size: var(--font-sm);
+      white-space: nowrap;
     }
 
     .stats-card-value {
       font-weight: 700;
       color: #333;
-      font-size: var(--font-lg);
+      font-size: var(--font-2xl);
     }
 
     /* 통계 섹션 */
