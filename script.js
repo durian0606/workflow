@@ -1,4 +1,63 @@
     // ========================================
+    // ⭐ 상수 정의
+    // ========================================
+
+    /**
+     * 시간 관련 상수 (밀리초)
+     */
+    const TIME = {
+      SECOND: 1000,
+      MINUTE: 60 * 1000,
+      HOUR: 60 * 60 * 1000,
+      DAY: 24 * 60 * 60 * 1000,
+      WEEK: 7 * 24 * 60 * 60 * 1000
+    };
+
+    /**
+     * UI 관련 상수
+     */
+    const UI_CONSTANTS = {
+      TOAST_DURATION: 3000,           // Toast 메시지 표시 시간
+      TOAST_DURATION_LONG: 5000,      // Toast 긴 표시 시간
+      DEBOUNCE_DELAY: 300,            // Debounce 기본 대기 시간
+      THROTTLE_LIMIT: 300,            // Throttle 기본 제한 시간
+      TEAM_CODE_LENGTH: 6,            // 팀 코드 길이
+      MAX_TOAST_COUNT: 5,             // 최대 동시 Toast 개수
+      AUTO_SAVE_DELAY: 1000,          // 자동 저장 대기 시간
+      SEARCH_DEBOUNCE: 300,           // 검색 디바운스 시간
+      SCROLL_THROTTLE: 100,           // 스크롤 쓰로틀 시간
+      API_TIMEOUT: 5000,              // API 요청 타임아웃
+      CODE_CHANGE_COOLDOWN: 5 * 60 * 1000  // 팀코드 변경 쿨다운 (5분)
+    };
+
+    /**
+     * Firebase 데이터베이스 경로
+     */
+    const DB_PATHS = {
+      TEAMS: 'teams',
+      WORKLIST: 'worklist',
+      ASSIGNEES: 'assignees',
+      SITES: 'sites',
+      SETTINGS: 'settings',
+      METADATA: 'metadata'
+    };
+
+    /**
+     * 에러 메시지
+     */
+    const ERROR_MESSAGES = {
+      NETWORK_ERROR: '네트워크 연결을 확인해주세요',
+      INVALID_TEAM_CODE: '유효하지 않은 팀 코드입니다',
+      TEAM_NOT_FOUND: '팀을 찾을 수 없습니다',
+      DUPLICATE_TEAM_CODE: '이미 존재하는 팀 코드입니다',
+      SAVE_FAILED: '저장에 실패했습니다',
+      LOAD_FAILED: '불러오기에 실패했습니다',
+      PERMISSION_DENIED: '권한이 없습니다',
+      INVALID_INPUT: '입력값이 올바르지 않습니다',
+      UNKNOWN_ERROR: '알 수 없는 오류가 발생했습니다'
+    };
+
+    // ========================================
     // ⭐ 유틸리티 함수
     // ========================================
 
@@ -9,7 +68,7 @@
      * @param {number} wait - 대기 시간 (ms)
      * @returns {Function} - 디바운스된 함수
      */
-    function debounce(func, wait = 300) {
+    function debounce(func, wait = UI_CONSTANTS.DEBOUNCE_DELAY) {
       let timeout;
       return function executedFunction(...args) {
         const later = () => {
@@ -28,7 +87,7 @@
      * @param {number} limit - 제한 시간 (ms)
      * @returns {Function} - 쓰로틀된 함수
      */
-    function throttle(func, limit = 300) {
+    function throttle(func, limit = UI_CONSTANTS.THROTTLE_LIMIT) {
       let inThrottle;
       return function executedFunction(...args) {
         if (!inThrottle) {
@@ -134,7 +193,7 @@
      * @param {string} type - 'success'|'error'|'warning'|'info'
      * @param {number} duration - 표시 시간 (ms, 기본 3000)
      */
-    window.showToast = function(message, type = 'info', duration = 3000) {
+    window.showToast = function(message, type = 'info', duration = UI_CONSTANTS.TOAST_DURATION) {
       const container = document.getElementById('toastContainer');
       if (!container) {
         console.error('Toast 컨테이너를 찾을 수 없습니다');
@@ -633,8 +692,8 @@
 
         if (pendingInvitations.length > 0) {
           setTimeout(() => {
-            showToast(`📬 받은 초대 ${pendingInvitations.length}개가 있습니다. 팀관리에서 확인하세요!`, 'info', 5000);
-          }, 1000); // 로그인 후 1초 뒤에 표시
+            showToast(`📬 받은 초대 ${pendingInvitations.length}개가 있습니다. 팀관리에서 확인하세요!`, 'info', UI_CONSTANTS.TOAST_DURATION_LONG);
+          }, TIME.SECOND); // 로그인 후 1초 뒤에 표시
         }
       } catch (error) {
         console.error('초대 확인 실패:', error);
@@ -872,7 +931,7 @@
         return;
       }
 
-      if (teamCode.length !== 6) {
+      if (teamCode.length !== UI_CONSTANTS.TEAM_CODE_LENGTH) {
         showToast('팀코드는 6자리입니다.', 'warning');
         return;
       }
@@ -1312,12 +1371,11 @@
 
       const lastUpdatedTime = new Date(lastUpdated).getTime();
       const now = Date.now();
-      const fiveMinutes = 5 * 60 * 1000; // 5분
       const timeDiff = now - lastUpdatedTime;
 
-      if (timeDiff < fiveMinutes) {
+      if (timeDiff < UI_CONSTANTS.CODE_CHANGE_COOLDOWN) {
         // 5분 미만이면 비활성화
-        const remainingSeconds = Math.ceil((fiveMinutes - timeDiff) / 1000);
+        const remainingSeconds = Math.ceil((UI_CONSTANTS.CODE_CHANGE_COOLDOWN - timeDiff) / TIME.SECOND);
         const minutes = Math.floor(remainingSeconds / 60);
         const seconds = remainingSeconds % 60;
         btn.disabled = true;
@@ -1326,7 +1384,7 @@
         btn.style.cursor = 'not-allowed';
 
         // 1초마다 업데이트
-        setTimeout(updateChangeCodeButtonState, 1000);
+        setTimeout(updateChangeCodeButtonState, TIME.SECOND);
       } else {
         // 5분 이상 지났으면 활성화
         btn.disabled = false;
@@ -1347,11 +1405,10 @@
       if (lastUpdated) {
         const lastUpdatedTime = new Date(lastUpdated).getTime();
         const now = Date.now();
-        const fiveMinutes = 5 * 60 * 1000;
         const timeDiff = now - lastUpdatedTime;
 
-        if (timeDiff < fiveMinutes) {
-          const remainingSeconds = Math.ceil((fiveMinutes - timeDiff) / 1000);
+        if (timeDiff < UI_CONSTANTS.CODE_CHANGE_COOLDOWN) {
+          const remainingSeconds = Math.ceil((UI_CONSTANTS.CODE_CHANGE_COOLDOWN - timeDiff) / TIME.SECOND);
           const minutes = Math.floor(remainingSeconds / 60);
           const seconds = remainingSeconds % 60;
           showToast(`팀코드는 ${minutes}분 ${seconds}초 후에 변경할 수 있습니다.`, 'warning', 4000);
@@ -2062,7 +2119,7 @@
           if (typeof kakao !== 'undefined' && kakao.maps) {
             initMap();
           }
-        }, 1000);
+        }, TIME.SECOND);
         return;
       }
       try {
@@ -2171,8 +2228,8 @@
             },
             {
               enableHighAccuracy: false,
-              timeout: 5000,
-              maximumAge: 300000 // 5분 캐시
+              timeout: UI_CONSTANTS.API_TIMEOUT,
+              maximumAge: TIME.MINUTE * 5 // 5분 캐시
             }
           );
         } else {
@@ -2249,8 +2306,8 @@
             },
             {
               enableHighAccuracy: false,
-              timeout: 5000,
-              maximumAge: 300000
+              timeout: UI_CONSTANTS.API_TIMEOUT,
+              maximumAge: TIME.MINUTE * 5
             }
           );
         }
@@ -3045,7 +3102,7 @@
             
             clearAutoLogin();
 
-            showToast('회사 탈퇴가 완료되었습니다. 모든 데이터가 삭제되었습니다.', 'success', 5000);
+            showToast('회사 탈퇴가 완료되었습니다. 모든 데이터가 삭제되었습니다.', 'success', UI_CONSTANTS.TOAST_DURATION_LONG);
 
             currentUser = null;
             currentCompanyId = null;

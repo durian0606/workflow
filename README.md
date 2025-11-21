@@ -42,10 +42,50 @@ cp config.example.js config.js
 - **API**: Kakao Map SDK, Kakao Mobility Directions API
 - **Deployment**: Vercel
 
-## 보안 설정
+## ⚠️ 보안 설정 (필수)
 
-Firebase와 Kakao API 보안 설정이 필요합니다.
-자세한 내용은 `.claude/QUICK_SECURITY_SETUP.md` 참조
+**중요:** 프로덕션 배포 전 반드시 보안 설정을 완료하세요!
+
+### 1. Firebase Security Rules 설정 (5분)
+현재 데이터베이스가 **완전히 공개** 상태일 수 있습니다.
+
+```bash
+# 1. Firebase Console 접속
+https://console.firebase.google.com/
+
+# 2. Realtime Database > 규칙 탭 클릭
+
+# 3. .claude/firebase-rules.json 내용 복사하여 적용
+
+# 4. "게시" 버튼 클릭
+```
+
+**빠른 가이드:** `.claude/QUICK_SECURITY_SETUP.md` 참조
+
+### 2. Kakao API 도메인 제한 (2분)
+```bash
+# 1. https://developers.kakao.com/console/app 접속
+
+# 2. 앱 설정 > 플랫폼 > Web 플랫폼 등록
+
+# 3. 사이트 도메인 추가:
+#    - 개발: http://localhost:5500
+#    - 배포: https://yourdomain.com
+
+# 4. 저장
+```
+
+### 3. 환경 변수 관리
+```bash
+# config.js는 .gitignore에 등록되어 있습니다
+# 절대 Git에 커밋하지 마세요!
+
+# 팀원에게는 config.example.js 공유
+```
+
+**상세 가이드:**
+- `.claude/QUICK_SECURITY_SETUP.md` - 5분 빠른 설정
+- `.claude/SECURITY_GUIDE.md` - 상세 보안 가이드
 
 ## 라이선스
 
