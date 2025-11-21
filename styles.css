@@ -86,6 +86,12 @@
       --transition-fast: 0.2s;
       --transition-base: 0.3s;
       --transition-slow: 0.4s;
+
+      /* Breakpoints (for reference in @media) */
+      --breakpoint-mobile: 480px;
+      --breakpoint-tablet: 768px;
+      --breakpoint-desktop: 1024px;
+      --breakpoint-wide: 1280px;
     }
 
     /* Lucide Icons 스타일 */
