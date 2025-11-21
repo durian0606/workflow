@@ -1518,6 +1518,49 @@
     }
 
     /* 메뉴 시스템 */
+    .install-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-xl);
+      cursor: pointer;
+      transition: all var(--transition-base) ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      margin-right: var(--spacing-sm);
+    }
+
+    .install-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .install-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%) scale(0);
+      transition: transform var(--transition-slow);
+    }
+
+    .install-btn:hover::before {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .install-btn:active {
+      transform: scale(0.95);
+    }
+
     .menu-btn {
       background: rgba(255, 255, 255, 0.2);
       border: none;

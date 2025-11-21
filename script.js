@@ -5673,3 +5673,66 @@
       }
     };
 
+    // ========================================
+    // ⭐ PWA 설치 프롬프트
+    // ========================================
+
+    let deferredPrompt = null;
+
+    // PWA 설치 가능 이벤트 감지
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // 기본 미니 인포바 방지
+      e.preventDefault();
+
+      // 나중에 사용하기 위해 이벤트 저장
+      deferredPrompt = e;
+
+      // 설치 버튼 표시
+      const installBtn = document.getElementById('installBtn');
+      if (installBtn) {
+        installBtn.style.display = 'flex';
+        console.log('📱 PWA 설치 가능 - 버튼 표시됨');
+      }
+    });
+
+    // 설치 버튼 클릭 핸들러
+    window.showInstallPrompt = async function() {
+      if (!deferredPrompt) {
+        showToast('이미 설치되었거나 설치할 수 없습니다', 'info');
+        return;
+      }
+
+      // 설치 프롬프트 표시
+      deferredPrompt.prompt();
+
+      // 사용자 선택 결과 대기
+      const { outcome } = await deferredPrompt.userChoice;
+
+      if (outcome === 'accepted') {
+        console.log('✅ PWA 설치 수락됨');
+        showToast('홈 화면에 추가되었습니다! 🎉', 'success');
+      } else {
+        console.log('❌ PWA 설치 거부됨');
+      }
+
+      // 프롬프트는 한 번만 사용 가능
+      deferredPrompt = null;
+
+      // 버튼 숨기기
+      const installBtn = document.getElementById('installBtn');
+      if (installBtn) {
+        installBtn.style.display = 'none';
+      }
+    };
+
+    // PWA 설치 완료 이벤트
+    window.addEventListener('appinstalled', () => {
+      console.log('✅ PWA 설치 완료');
+      deferredPrompt = null;
+
+      const installBtn = document.getElementById('installBtn');
+      if (installBtn) {
+        installBtn.style.display = 'none';
+      }
+    });
+
