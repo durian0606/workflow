@@ -2278,25 +2278,35 @@
     /* 요약 카드 그리드 */
     .stats-summary {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
       margin-bottom: 0; /* 그리드 레이아웃에서 row가 margin 관리 */
+    }
+
+    /* 모바일에서는 2x2 */
+    @media (max-width: 768px) {
+      .stats-summary {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
 
     .stats-card {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 10px;
-      padding: 12px 14px;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 10px;
       background: white;
       border: 1px solid #e0e0e0;
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      text-align: center;
     }
 
     .stats-card-icon {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border-radius: 8px;
       display: flex;
       align-items: center;
@@ -2306,20 +2316,23 @@
     }
 
     .stats-card-content {
-      flex: 1;
-      min-width: 0; /* 텍스트 오버플로우 방지 */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
     }
 
     .stats-card-label {
       font-size: var(--font-xs);
       color: #666;
-      margin-bottom: 2px;
+      white-space: nowrap;
     }
 
     .stats-card-value {
-      font-size: var(--font-2xl);
+      font-size: var(--font-3xl);
       font-weight: 700;
       color: #333;
+      line-height: 1;
     }
 
     /* 통계 섹션 */
