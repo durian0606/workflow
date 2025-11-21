@@ -287,7 +287,11 @@
       const now = new Date();
       let startDate = null;
 
-      if (currentStatsPeriod === 'week') {
+      if (currentStatsPeriod === 'today') {
+        // 오늘 (00:00:00부터)
+        startDate = new Date(now);
+        startDate.setHours(0, 0, 0, 0);
+      } else if (currentStatsPeriod === 'week') {
         // 이번 주 (월요일부터)
         const dayOfWeek = now.getDay();
         const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // 일요일은 -6, 월~토는 1-dayOfWeek
