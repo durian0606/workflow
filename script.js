@@ -323,7 +323,7 @@
         stats.total++;
 
         // 완료/진행중 구분
-        if (work.isCompleted) {
+        if (work.completed) {
           stats.completed++;
         } else {
           stats.inProgress++;
@@ -342,7 +342,7 @@
           stats.byAssignee[assignee] = { total: 0, completed: 0 };
         }
         stats.byAssignee[assignee].total++;
-        if (work.isCompleted) {
+        if (work.completed) {
           stats.byAssignee[assignee].completed++;
         }
 
