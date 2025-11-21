@@ -118,6 +118,56 @@
       /* 현재는 미구현 */
     }
 
+    /* ==========================================
+       Accessibility Improvements
+       ========================================== */
+
+    /* Focus visible for keyboard navigation */
+    *:focus {
+      outline: 2px solid transparent;
+    }
+
+    *:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+      border-radius: var(--radius-sm);
+    }
+
+    /* Skip to main content link */
+    .skip-to-main {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--color-primary);
+      color: white;
+      padding: var(--spacing-sm) var(--spacing-lg);
+      z-index: 1000;
+      transition: top var(--transition-fast);
+    }
+
+    .skip-to-main:focus {
+      top: 0;
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+      :root {
+        --color-border: #000000;
+        --color-text-secondary: #000000;
+      }
+    }
+
     /* Lucide Icons 스타일 */
     [data-lucide] {
       display: inline-block;
