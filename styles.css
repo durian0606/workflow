@@ -94,6 +94,30 @@
       --breakpoint-wide: 1280px;
     }
 
+    /* ==========================================
+       Dark Mode Support (준비)
+       ========================================== */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        /* Dark mode는 현재 비활성화 */
+        /* 향후 활성화 시 아래 변수들을 오버라이드하세요 */
+
+        /* 예시:
+        --color-bg-primary: #1a1a1a;
+        --color-bg-secondary: #2d2d2d;
+        --color-text-primary: #ffffff;
+        --color-text-secondary: #b0b0b0;
+        --color-border: #404040;
+        */
+      }
+    }
+
+    /* Manual dark mode class (선택적) */
+    .dark-mode {
+      /* JS로 body에 .dark-mode 클래스 추가 시 활성화 */
+      /* 현재는 미구현 */
+    }
+
     /* Lucide Icons 스타일 */
     [data-lucide] {
       display: inline-block;
