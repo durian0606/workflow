@@ -5698,7 +5698,17 @@
     // 설치 버튼 클릭 핸들러
     window.showInstallPrompt = async function() {
       if (!deferredPrompt) {
-        showToast('이미 설치되었거나 설치할 수 없습니다', 'info');
+        // iOS Safari인지 확인
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+        if (isIOS || isSafari) {
+          showToast('Safari: 공유 버튼(⬆️) → "홈 화면에 추가" 를 눌러주세요', 'info', UI_CONSTANTS.TOAST_DURATION_LONG);
+        } else if (window.matchMedia('(display-mode: standalone)').matches) {
+          showToast('이미 홈 화면에 추가되었습니다', 'info');
+        } else {
+          showToast('Chrome/Edge 브라우저에서 설치할 수 있습니다', 'info');
+        }
         return;
       }
 
@@ -5717,12 +5727,6 @@
 
       // 프롬프트는 한 번만 사용 가능
       deferredPrompt = null;
-
-      // 버튼 숨기기
-      const installBtn = document.getElementById('installBtn');
-      if (installBtn) {
-        installBtn.style.display = 'none';
-      }
     };
 
     // PWA 설치 완료 이벤트
