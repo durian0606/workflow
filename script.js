@@ -246,7 +246,7 @@
     // ⭐ 통계 대시보드
     // ========================================
 
-    let currentStatsPeriod = 'week'; // 'week', 'month', 'all'
+    let currentStatsPeriod = 'today'; // 'today', 'week', 'month', 'all'
 
     window.toggleStatsModal = function() {
       console.log('📊 통계 대시보드 모달 토글');
