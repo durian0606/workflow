@@ -248,6 +248,24 @@
 
     let currentStatsPeriod = 'today'; // 'today', 'week', 'month', 'all'
 
+    // 🚀 성능 최적화: 통계 캐시
+    let statsCache = {};
+    let lastWorksHash = null;
+
+    // works 데이터의 해시 생성 (변경 감지용)
+    function getWorksHash() {
+      const workIds = Object.keys(works).sort().join(',');
+      const workStates = Object.values(works).map(w => `${w.completed}${w.date}${w.deadline}`).join(',');
+      return `${workIds}-${workStates}`;
+    }
+
+    // 캐시 무효화 (works 데이터 변경 시 호출)
+    window.invalidateStatsCache = function() {
+      statsCache = {};
+      lastWorksHash = null;
+      console.log('🔄 통계 캐시 무효화');
+    };
+
     window.toggleStatsModal = function() {
       console.log('📊 통계 대시보드 모달 토글');
       const modal = document.getElementById('statsModal');
@@ -282,6 +300,18 @@
 
     function calculateAndRenderStats() {
       console.log('📊 통계 계산 시작 - 기간:', currentStatsPeriod);
+
+      // 🚀 성능 최적화: 캐시 확인
+      const currentHash = getWorksHash();
+      const cacheKey = `${currentStatsPeriod}-${currentHash}`;
+
+      if (statsCache[cacheKey]) {
+        console.log('⚡ 캐시 히트! 저장된 통계 사용');
+        renderStats(statsCache[cacheKey]);
+        return;
+      }
+
+      console.log('🔄 캐시 미스 - 통계 새로 계산');
 
       // 기간 필터링을 위한 날짜 계산
       const now = new Date();
@@ -360,6 +390,10 @@
 
       console.log('📊 통계 계산 완료:', stats);
 
+      // 🚀 성능 최적화: 캐시에 저장
+      statsCache[cacheKey] = stats;
+      console.log('💾 통계 캐시 저장:', cacheKey);
+
       // 통계 렌더링
       renderStats(stats);
     }
@@ -399,7 +433,7 @@
       document.getElementById('statsInProgressBar').style.width = `${inProgressPercent}%`;
       document.getElementById('statsOverdueBar').style.width = `${overduePercent}%`;
 
-      // 3. 담당자별 통계 렌더링
+      // 3. 담당자별 통계 렌더링 (🚀 DocumentFragment 사용)
       const assigneeListEl = document.getElementById('statsAssigneeList');
       assigneeListEl.innerHTML = '';
 
@@ -409,6 +443,7 @@
       if (assigneeStats.length === 0) {
         assigneeListEl.innerHTML = '<div style="color: #999; text-align: center; padding: 20px;">데이터가 없습니다</div>';
       } else {
+        const fragment = document.createDocumentFragment();
         assigneeStats.forEach(([assignee, data]) => {
           const item = document.createElement('div');
           item.className = 'stats-assignee-item';
@@ -433,11 +468,12 @@
             </div>
           `;
 
-          assigneeListEl.appendChild(item);
+          fragment.appendChild(item);
         });
+        assigneeListEl.appendChild(fragment);
       }
 
-      // 4. 현장별 통계 렌더링
+      // 4. 현장별 통계 렌더링 (🚀 DocumentFragment 사용)
       const siteListEl = document.getElementById('statsSiteList');
       siteListEl.innerHTML = '';
 
@@ -447,6 +483,7 @@
       if (siteStats.length === 0) {
         siteListEl.innerHTML = '<div style="color: #999; text-align: center; padding: 20px;">데이터가 없습니다</div>';
       } else {
+        const fragment = document.createDocumentFragment();
         siteStats.forEach(([site, count]) => {
           const item = document.createElement('div');
           item.className = 'stats-site-item';
@@ -456,8 +493,9 @@
             <div class="stats-site-count">${count}</div>
           `;
 
-          siteListEl.appendChild(item);
+          fragment.appendChild(item);
         });
+        siteListEl.appendChild(fragment);
       }
 
       // Lucide 아이콘 초기화
@@ -3273,6 +3311,12 @@
           testDate: testDateStr
         });
       }
+
+      // 🚀 통계 캐시 무효화
+      if (window.invalidateStatsCache) {
+        window.invalidateStatsCache();
+      }
+
       document.getElementById('siteInput').value = '';
       document.getElementById('workInput').value = '';
     };
@@ -3299,6 +3343,12 @@
       window.dbOnValue(worksRef, (snapshot) => {
         works = snapshot.val() || {};
         console.log('✅ 작업 데이터 로드 완료:', Object.keys(works).length, '개');
+
+        // 🚀 통계 캐시 무효화 (데이터 변경 감지)
+        if (window.invalidateStatsCache) {
+          window.invalidateStatsCache();
+        }
+
         renderWorks();
       });
     }
@@ -4263,8 +4313,13 @@
       }
 
       window.dbUpdate(workRef, updateData);
+
+      // 🚀 통계 캐시 무효화
+      if (window.invalidateStatsCache) {
+        window.invalidateStatsCache();
+      }
     }
-    
+
     function saveAssignee(workId, assignee) {
       console.log('👤 담당자 변경:', workId, '→', assignee);
 
@@ -4281,6 +4336,11 @@
         assignee: assignee
       }).then(() => {
         console.log('✅ 담당자 변경 완료 - Firebase 리스너가 자동으로 업데이트합니다');
+
+        // 🚀 통계 캐시 무효화
+        if (window.invalidateStatsCache) {
+          window.invalidateStatsCache();
+        }
       });
 
       // Firebase 리스너(loadWorks의 dbOnValue)가 자동으로 renderWorks()를 호출함
@@ -4311,7 +4371,12 @@
         if (!confirm('이 작업을 삭제하시겠습니까?')) return;
       }
       const workRef = window.dbRef(window.db, `${worksPath}/${workId}`);
-      window.dbRemove(workRef);
+      window.dbRemove(workRef).then(() => {
+        // 🚀 통계 캐시 무효화
+        if (window.invalidateStatsCache) {
+          window.invalidateStatsCache();
+        }
+      });
     }
     
     window.toggleSiteModal = function() {
