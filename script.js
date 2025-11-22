@@ -975,6 +975,15 @@
           teamSelectionModal.classList.remove('active');
         }
 
+        // 데이터 재로드 및 통계 캐시 무효화
+        loadWorks();
+        loadSites();
+        loadAssignees();
+        loadAllCompaniesWorks();
+        if (window.invalidateStatsCache) {
+          window.invalidateStatsCache();
+        }
+
         // 팀 설정 모달 자동으로 열기
         setTimeout(() => {
           toggleTeamSettingsModal();
@@ -1067,6 +1076,15 @@
         document.getElementById('joinTeamCodeInput').value = '';
 
         toggleJoinTeamModal();
+
+        // 데이터 재로드 및 통계 캐시 무효화
+        loadWorks();
+        loadSites();
+        loadAssignees();
+        loadAllCompaniesWorks();
+        if (window.invalidateStatsCache) {
+          window.invalidateStatsCache();
+        }
 
         console.log('팀 참여 완료:', foundTeamId);
 
@@ -1345,6 +1363,11 @@
         loadSites();
         loadAssignees();
         loadAllCompaniesWorks();
+
+        // 통계 캐시 무효화
+        if (window.invalidateStatsCache) {
+          window.invalidateStatsCache();
+        }
 
         console.log('✅ 팀 데이터 재로드 완료');
       } catch (error) {
