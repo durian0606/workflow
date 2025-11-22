@@ -347,6 +347,14 @@
         bySite: {}
       };
 
+      // 🚀 팀원이 있으면 모든 팀원을 초기화 (작업이 없어도 표시되도록)
+      if (currentTeamId && assignees && assignees.length > 0) {
+        assignees.forEach(assignee => {
+          stats.byAssignee[assignee.name] = { total: 0, completed: 0 };
+        });
+        console.log('👥 팀원 초기화:', assignees.length, '명');
+      }
+
       // 모든 작업 순회
       Object.values(works).forEach(work => {
         // 기간 필터링
