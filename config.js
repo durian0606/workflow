@@ -30,7 +30,7 @@ const CONFIG = {
 
   // Google Gemini API
   gemini: {
-    apiKey: 'YOUR_GEMINI_API_KEY_HERE',
+    apiKey: 'AIzaSyChULZH-Zhf6Cc_JNyDn-ET8-O9tm0xodk',
     // API 키 발급 방법:
     // 1. Google AI Studio 접속 (https://aistudio.google.com/apikey)
     // 2. "Get API Key" 클릭
