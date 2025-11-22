@@ -2963,8 +2963,229 @@
         showToast('사용자 목록을 불러오는데 실패했습니다.', 'error');
       });
     }
-    
-    
+
+    // ========================================
+    // 🤖 AI 담당자 추천 기능
+    // ========================================
+
+    /**
+     * 과거 작업 히스토리 분석 - 현장 경험과 작업 유형 전문성 계산
+     * @param {string} site - 현장명
+     * @param {string} workType - 작업 유형
+     * @returns {Object} 담당자별 통계 정보
+     */
+    function analyzeWorkHistory(site, workType) {
+      console.log('📊 작업 히스토리 분석 시작:', { site, workType });
+
+      const assigneeStats = {};
+
+      // 모든 담당자 초기화
+      assignees.forEach(assignee => {
+        assigneeStats[assignee.name] = {
+          siteExperience: 0,        // 해당 현장에서의 작업 횟수
+          workTypeExperience: 0,    // 해당 작업 유형 수행 횟수
+          totalCompleted: 0,        // 전체 완료한 작업 수
+          totalPending: 0,          // 현재 진행 중인 작업 수
+          successRate: 0            // 완료율
+        };
+      });
+
+      // 작업 히스토리 분석
+      Object.values(works).forEach(work => {
+        if (!work.assignee || !assigneeStats[work.assignee]) return;
+
+        const stats = assigneeStats[work.assignee];
+
+        // 현장 경험 카운트
+        if (work.site === site) {
+          stats.siteExperience++;
+        }
+
+        // 작업 유형 경험 카운트
+        if (work.work === workType || work.displayWork === workType) {
+          stats.workTypeExperience++;
+        }
+
+        // 완료/진행중 카운트
+        if (work.completed) {
+          stats.totalCompleted++;
+        } else {
+          stats.totalPending++;
+        }
+      });
+
+      // 성공률 계산
+      Object.keys(assigneeStats).forEach(name => {
+        const stats = assigneeStats[name];
+        const total = stats.totalCompleted + stats.totalPending;
+        stats.successRate = total > 0 ? (stats.totalCompleted / total * 100).toFixed(1) : 0;
+      });
+
+      console.log('✅ 히스토리 분석 완료:', assigneeStats);
+      return assigneeStats;
+    }
+
+    /**
+     * Google Gemini API 호출
+     * @param {string} prompt - AI에게 보낼 프롬프트
+     * @returns {Promise<string>} AI 응답
+     */
+    async function callGeminiAPI(prompt) {
+      const apiKey = window.CONFIG?.gemini?.apiKey;
+      const model = window.CONFIG?.gemini?.model || 'gemini-1.5-flash';
+
+      if (!apiKey || apiKey === 'YOUR_GEMINI_API_KEY_HERE') {
+        console.warn('⚠️ Gemini API 키가 설정되지 않았습니다.');
+        throw new Error('API_KEY_NOT_SET');
+      }
+
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: prompt
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.3,  // 낮은 temperature로 일관된 답변 유도
+              maxOutputTokens: 200
+            }
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          console.error('❌ Gemini API 에러:', error);
+          throw new Error('API_REQUEST_FAILED');
+        }
+
+        const data = await response.json();
+        const aiResponse = data.candidates[0].content.parts[0].text;
+        console.log('✅ Gemini API 응답:', aiResponse);
+
+        return aiResponse;
+      } catch (error) {
+        console.error('❌ Gemini API 호출 실패:', error);
+        throw error;
+      }
+    }
+
+    /**
+     * AI를 사용해 담당자 추천
+     * @param {string} site - 현장명
+     * @param {string} workType - 작업 유형
+     * @returns {Promise<Object>} { recommendedAssignee: string, confidence: string, reason: string }
+     */
+    window.recommendAssigneeWithAI = async function(site, workType) {
+      console.log('🤖 AI 담당자 추천 시작:', { site, workType });
+
+      // AI 기능이 비활성화된 경우
+      if (!window.CONFIG?.app?.features?.aiAssigneeRecommendation) {
+        console.log('⚠️ AI 추천 기능이 비활성화되어 있습니다.');
+        return null;
+      }
+
+      // 담당자가 없는 경우
+      if (!assignees || assignees.length === 0) {
+        console.log('⚠️ 할당 가능한 담당자가 없습니다.');
+        return null;
+      }
+
+      // 담당자가 1명뿐인 경우 - AI 호출 없이 바로 반환
+      if (assignees.length === 1) {
+        console.log('✅ 담당자가 1명뿐입니다:', assignees[0].name);
+        return {
+          recommendedAssignee: assignees[0].name,
+          confidence: '100%',
+          reason: '유일한 담당자입니다.'
+        };
+      }
+
+      try {
+        // 1. 작업 히스토리 분석
+        const stats = analyzeWorkHistory(site, workType);
+
+        // 2. AI 프롬프트 생성
+        const assigneeList = assignees.map(a => a.name).join(', ');
+        const statsText = Object.entries(stats)
+          .map(([name, data]) =>
+            `- ${name}: 현장경험 ${data.siteExperience}회, 작업유형경험 ${data.workTypeExperience}회, 현재작업 ${data.totalPending}개, 완료율 ${data.successRate}%`
+          )
+          .join('\n');
+
+        const prompt = `당신은 건설 현장 작업 담당자 배정 전문가입니다.
+
+현장명: ${site}
+작업 유형: ${workType}
+
+담당자 목록: ${assigneeList}
+
+담당자별 작업 통계:
+${statsText}
+
+위 정보를 바탕으로 다음 기준으로 가장 적합한 담당자 1명을 추천해주세요:
+1. 해당 현장에서의 작업 경험 (현장 친숙도)
+2. 해당 작업 유형의 수행 경험 (작업 전문성)
+3. 현재 진행 중인 작업 부하 (업무 균형)
+4. 작업 완료율 (신뢰도)
+
+반드시 다음 형식으로만 답변하세요:
+추천: [담당자이름]
+신뢰도: [0-100]%
+이유: [1-2문장으로 간단히]`;
+
+        // 3. Gemini API 호출
+        const aiResponse = await callGeminiAPI(prompt);
+
+        // 4. AI 응답 파싱
+        const recommendMatch = aiResponse.match(/추천:\s*(.+)/);
+        const confidenceMatch = aiResponse.match(/신뢰도:\s*(\d+)%/);
+        const reasonMatch = aiResponse.match(/이유:\s*(.+)/);
+
+        if (!recommendMatch) {
+          console.warn('⚠️ AI 응답 파싱 실패');
+          return null;
+        }
+
+        const recommendedName = recommendMatch[1].trim();
+        const confidence = confidenceMatch ? `${confidenceMatch[1]}%` : '알 수 없음';
+        const reason = reasonMatch ? reasonMatch[1].trim() : 'AI 분석 결과';
+
+        // 추천된 담당자가 실제 목록에 있는지 확인
+        const isValidAssignee = assignees.some(a => a.name === recommendedName);
+        if (!isValidAssignee) {
+          console.warn('⚠️ AI가 추천한 담당자가 목록에 없습니다:', recommendedName);
+          return null;
+        }
+
+        console.log('✅ AI 추천 완료:', { recommendedName, confidence, reason });
+
+        return {
+          recommendedAssignee: recommendedName,
+          confidence: confidence,
+          reason: reason
+        };
+
+      } catch (error) {
+        if (error.message === 'API_KEY_NOT_SET') {
+          console.log('⚠️ Gemini API 키를 설정해주세요. (config.js)');
+          showToast('AI 추천 기능을 사용하려면 API 키를 설정해주세요.', 'warning');
+        } else {
+          console.error('❌ AI 추천 실패:', error);
+          showToast('AI 추천에 실패했습니다. 직접 선택해주세요.', 'error');
+        }
+        return null;
+      }
+    };
+
+
     window.addNewUser = function() {
       const input = document.getElementById('newUserInput');
       const name = input.value.trim();
@@ -3256,7 +3477,7 @@
       document.getElementById('dateDisplay').textContent = currentDate.toLocaleDateString('ko-KR', options);
     }
     
-    window.addWork = function() {
+    window.addWork = async function() {
       const site = document.getElementById('siteInput').value.trim();
       const work = document.getElementById('workInput').value.trim();
       if (!site || !work) {
@@ -3276,7 +3497,9 @@
       const todayStr = currentDate.toISOString().split('T')[0];
       const newWorkRef = window.dbPush(worksRef);
       const parentWorkId = newWorkRef.key;
-      window.dbSet(newWorkRef, {
+
+      // 기본 작업 데이터
+      const workData = {
         date: todayStr,
         site: site,
         work: work,
@@ -3286,11 +3509,39 @@
         createdAt: new Date().toISOString(),
         deadline: work === '시험' ? null : todayStr,
         order: Date.now()
-      });
+      };
+
+      // 작업 저장
+      window.dbSet(newWorkRef, workData);
+
+      // 🤖 백그라운드에서 AI 담당자 추천 (비동기, non-blocking)
+      if (window.CONFIG?.app?.features?.aiAssigneeRecommendation && assignees.length > 1) {
+        // 작업 추가는 즉시 완료되고, AI 추천은 백그라운드에서 실행
+        window.recommendAssigneeWithAI(site, work).then(recommendation => {
+          if (recommendation) {
+            console.log('🤖 AI 추천 결과:', recommendation);
+            // 추천 정보를 작업에 추가 (UI에서 강조 표시용)
+            const workUpdateRef = window.dbRef(window.db, `${worksPath}/${parentWorkId}`);
+            window.dbUpdate(workUpdateRef, {
+              aiRecommendation: {
+                assignee: recommendation.recommendedAssignee,
+                confidence: recommendation.confidence,
+                reason: recommendation.reason,
+                timestamp: new Date().toISOString()
+              }
+            });
+          }
+        }).catch(error => {
+          console.log('⚠️ AI 추천 스킵:', error.message);
+        });
+      }
       if (work === '시험') {
         const testDateStr = todayStr;
+
+        // 캡핑 작업
         const cappingDate = addBusinessDays(testDateStr, 1);
         const cappingRef = window.dbPush(worksRef);
+        const cappingWorkId = cappingRef.key;
         window.dbSet(cappingRef, {
           date: cappingDate,
           site: site,
@@ -3302,8 +3553,11 @@
           parentWorkId: parentWorkId,
           testDate: testDateStr
         });
+
+        // 탈형 작업
         const demoldingDate = addBusinessDays(testDateStr, 2);
         const demoldingRef = window.dbPush(worksRef);
+        const demoldingWorkId = demoldingRef.key;
         window.dbSet(demoldingRef, {
           date: demoldingDate,
           site: site,
@@ -3315,8 +3569,11 @@
           parentWorkId: parentWorkId,
           testDate: testDateStr
         });
+
+        // 7일 강도 시험
         const day7Date = addCalendarDays(testDateStr, 7);
         const day7Ref = window.dbPush(worksRef);
+        const day7WorkId = day7Ref.key;
         window.dbSet(day7Ref, {
           date: day7Date,
           site: site,
@@ -3328,8 +3585,11 @@
           parentWorkId: parentWorkId,
           testDate: testDateStr
         });
+
+        // 28일 강도 시험
         const day28Date = addCalendarDays(testDateStr, 28);
         const day28Ref = window.dbPush(worksRef);
+        const day28WorkId = day28Ref.key;
         window.dbSet(day28Ref, {
           date: day28Date,
           site: site,
@@ -3341,6 +3601,36 @@
           parentWorkId: parentWorkId,
           testDate: testDateStr
         });
+
+        // 🤖 시험 관련 작업들에도 AI 추천 (병렬 처리)
+        if (window.CONFIG?.app?.features?.aiAssigneeRecommendation && assignees.length > 1) {
+          const relatedWorks = [
+            { id: cappingWorkId, type: '캡핑' },
+            { id: demoldingWorkId, type: '탈형' },
+            { id: day7WorkId, type: '7일 강도 시험' },
+            { id: day28WorkId, type: '28일 강도 시험' }
+          ];
+
+          // 병렬로 AI 추천 호출
+          relatedWorks.forEach(({ id, type }) => {
+            window.recommendAssigneeWithAI(site, type).then(recommendation => {
+              if (recommendation) {
+                console.log(`🤖 ${type} AI 추천:`, recommendation);
+                const workUpdateRef = window.dbRef(window.db, `${worksPath}/${id}`);
+                window.dbUpdate(workUpdateRef, {
+                  aiRecommendation: {
+                    assignee: recommendation.recommendedAssignee,
+                    confidence: recommendation.confidence,
+                    reason: recommendation.reason,
+                    timestamp: new Date().toISOString()
+                  }
+                });
+              }
+            }).catch(error => {
+              console.log(`⚠️ ${type} AI 추천 스킵:`, error.message);
+            });
+          });
+        }
       }
 
       // 🚀 통계 캐시 무효화
@@ -4083,28 +4373,72 @@
       const labelText = document.createTextNode('담당자');
       assigneeLabel.appendChild(labelText);
 
+      // 🤖 AI 추천 정보가 있으면 라벨에 표시
+      if (work.aiRecommendation && !work.assignee) {
+        const aiIcon = document.createElement('span');
+        aiIcon.className = 'ai-recommendation-badge';
+        aiIcon.innerHTML = '🤖 AI 추천';
+        aiIcon.title = work.aiRecommendation.reason;
+        aiIcon.style.cssText = 'margin-left: 6px; font-size: 10px; color: #2196f3; font-weight: 600;';
+        assigneeLabel.appendChild(aiIcon);
+      }
+
       const assigneeSelect = document.createElement('select');
       assigneeSelect.className = 'assignee-select';
       assigneeSelect.onclick = (e) => e.stopPropagation();
       if (isCompleted) assigneeSelect.disabled = true;
+
       const assigneeDefaultOption = document.createElement('option');
       assigneeDefaultOption.value = '';
       assigneeDefaultOption.textContent = '선택';
       assigneeSelect.appendChild(assigneeDefaultOption);
+
       assignees.forEach(assignee => {
         const option = document.createElement('option');
         option.value = assignee.name;
-        option.textContent = assignee.name;
+
+        // 🤖 AI 추천 담당자에게 특별 표시
+        const isRecommended = work.aiRecommendation &&
+                             work.aiRecommendation.assignee === assignee.name &&
+                             !work.assignee; // 아직 담당자가 할당되지 않은 경우만
+
+        if (isRecommended) {
+          option.textContent = `⭐ ${assignee.name} (AI 추천 ${work.aiRecommendation.confidence})`;
+          option.style.fontWeight = '700';
+          option.style.backgroundColor = '#e3f2fd';
+          option.title = `AI 추천 이유: ${work.aiRecommendation.reason}`;
+        } else {
+          option.textContent = assignee.name;
+        }
+
         if (work.assignee === assignee.name) {
           option.selected = true;
         }
+
         assigneeSelect.appendChild(option);
       });
+
       if (!isCompleted) {
         assigneeSelect.onchange = () => saveAssignee(work.id, assigneeSelect.value);
       }
+
       assigneeWrapper.appendChild(assigneeLabel);
       assigneeWrapper.appendChild(assigneeSelect);
+
+      // 🤖 AI 추천 이유를 별도 툴팁으로 표시 (담당자 미배정 시에만)
+      if (work.aiRecommendation && !work.assignee) {
+        const aiTooltip = document.createElement('div');
+        aiTooltip.className = 'ai-recommendation-tooltip';
+        aiTooltip.innerHTML = `
+          <div style="font-size: 11px; color: #666; margin-top: 4px; padding: 6px 8px; background: #e3f2fd; border-radius: 4px; border-left: 3px solid #2196f3;">
+            <div style="font-weight: 600; color: #1976d2; margin-bottom: 2px;">💡 ${work.aiRecommendation.assignee} 추천</div>
+            <div style="color: #555;">${work.aiRecommendation.reason}</div>
+            <div style="color: #999; font-size: 10px; margin-top: 2px;">신뢰도: ${work.aiRecommendation.confidence}</div>
+          </div>
+        `;
+        assigneeWrapper.appendChild(aiTooltip);
+      }
+
       personContainer.appendChild(assigneeWrapper);
       card.appendChild(personContainer);
       
